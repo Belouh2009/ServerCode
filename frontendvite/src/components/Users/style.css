@@ -1,0 +1,234 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    /* Centrage horizontal */
+    align-items: center;
+    /* Centrage vertical */
+    height: 100vh;
+    /* La hauteur de la fenêtre */
+    margin: 0 auto;
+}
+
+.container .login-form,
+.container .registre-form {
+    position: relative;
+    max-width: 400px;
+    max-height: 600px;
+    width: 100%;
+    /* Faire en sorte que le formulaire prenne la largeur maximale disponible */
+    padding: 20px 20px;
+    border: 2px solid rgba(255, 255, 255, .5);
+    border-radius: 20px;
+    background: transparent;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container .registre-form {
+    flex-direction: column;
+    /* Empiler les éléments verticalement */
+    max-width: 500px;
+    max-height: 650px;
+}
+
+.container form .form-label {
+    font-size: 1rem;
+}
+
+.container form .button-container {
+    /* Maintenir les styles actuels */
+    display: flex;
+    position: relative;
+    margin: 0 40px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.container form .btn {
+    width: 90%;
+}
+
+h2 {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.left-section,
+.right-section {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+}
+
+/* Adaptation mobile */
+@media (max-width: 768px) {
+    .registre {
+        padding: 5vw;
+    }
+}
+
+@media (max-width: 576px) {
+    .registre {
+        width: 100vw;
+        /* Utilise toute la largeur de l'écran */
+        min-height: 90vh;
+        /* Utilise 90% de la hauteur de la fenêtre */
+    }
+}
+
+.mb-3 {
+    margin-bottom: 10px;
+}
+
+.mb-3 input,
+.mb-3 select {
+    transition: all 0.3s ease;
+    /* Ajoute une transition fluide pour les effets */
+}
+
+.mb-3 .form-control {
+    width: 100%;
+}
+
+.mb-3 input:hover,
+.mb-3 select:hover {
+    border: 1px solid #1268da;
+    box-shadow: 0 0 8px rgba(18, 104, 218, 0.5);
+    /* Effet de bordure floutée */
+}
+
+.mb-3 input::placeholder {
+    transition: transform 0.3s ease, font-size 0.3s ease;
+    /* Transition pour agrandir le placeholder */
+    text-indent: 0;
+    /* Position de départ */
+}
+
+.mb-3 select option {
+    font-size: 1rem;
+    /* Taille par défaut des options */
+    color: #333;
+    /* Couleur par défaut */
+    transition: background-color 0.3s ease;
+}
+
+.mb-3 select option:hover {
+    background-color: #f0f8ff;
+    /* Change le fond de l'option au survol */
+    color: #1268da;
+    /* Change la couleur du texte */
+}
+
+
+.form-check {
+    margin: -15px 10 15px;
+    display: flex;
+}
+
+.form-check a {
+    margin: 20px;
+}
+
+.login-register {
+    text-align: center;
+    margin: 5px 0;
+}
+
+.login-register p a {
+    text-decoration: none;
+}
+
+.login-register p a:hover {
+    text-decoration: underline;
+}
+
+.form-check {
+    font-size: .9em;
+    font-weight: 500;
+    margin: 10px 0 10px;
+    display: flex;
+}
+
+.form-check-input {
+    margin-right: 10px;
+    /* Espacement entre la case à cocher et le label */
+    vertical-align: middle;
+    /* Assure que la case à cocher est alignée verticalement */
+}
+
+.form-check-label a {
+    text-decoration: none;
+    margin: 23px;
+}
+
+.form-check a:hover {
+    text-decoration: underline;
+}
+
+#password-error {
+    color: crimson;
+    justify-content: center;
+    text-align: center;
+}
+
+.alert {
+    display: none;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    /* Espace sous l'alerte */
+    text-align: center;
+    font-size: 16px;
+    color: #444;
+    transition: opacity 0.3s ease, height 0.3s ease;
+    /* Transition douce */
+    opacity: 1;
+}
+
+.alert.error {
+    background-color: rgba(236, 77, 43, 0.2);
+    border: 2px solid #ef9400;
+}
+
+.alert.hidden {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+
+.close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 1px 4px;
+    cursor: pointer;
+    border-radius: 25%;
+    border: 1px solid #535c68;
+}
+
+.close:hover {
+    background-color: wheat;
+}
+
+.header{
+    color: #1268da;
+}

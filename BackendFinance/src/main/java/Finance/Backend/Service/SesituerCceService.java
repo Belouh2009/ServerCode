@@ -1,0 +1,20 @@
+package Finance.Backend.Service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import Finance.Backend.Model.SesituerCce;
+import Finance.Backend.Repository.SeSituerCceRepository;
+
+@Service
+public class SesituerCceService {
+
+	 @Autowired
+	    private SeSituerCceRepository sesituerCceRepository;
+
+	    public List<SesituerCce> getSesituerByAgentId(Long idAgent) {
+	        return sesituerCceRepository.findByAgentcce_IdAgent(idAgent);
+	    }
+}
