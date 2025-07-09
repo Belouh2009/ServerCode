@@ -21,7 +21,7 @@ const CodeZone = ({ darkTheme }) => {
 
   const fetchZones = () => {
     setLoading(true);
-    fetch('http://localhost:8087/zones/all')
+    fetch('http://192.168.88.53:8088/zones/all')
       .then(response => response.json())
       .then(data => {
         setZones(data);
@@ -98,7 +98,7 @@ const CodeZone = ({ darkTheme }) => {
 
 
   const sendToBackend = (data) => {
-    fetch('http://localhost:8087/zones/import', {
+    fetch('http://192.168.88.53:8088/zones/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

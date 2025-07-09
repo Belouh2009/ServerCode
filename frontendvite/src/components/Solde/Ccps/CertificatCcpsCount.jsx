@@ -6,7 +6,7 @@ export default function CertificatCountCard() {
     const [certificatCount, setCertificatCount] = useState(0);
 
     useEffect(() => {
-        fetch("http://localhost:8087/certificatsCcps/count")
+        fetch("http://192.168.88.53:8088/certificatsCcps/count")
             .then(response => response.json())
             .then(data => setCertificatCount(data))
             .catch(error => console.error("Erreur lors de la récupération des certificats :", error));

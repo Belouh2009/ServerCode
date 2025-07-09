@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final JavaMailSender mailSender;
-    private final String adminEmail = "acandimario11@gmail.com";
+    private final String adminEmail = "nambinintsuandry@gmail.com";
     private final String appLink = "http://localhost:5173/login?redirect=/utilisateurs";
 
     public EmailService(JavaMailSender mailSender) {

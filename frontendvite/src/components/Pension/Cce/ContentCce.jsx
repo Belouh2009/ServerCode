@@ -37,7 +37,7 @@ export default function ContentSection({ darkTheme }) {
     const fetchAgents = async () => {
         try {
             setLoading(true);
-            const response = await axios.get("http://localhost:8087/agentsCce/all");
+            const response = await axios.get("http://192.168.88.53:8088/agentsCce/all");
             console.log(response.data);  // Vérifie la structure des données renvoyées
             setUsers(response.data);
         } catch (error) {

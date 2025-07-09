@@ -20,7 +20,7 @@ const CodeCorps = ({ darkTheme }) => {
   // Fonction pour récupérer les rubriques depuis le backend
   const fetchRubriques = () => {
     setLoading(true);
-    fetch('http://localhost:8087/corps/all')
+    fetch('http://192.168.88.53:8088/corps/all')
       .then(response => response.json())
       .then(data => {
         setRubriques(data);
@@ -76,7 +76,7 @@ const CodeCorps = ({ darkTheme }) => {
   };
 
   const sendToBackend = (data) => {
-    fetch('http://localhost:8087/corps/import', {
+    fetch('http://192.168.88.53:8088/corps/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

@@ -26,7 +26,7 @@ const CodeCorps = ({ darkTheme }) => {
 
   const fetchRubriques = () => {
     setLoading(true);
-    axios.get('http://localhost:8087/CorpsGradeIndice/all')
+    axios.get('http://192.168.88.53:8088/CorpsGradeIndice/all')
       .then(response => {
         setRubriques(response.data);
         setFilteredData(response.data);
@@ -77,7 +77,7 @@ const CodeCorps = ({ darkTheme }) => {
       setProgress(60);
       setStatus('Envoi des données au serveur...');
 
-      await axios.post('http://localhost:8087/CorpsGradeIndice/import', processedData, {
+      await axios.post('http://192.168.88.53:8088/CorpsGradeIndice/import', processedData, {
         headers: { 'Content-Type': 'application/json' },
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(

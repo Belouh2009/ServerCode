@@ -22,7 +22,7 @@ const ModalModifCorps = ({ open, onClose, corps, onSuccess }) => {
 
         try {
             const response = await axios.put(
-                `http://localhost:8087/corps/modifier/${id_corps}`,
+                `http://192.168.88.53:8088/corps/modifier/${id_corps}`,
                 updatedCorpsData,
                 { headers: { "Content-Type": "application/json" } }
             );

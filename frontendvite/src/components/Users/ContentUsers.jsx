@@ -20,7 +20,7 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
 
     const updateNonValideCount = async () => {
         try {
-            const response = await axios.get("http://localhost:8087/utilisateur/non-valide/count");
+            const response = await axios.get("http://192.168.88.53:8088/utilisateur/non-valide/count");
             setNonValideCount(response.data);
         } catch (error) {
             console.error("Erreur lors de la récupération du nombre d'utilisateurs non validés :", error);
@@ -31,7 +31,7 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:8087/utilisateur?status=${status}`);
+            const response = await axios.get(`http://192.168.88.53:8088/utilisateur?status=${status}`);
             setUsers(response.data);
         } catch (error) {
             console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -53,7 +53,7 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await axios.post(`http://localhost:8087/utilisateur/valide/${matricule}`);
+                    const response = await axios.post(`http://192.168.88.53:8088/utilisateur/valide/${matricule}`);
                     if (response.status === 200) {
                         Swal.fire("Succès", "Utilisateur validé avec succès !", "success");
                         setStatus("valid");
@@ -78,7 +78,7 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await axios.delete(`http://localhost:8087/utilisateur/delete/${matricule}`);
+                    const response = await axios.delete(`http://192.168.88.53:8088/utilisateur/delete/${matricule}`);
                     if (response.status === 200) {
                         Swal.fire("Succès", "Utilisateur supprimé avec succès !", "success");
                         fetchUsers();
@@ -104,7 +104,8 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
         user.nom.toLowerCase().includes(searchQuery) ||
         user.prenom.toLowerCase().includes(searchQuery) ||
         user.username.toLowerCase().includes(searchQuery) ||
-        user.division.toLowerCase().includes(searchQuery) 
+        user.division.toLowerCase().includes(searchQuery) ||
+        user.email.toLowerCase().includes(searchQuery)
     );
     const columns = [
         {
@@ -132,6 +133,11 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
             title: "Nom d'utilisateur",
             dataIndex: "username",
             sorter: (a, b) => a.username.localeCompare(b.username),
+        },
+        {
+            title: "Email",
+            dataIndex: "email",
+            sorter: (a, b) => a.email.localeCompare(b.email),
         },
         {
             title: "Actions",
@@ -166,6 +172,7 @@ export default function ContentUsers({ darkTheme, status, setStatus }) {
         prenom: user.prenom,
         username: user.username,
         division: user.division,
+        email: user.email,
         actions: user.actions,
     }));
 

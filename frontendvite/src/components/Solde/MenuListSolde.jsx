@@ -22,7 +22,7 @@ const MenuList = ({ darkTheme, setSelectedPage }) => {
     },
     {
       key: "code",
-      label: "Codes",
+      label: "Référentiels",
       icon: <CodepenOutlined />,
       children: [
         { key: "corps", label: "Corps" },

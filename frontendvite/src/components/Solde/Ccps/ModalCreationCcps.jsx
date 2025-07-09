@@ -12,10 +12,11 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
     const [localites, setLocalites] = useState([]);
     const [articles, setArticles] = useState([]);
     const [rubriques, setRubriques] = useState([]);
+    const [loadingCorps, setLoadingCorps] = useState([]);
 
 
     useEffect(() => {
-        axios.get("http://localhost:8087/CorpsGradeIndice/corps")
+        axios.get("http://192.168.88.53:8088/CorpsGradeIndice/corps")
             .then((response) => {
                 setCorpsList(response.data);
                 setLoadingCorps(false);
@@ -25,15 +26,15 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
                 setLoadingCorps(false);
             });
 
-        axios.get("http://localhost:8087/chapitres")
+        axios.get("http://192.168.88.53:8088/chapitres")
             .then((response) => setChapitreList(response.data))
             .catch((error) => console.error("Erreur lors du chargement des chapitres :", error));
 
-        axios.get("http://localhost:8087/articles")
+        axios.get("http://192.168.88.53:8088/articles")
             .then((response) => setArticles(response.data))
             .catch((error) => console.error("Erreur lors du chargement des chapitres :", error));
 
-        axios.get("http://localhost:8087/localites/noms")
+        axios.get("http://192.168.88.53:8088/localites/noms")
             .then((response) => {
                 setLocalites(response.data);
             })
@@ -41,7 +42,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
                 console.error("Erreur lors du chargement des localités :", error);
             });
 
-        axios.get("http://localhost:8087/rubriquesolde/ids")
+        axios.get("http://192.168.88.53:8088/rubriquesolde/ids")
             .then((response) => {
                 const data = response.data;
                 if (Array.isArray(data)) setRubriques(data);
@@ -53,7 +54,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
     // Charger la liste des grades avec indices lorsqu'un corps est sélectionné
     const handleCorpsChange = (value) => {
         setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" })); // Réinitialiser grade et indice
-        axios.get(`http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`)
+        axios.get(`http://192.168.88.53:8088/CorpsGradeIndice/grades?corps=${value}`)
             .then((response) => setGradesWithIndices(response.data))
             .catch((error) => console.error("Erreur lors du chargement des grades :", error));
     };
@@ -127,7 +128,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
 
         try {
             // Récupérer le dernier ID
-            const lastIdResponse = await fetch("http://localhost:8087/certificatsCcps/lastId");
+            const lastIdResponse = await fetch("http://192.168.88.53:8088/certificatsCcps/lastId");
             if (!lastIdResponse.ok) {
                 throw new Error("Impossible de récupérer le dernier ID");
             }
@@ -152,7 +153,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
             };
 
             // Envoi de la requête pour enregistrer l'agent
-            const response = await fetch("http://localhost:8087/agentsCcps/enregistre", {
+            const response = await fetch("http://192.168.88.53:8088/agentsCcps/enregistre", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(dataToSend),

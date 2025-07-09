@@ -51,7 +51,7 @@ export default function ContentSection({ darkTheme }) {
     const fetchAgentsRect = async () => {
         try {
             setLoading(true);
-            const response = await axios.get("http://localhost:8087/agentsCcpsRect/all");
+            const response = await axios.get("http://192.168.88.53:8088/agentsCcpsRect/all");
             setUsers(response.data);
         } catch (error) {
             console.error("Erreur lors de la récupération des utilisateurs :", error);

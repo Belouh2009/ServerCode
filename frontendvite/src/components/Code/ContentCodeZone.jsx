@@ -12,7 +12,7 @@ const CodeZone = ({ darkTheme }) => {
 
   const fetchZones = () => {
     setLoading(true);
-    fetch('http://localhost:8087/zones/all')
+    fetch('http://192.168.88.53:8088/zones/all')
       .then(response => response.json())
       .then(data => {
         setZones(data);

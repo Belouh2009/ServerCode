@@ -21,7 +21,7 @@ const CodeRubrique = ({ darkTheme }) => {
   // Fonction pour récupérer les rubriques depuis le backend
   const fetchRubriques = () => {
     setLoading(true);
-    fetch('http://localhost:8087/rubriques/liste')
+    fetch('http://192.168.88.53:8088/rubriques/liste')
       .then(response => response.json())
       .then(data => {
         setRubriques(data);
@@ -78,7 +78,7 @@ const CodeRubrique = ({ darkTheme }) => {
   };
 
   const sendToBackend = (data) => {
-    fetch('http://localhost:8087/rubriques/import', {
+    fetch('http://192.168.88.53:8088/rubriques/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

@@ -9,7 +9,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
 
     useEffect(() => {
         // Charger les rubriques disponibles
-        fetch("http://localhost:8087/rubriques/ids")
+        fetch("http://192.168.88.53:8088/rubriques/ids")
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) setRubriques(data);
@@ -68,7 +68,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
 
         try {
             // Obtenir le dernier ID du certificat depuis l'API
-            const lastIdResponse = await fetch("http://localhost:8087/certificats/lastId");
+            const lastIdResponse = await fetch("http://192.168.88.53:8088/certificats/lastId");
             const lastId = await lastIdResponse.text();
 
             let id_certificat = generateCertificatId(lastId); // Générer un nouvel ID basé sur le dernier ID
@@ -96,7 +96,7 @@ const ModalCreation = ({ open, onClose, formData, setFormData, formFields, setFo
             };
 
             // Envoyer les données à l'API
-            const response = await fetch("http://localhost:8087/agents/enregistre", {
+            const response = await fetch("http://192.168.88.53:8088/agents/enregistre", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

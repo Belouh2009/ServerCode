@@ -106,7 +106,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
     }, [open, agent]);
 
     useEffect(() => {
-        axios.get("http://localhost:8087/CorpsGradeIndice/corps")
+        axios.get("http://192.168.88.53:8088/CorpsGradeIndice/corps")
             .then((response) => {
                 setCorpsList(response.data);
                 setLoadingCorps(false);
@@ -116,15 +116,15 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                 setLoadingCorps(false);
             });
 
-        axios.get("http://localhost:8087/chapitres")
+        axios.get("http://192.168.88.53:8088/chapitres")
             .then((response) => setChapitreList(response.data))
             .catch((error) => console.error("Erreur lors du chargement des chapitres :", error));
 
-        axios.get("http://localhost:8087/articles")
+        axios.get("http://192.168.88.53:8088/articles")
             .then((response) => setArticles(response.data))
             .catch((error) => console.error("Erreur lors du chargement des chapitres :", error));
 
-        axios.get("http://localhost:8087/localites/noms")
+        axios.get("http://192.168.88.53:8088/localites/noms")
             .then((response) => {
                 setLocalites(response.data);
             })
@@ -137,7 +137,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
     // Si les rubriques ne sont pas passées en prop, on effectue un appel API pour les récupérer
     useEffect(() => {
         if (rubriques.length === 0 && localRubriques.length === 0) {  // Ajouter la condition pour vérifier si rubriques sont déjà présentes
-            fetch("http://localhost:8087/rubriquesolde/ids")
+            fetch("http://192.168.88.53:8088/rubriquesolde/ids")
                 .then((response) => response.json())
                 .then((data) => {
                     if (Array.isArray(data)) {
@@ -172,7 +172,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
         setGrade(""); // Réinitialiser la valeur de grade
         setIndice(""); // Réinitialiser l'indice
         try {
-            const response = await axios.get(`http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`);
+            const response = await axios.get(`http://192.168.88.53:8088/CorpsGradeIndice/grades?corps=${value}`);
             setGradesWithIndices(response.data);
         } catch (error) {
             console.error("Erreur lors du chargement des grades :", error);
@@ -247,7 +247,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
         try {
             // Assurez-vous que l'URL est correcte
             const response = await axios.put(
-                `http://localhost:8087/agentsCcps/modifier/${agent.key}`,  // Utilise 'key' dans l'URL
+                `http://192.168.88.53:8088/agentsCcps/modifier/${agent.key}`,  // Utilise 'key' dans l'URL
                 updatedAgentData,
                 { headers: { "Content-Type": "application/json" } }
             );

@@ -66,7 +66,7 @@ export default function AppUsers() {
   const updateNonValideCount = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8087/utilisateur/non-valide/count"
+        "http://192.168.88.53:8088/utilisateur/non-valide/count"
       );
       setNonValideCount(response.data);
     } catch (error) {

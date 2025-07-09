@@ -15,9 +15,9 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
       try {
         setLoading(true);
         const [corpsRes, chapitreRes, localitesRes] = await Promise.all([
-          axios.get("http://localhost:8087/CorpsGradeIndice/corps"),
-          axios.get("http://localhost:8087/chapitres"),
-          axios.get("http://localhost:8087/localites/noms"),
+          axios.get("http://192.168.88.53:8088/CorpsGradeIndice/corps"),
+          axios.get("http://192.168.88.53:8088/chapitres"),
+          axios.get("http://192.168.88.53:8088/localites/noms"),
         ]);
 
         setCorpsList(corpsRes.data);
@@ -38,7 +38,7 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
     setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" }));
 
     try {
-      const response = await axios.get(`http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`);
+      const response = await axios.get(`http://192.168.88.53:8088/CorpsGradeIndice/grades?corps=${value}`);
       setGradesWithIndices(response.data);
     } catch (error) {
       console.error("Erreur lors du chargement des grades :", error);
@@ -85,7 +85,7 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
         },
       };
 
-      const response = await fetch(`http://localhost:8087/agentsCas/modifier/${formData.matricule}`, {
+      const response = await fetch(`http://192.168.88.53:8088/agentsCas/modifier/${formData.matricule}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
