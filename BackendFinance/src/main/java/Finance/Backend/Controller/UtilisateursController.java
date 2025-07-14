@@ -54,6 +54,14 @@ public class UtilisateursController {
         return ResponseEntity.ok(result);
     }
     
+    @PostMapping("/blocke/{matricule}")
+    public ResponseEntity<String> blockedUser(@PathVariable String matricule) {
+        String result = userService.blockedUser(matricule);
+        if (result.equals("Utilisateur non trouvé")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
     
  // Endpoint pour supprimer un utilisateur
     @DeleteMapping("/delete/{matricule}")

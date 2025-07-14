@@ -31,7 +31,7 @@ public class AgentCapController {
     @PostMapping("/enregistre")
     public ResponseEntity<String> ajouterAgent(@RequestBody AgentCapDTO agentDTO) {
         agentService.enregistrerAgent(agentDTO);
-        return new ResponseEntity<>("Agent enregistré avec succès.", HttpStatus.CREATED);
+        return new ResponseEntity<>("Cértificat enregistré avec succès.", HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

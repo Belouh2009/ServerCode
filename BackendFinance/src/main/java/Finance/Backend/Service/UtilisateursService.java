@@ -59,7 +59,7 @@ public class UtilisateursService {
 	    }
 
 	    public String valideUser(String matricule) {
-	        Optional<Utilisateurs> userOptional = userRepository.findByMatricule(matricule);  // Recherche par matricule
+	        Optional<Utilisateurs> userOptional = userRepository.findByMatricule(matricule); 
 	        if (userOptional.isPresent()) {
 	            Utilisateurs user = userOptional.get();
 	            if (user.isValide()) {
@@ -68,6 +68,20 @@ public class UtilisateursService {
 	            user.setValide(true);
 	            userRepository.save(user);
 	            return "Compte validé avec succès";
+	        }
+	        return "Utilisateur non trouvé";
+	    }
+	    
+	    public String blockedUser(String matricule) {
+	        Optional<Utilisateurs> userOptional = userRepository.findByMatricule(matricule); 
+	        if (userOptional.isPresent()) {
+	            Utilisateurs user = userOptional.get();
+	            if (!user.isValide()) {
+	                return "L'utilisateur est déjà bloqué"; // ici on vérifie si DEJA bloqué
+	            }
+	            user.setValide(false); // on le bloque
+	            userRepository.save(user);
+	            return "Compte bloqué avec succès";
 	        }
 	        return "Utilisateur non trouvé";
 	    }
