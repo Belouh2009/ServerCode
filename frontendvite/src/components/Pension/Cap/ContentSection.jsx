@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Typography, Table, Input, Button, Spin, Card } from "antd";
+import {
+  Layout,
+  Typography,
+  Table,
+  Input,
+  Button,
+  Spin,
+  Card,
+  Select,
+} from "antd";
 import { RiFileEditFill } from "react-icons/ri";
 import { IoCreate } from "react-icons/io5";
 import Swal from "sweetalert2";
@@ -10,16 +19,17 @@ import OpenPDFButton from "./Pdf";
 
 const { Content } = Layout;
 const { Title } = Typography;
+const { Option } = Select;
 
-export default function ContentSection({ darkTheme }) {
+export default function ContentSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showModalModif, setShowModalModif] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
+  const [pageSize, setPageSize] = useState(5); // valeur par défaut
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
 
   const [formData, setFormData] = useState({
     civilite: "",
@@ -36,7 +46,7 @@ export default function ContentSection({ darkTheme }) {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://192.168.88.53:8088/agents/all");
+      const response = await axios.get("http://localhost:8087/agents/all");
       setUsers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -107,6 +117,7 @@ export default function ContentSection({ darkTheme }) {
       searchTerm === "" ||
       user.civilite.toLowerCase().includes(searchTerm) ||
       user.id_certificat.toString().includes(searchTerm) ||
+      user.date_creation.toString().includes(searchTerm) ||
       user.nom.toLowerCase().includes(searchTerm) ||
       user.prenom.toLowerCase().includes(searchTerm) ||
       user.num_pension.toLowerCase().includes(searchTerm) ||
@@ -118,7 +129,6 @@ export default function ContentSection({ darkTheme }) {
       )
   );
 
-
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys) => {
@@ -127,16 +137,14 @@ export default function ContentSection({ darkTheme }) {
     preserveSelectedRowKeys: true,
   };
 
-
   const hasSelected = selectedRowKeys.length > 0;
-
 
   const columns = [
     {
       title: "ID Certificat",
       dataIndex: "id_certificat",
       sorter: (a, b) => a.id_certificat.localeCompare(b.id_certificat),
-      defaultSortOrder: 'ascend',  // Tri croissant par défaut
+      defaultSortOrder: "ascend", // Tri croissant par défaut
     },
     {
       title: "Date de Création",
@@ -186,7 +194,7 @@ export default function ContentSection({ darkTheme }) {
 
     {
       title: "Actions",
-      fixed: 'right',
+      fixed: "right",
       width: 100,
       render: (_, record) => {
         return (
@@ -202,10 +210,26 @@ export default function ContentSection({ darkTheme }) {
     },
   ];
 
-
   return (
-    <Content style={{ marginLeft: "10px", marginTop: "10px", padding: "24px", background: darkTheme ? "#001529" : "#fff", color: darkTheme ? "#ffffff" : "#000000", borderRadius: "10px 0 0 0", minHeight: "280px" }}>
-      <Title level={2} style={{ color: darkTheme ? "#ffffff" : "#000000" }}>
+    <Content
+      style={{
+        marginLeft: "10px",
+        marginTop: "10px",
+        padding: "24px",
+        background: "#f4f6fc",
+        color: "#000",
+        borderRadius: "12px",
+        minHeight: "280px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+      }}
+    >
+      <Title
+        level={2}
+        style={{
+          color: "#1e88e5",
+          marginBottom: "20px",
+        }}
+      >
         Certificat Administratif de la Pension
       </Title>
 
@@ -216,15 +240,52 @@ export default function ContentSection({ darkTheme }) {
         </div>
       ) : (
         <Card>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-            <Input
-              type="search"
-              placeholder="Rechercher..."
-              onChange={handleSearch}
-              style={{ width: "200px" }}
-            />
-            <Button type="primary" onClick={handleShowCreateModal}>
-              <IoCreate size={20} />
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "12px",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <Select
+                defaultValue={10}
+                onChange={(value) => setPageSize(value)}
+                style={{ width: 120 }}
+              >
+                <Option value={10}>10</Option>
+                <Option value={20}>20</Option>
+                <Option value={30}>30</Option>
+                <Option value={50}>50</Option>
+              </Select>
+
+              <Input
+                type="search"
+                placeholder="🔍 Rechercher..."
+                onChange={handleSearch}
+                style={{
+                  width: "220px",
+                  borderRadius: "6px",
+                  borderColor: "#cfd8dc",
+                }}
+              />
+            </div>
+
+            <Button
+              type="primary"
+              onClick={handleShowCreateModal}
+              style={{ whiteSpace: "nowrap" }}
+            >
+              <IoCreate size={20} style={{ marginRight: 6 }} />
               Créer un nouveau certificat
             </Button>
           </div>
@@ -242,25 +303,32 @@ export default function ContentSection({ darkTheme }) {
                 rowSelection={rowSelection}
                 columns={columns}
                 rowKey="key"
-                pagination={{ pageSize: 4, position: ["bottomRight"] }}
+                pagination={{ pageSize, position: ["bottomRight"] }}
                 scroll={{ x: "max-content" }}
+                rowClassName={() => "table-row-hover"}
+                className="styled-table"
               />
 
-              <div style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "10px"
-              }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
                 <OpenPDFButton
-                  data={filteredData.filter((item) => selectedRowKeys.includes(item.key))}
+                  data={filteredData.filter((item) =>
+                    selectedRowKeys.includes(item.key)
+                  )}
                   label="Imprimer"
                 />
                 {hasSelected && (
-                  <span>{selectedRowKeys.length} certificat(s) sélectionné(s)</span>
+                  <span>
+                    {selectedRowKeys.length} certificat(s) sélectionné(s)
+                  </span>
                 )}
               </div>
-              
             </>
           )}
         </Card>

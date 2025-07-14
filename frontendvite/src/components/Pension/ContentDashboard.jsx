@@ -1,8 +1,8 @@
 import React from "react";
 import { Layout, Card, Row, Col, Typography } from "antd";
 import { motion } from "framer-motion";
-import CertificatCasCount from "./Cas/CertificatCasCount";
-import CertificatCcpsCount from "./Ccps/CertificatCcpsCount";
+import CertificatCountCard from "./Cap/CertificatCapCount";
+import CertificatCountCce from "./Cce/CertificatCceCount";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -44,7 +44,9 @@ export default function ContentDashboard() {
           >
             <Card
               title={
-                <div style={{ textAlign: "center", width: "100%" }}>Solde</div>
+                <div style={{ textAlign: "center", width: "100%" }}>
+                  Pension
+                </div>
               }
               bordered={false}
               style={{
@@ -61,11 +63,10 @@ export default function ContentDashboard() {
             >
               <Row gutter={[16, 16]} justify="center">
                 <Col xs={24} sm={12}>
-                  <CertificatCasCount />
+                  <CertificatCountCard />
                 </Col>
-
                 <Col xs={24} sm={12}>
-                  <CertificatCcpsCount />
+                  <CertificatCountCce />
                 </Col>
               </Row>
             </Card>

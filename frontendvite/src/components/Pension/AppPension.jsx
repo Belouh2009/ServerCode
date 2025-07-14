@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button, Layout, Dropdown, Menu } from "antd";
 import Logo from "../Logo";
 import MenuList from "./MenuList";
-import ToggleThemeButton from "../ToggleThemeButton";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -12,11 +11,12 @@ import { MdOutlineManageAccounts } from "react-icons/md";
 import { FaUser, FaPowerOff } from "react-icons/fa";
 import ContentSection from "./Cap/ContentSection";
 import ContentCce from "./Cce/ContentCce";
-import ContentDashboard from "../ContentDashboard";
+import ContentDashboard from "../Pension/ContentDashboard";
 import CodeRubrique from "../Code/ContentCodeRubrique";
 import CodeZone from "../Code/ContentCodeZone";
 import CodeCorps from "../Code/ContentCodeCorps";
 import CodeCorpsGradeIndice from "../Code/ContentCorpsGradeIndice";
+import "../../index.css";
 
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -40,10 +40,6 @@ export default function App() {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
-
-  const toggleTheme = () => {
-    setDarkTheme(!darkTheme);
-  };
 
   const handleMenuClick = (key) => {
     if (key === "logout") {
@@ -82,48 +78,59 @@ export default function App() {
   const renderContent = () => {
     switch (selectedPage) {
       case "cap":
-        return <ContentSection darkTheme={darkTheme} />;
+        return <ContentSection />;
       case "cce":
-        return <ContentCce darkTheme={darkTheme} />;
+        return <ContentCce />;
       case "rubrique":
-        return <CodeRubrique darkTheme={darkTheme} />;
+        return <CodeRubrique />;
       case "corps":
-        return <CodeCorps darkTheme={darkTheme} />;
+        return <CodeCorps />;
       case "zone":
-        return <CodeZone darkTheme={darkTheme} />;
+        return <CodeZone />;
       case "corps-grade-indice":
-        return <CodeCorpsGradeIndice darkTheme={darkTheme} />;
+        return <CodeCorpsGradeIndice />;
       default:
-        return <ContentDashboard darkTheme={darkTheme} />;
+        return <ContentDashboard />;
     }
   };
 
   return (
-    <Layout darkTheme={darkTheme}>
+    <Layout>
       <Sider
         collapsed={collapsed}
         collapsible
         trigger={null}
-        theme={darkTheme ? "dark" : "light"}
-        className="sidebar"
+        className="custom-sider"
+        theme="light"
+        breakpoint="lg"
+        width={"220px"}
+        onBreakpoint={(broken) => {
+          setCollapsed(broken);
+        }}
       >
         <Logo />
-        <MenuList darkTheme={darkTheme} setSelectedPage={setSelectedPage} />
-        <ToggleThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
+        <MenuList
+          selectedPage={selectedPage}
+          setSelectedPage={setSelectedPage}
+        />
       </Sider>
 
       <Layout>
         <Header
           style={{
             padding: 0,
-            background: darkTheme ? "#001529" : "#fff",
-            color: darkTheme ? "#fff" : "#000",
+            background: "linear-gradient(to right, #2196f3, #1e88e5)",
+            color: "#fff",
             display: "flex",
             alignItems: "center",
             paddingLeft: "16px",
             marginLeft: "10px",
+            marginTop: "10px",
+            marginRight: "10px",
+            height: "64px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
-          className={darkTheme ? "headers dark-theme" : "headers light-theme"}
+          className="headers"
         >
           <Button
             type="text"
@@ -147,14 +154,9 @@ export default function App() {
               )
             }
           />
-
           <h1>Edition CA.P/CCE</h1>
 
           <div className="nav-action">
-            <div className="user-menu">
-              <FaUser className="icon" /> <span>{username}</span>
-            </div>
-
             <Dropdown
               overlay={
                 <Menu onClick={({ key }) => handleMenuClick(key)}>
@@ -179,8 +181,12 @@ export default function App() {
               placement="bottomRight"
               trigger={["click"]}
             >
-              <div className="user-menu-icon" title="Options utilisateur">
-                <MoreOutlined style={{ fontSize: 20, cursor: "pointer" }} />
+              <div
+                className="user-menu"
+                style={{ cursor: "pointer", marginRight: "12px" }}
+              >
+                <FaUser className="icon" />
+                <span style={{ marginLeft: "6px" }}>{username}</span>
               </div>
             </Dropdown>
           </div>

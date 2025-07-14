@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Input, Button, Upload, Table, Spin, Card, Typography } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import {
+  Layout,
+  Input,
+  Button,
+  Upload,
+  Table,
+  Spin,
+  Card,
+  Typography,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { RiFileEditFill } from "react-icons/ri";
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import ModalRubrique from './ModalRubrique';
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import ModalRubrique from "./ModalRubrique";
 
 const { Title } = Typography;
 const { Content } = Layout;
 
-const CodeRubrique = ({ darkTheme }) => {
+const CodeRubrique = () => {
   const [fileData, setFileData] = useState([]);
   const [rubriques, setRubriques] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,16 +30,16 @@ const CodeRubrique = ({ darkTheme }) => {
   // Fonction pour récupérer les rubriques depuis le backend
   const fetchRubriques = () => {
     setLoading(true);
-    fetch('http://192.168.88.53:8088/rubriques/liste')
-      .then(response => response.json())
-      .then(data => {
+    fetch("http://localhost:8087/rubriques/liste")
+      .then((response) => response.json())
+      .then((data) => {
         setRubriques(data);
         setFilteredData(data); // Mise à jour des données filtrées
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setLoading(false);
-        console.error('Erreur lors de la récupération des rubriques:', error);
+        console.error("Erreur lors de la récupération des rubriques:", error);
       });
   };
 
@@ -61,12 +70,12 @@ const CodeRubrique = ({ darkTheme }) => {
     const reader = new FileReader();
     reader.onload = () => {
       const abuf = reader.result;
-      const wb = XLSX.read(abuf, { type: 'array' });
+      const wb = XLSX.read(abuf, { type: "array" });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws);
 
-      const formattedData = data.map(item => ({
-        idRubrique:String(item["Code"] || "").substring(0, 10) || "Aucun",
+      const formattedData = data.map((item) => ({
+        idRubrique: String(item["Code"] || "").substring(0, 10) || "Aucun",
         libelle: item["Salaire de base"] || "Aucun",
       }));
 
@@ -78,50 +87,61 @@ const CodeRubrique = ({ darkTheme }) => {
   };
 
   const sendToBackend = (data) => {
-    fetch('http://192.168.88.53:8088/rubriques/import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("http://localhost:8087/rubriques/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((data) => {
         if (data.message) {
-          Swal.fire({ title: 'Succès!', text: data.message, icon: 'success', confirmButtonText: 'OK' });
+          Swal.fire({
+            title: "Succès!",
+            text: data.message,
+            icon: "success",
+            confirmButtonText: "OK",
+          });
           fetchRubriques(); // Recharger les rubriques après l'importation
         }
       })
       .catch((error) => {
-        Swal.fire({ title: 'Erreur!', text: "Erreur lors de l'importation des données", icon: 'error', confirmButtonText: 'OK' });
-        console.error('Erreur:', error);
+        Swal.fire({
+          title: "Erreur!",
+          text: "Erreur lors de l'importation des données",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        console.error("Erreur:", error);
       });
   };
 
   const handleSearch = (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    const filtered = rubriques.filter(rubrique =>
-      rubrique.idRubrique.toLowerCase().includes(searchTerm) ||
-      rubrique.libelle.toLowerCase().includes(searchTerm)
+    const filtered = rubriques.filter(
+      (rubrique) =>
+        rubrique.idRubrique.toLowerCase().includes(searchTerm) ||
+        rubrique.libelle.toLowerCase().includes(searchTerm)
     );
     setFilteredData(filtered);
   };
 
   const columns = [
     {
-      title: 'ID Rubrique',
-      dataIndex: 'idRubrique',
-      key: 'idRubrique',
+      title: "ID Rubrique",
+      dataIndex: "idRubrique",
+      key: "idRubrique",
       sorter: (a, b) => a.idRubrique.localeCompare(b.idRubrique), // Tri alphabétique
-      defaultSortOrder: 'ascend',  // Tri croissant par défaut
+      defaultSortOrder: "ascend", // Tri croissant par défaut
     },
     {
-      title: 'Libellé',
-      dataIndex: 'libelle',
-      key: 'libelle',
+      title: "Libellé",
+      dataIndex: "libelle",
+      key: "libelle",
       sorter: (a, b) => a.libelle.localeCompare(b.libelle), // Tri alphabétique
     },
     {
       title: "Actions",
-      fixed: 'right',
+      fixed: "right",
       width: 100,
       render: (_, record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -133,15 +153,26 @@ const CodeRubrique = ({ darkTheme }) => {
     },
   ];
 
-
   return (
-    <Content style={{
-      marginLeft: "10px", marginTop: "10px", padding: "24px",
-      background: darkTheme ? "#001529" : "#fff",
-      color: darkTheme ? "#ffffff" : "#000000",
-      borderRadius: "10px 0 0 0", minHeight: "280px"
-    }}>
-      <Title level={2} style={{ color: darkTheme ? "#ffffff" : "#000000" }}>
+    <Content
+      style={{
+        marginLeft: "10px",
+        marginTop: "10px",
+        padding: "24px",
+        background: "#f4f6fc",
+        color: "#000",
+        borderRadius: "12px",
+        minHeight: "280px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+      }}
+    >
+      <Title
+        level={2}
+        style={{
+          color: "#1e88e5",
+          marginBottom: "20px",
+        }}
+      >
         Liste des Codes Rubriques
       </Title>
 
@@ -152,10 +183,35 @@ const CodeRubrique = ({ darkTheme }) => {
         </div>
       ) : (
         <Card>
-          <div style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Input type="search" placeholder="Rechercher..." onChange={handleSearch} style={{ width: "200px", marginBottom: "10px" }} />
-            <Upload beforeUpload={handleFileUpload} showUploadList={false} accept=".xls,.xlsx">
-              <Button style={{ marginBottom: "10px" }} type='primary' icon={<UploadOutlined />}>Importer un fichier Excel</Button>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "10px",
+            }}
+          >
+            <Input
+              type="search"
+              placeholder="🔍 Rechercher..."
+              onChange={handleSearch}
+              style={{
+                width: "200px",
+                borderRadius: "6px",
+                borderColor: "#cfd8dc",
+              }}
+            />
+            <Upload
+              beforeUpload={handleFileUpload}
+              showUploadList={false}
+              accept=".xls,.xlsx"
+            >
+              <Button
+                style={{ marginBottom: "10px" }}
+                type="primary"
+                icon={<UploadOutlined />}
+              >
+                Importer un fichier Excel
+              </Button>
             </Upload>
           </div>
 
@@ -165,10 +221,16 @@ const CodeRubrique = ({ darkTheme }) => {
             </div>
           ) : (
             <Table
+              bordered
+              size="middle"
               dataSource={filteredData}
               columns={columns}
               rowKey="idRubrique"
-              pagination={{ position: ["bottomRight"], showSizeChanger: false }} scroll={{ y: 230 }} />
+              pagination={{ position: ["bottomRight"], showSizeChanger: false }}
+              scroll={{ y: 410 }}
+              rowClassName={() => "table-row-hover"}
+              className="styled-table"
+            />
           )}
         </Card>
       )}
@@ -178,7 +240,7 @@ const CodeRubrique = ({ darkTheme }) => {
         onClose={() => setshowModalRubrique(false)}
         rubrique={selectedRubrique}
         onSuccess={() => {
-          fetchRubriques();  // Recharger les rubriques après modification
+          fetchRubriques(); // Recharger les rubriques après modification
           setshowModalRubrique(false);
         }}
       />

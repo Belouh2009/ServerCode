@@ -119,7 +119,7 @@ html, body, #root {
 
 /* ✅ Style pour les en-têtes */
 .headers {
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px;
 }
 
 /* ✅ Bouton pour changer de thème */
@@ -155,16 +155,6 @@ html, body, #root {
   transition: color 0.3s ease-in-out;
 }
 
-/* ✅ Mode sombre */
-.dark-theme {
-  --text-color: #fff;
-}
-
-/* ✅ Mode clair */
-.light-theme {
-  --text-color: #000;
-}
-
 /* ✅ Style pour les Modals */
 .custom-modal {
   border-radius: 10px;
@@ -193,14 +183,22 @@ html, body, #root {
   padding: 10px 30px;
 }
 
-/* ✅ Style des formulaires */
+.custom-modal .ant-modal-content {
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+
 .form-container {
   border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 10px;
   padding: 15px;
   margin-bottom: 20px;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fefefe;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   max-height: 500px;
   margin-left: 10px;
@@ -240,40 +238,6 @@ html, body, #root {
 /* ✅ Style des boutons */
 .btn {
   margin-top: 9px;
-}
-
-/* ✅ Mode sombre pour les tableaux */
-.dark-theme-table .ant-table {
-  background-color: #001529 !important;
-  color: white !important;
-}
-
-.dark-theme-table .ant-table-thead > tr > th {
-  background-color: #001529 !important;
-  color: white !important;
-}
-
-.dark-theme-table .ant-table-tbody > tr > td {
-  background-color: #001529 !important;
-  color: white !important;
-}
-
-.dark-theme-table .ant-table-tbody > tr:hover > td {
-  background-color: #003366 !important;
-}
-
-.dark-theme-table .ant-table-cell {
-  border-color: #001529 !important;
-}
-
-.dark-theme-table .ant-btn-primary {
-  background-color: #001529 !important;
-  border-color: #001529 !important;
-}
-
-.dark-theme-table .ant-btn-primary:hover {
-  background-color: #0066cc !important;
-  border-color: #0066cc !important;
 }
 
 /* ✅ Notifications */
@@ -349,5 +313,114 @@ html, body, #root {
 .custom-scroll {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* IE 10+ */
+}
+
+@media (max-height: 800px) {
+  .custom-sider {
+    height: auto;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+
+.custom-sider {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a); 
+  color: white;
+  padding-top: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+}
+
+.custom-sider .ant-menu {
+  background: transparent;
+  color: white;
+  font-weight: 500;
+}
+
+.custom-sider .ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.2); /* sélection douce */
+  border-radius: 8px;
+}
+
+.custom-sider .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+.custom-sider .ant-menu-item-icon {
+  color: white;
+}
+
+.custom-sider .ant-menu-title-content {
+  color: white;
+}
+
+/* Effet hover sur ligne */
+.table-row-hover:hover {
+  background-color: #e3f2fd !important; /* bleu très léger */
+  cursor: pointer;
+}
+
+/* Style d'en-tête du tableau */
+.styled-table .ant-table-thead > tr > th {
+  background-color: #1976d2; /* bleu foncé */
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Centrage et espacement des colonnes */
+.styled-table .ant-table-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Cacher la scroll-bar sans désactiver le scroll */
+.styled-table .ant-table-body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.styled-table .ant-table-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+
+/* Ombre pour la table */
+.ant-card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+}
+
+/* Responsive amélioration */
+@media (max-width: 768px) {
+  .ant-card {
+    padding: 8px;
+  }
+
+  .styled-table {
+    font-size: 12px;
+  }
+
+  .ant-table-pagination {
+    justify-content: center;
+  }
+
+  .select-filter {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .search-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
 }
 

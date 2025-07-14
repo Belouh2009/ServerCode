@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Input, Button, Upload, Table, Spin, Card, Typography } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import {
+  Layout,
+  Input,
+  Button,
+  Upload,
+  Table,
+  Spin,
+  Card,
+  Typography,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { RiFileEditFill } from "react-icons/ri";
-import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
-import ModalZone from './ModalZone'; 
+import * as XLSX from "xlsx";
+import Swal from "sweetalert2";
+import ModalZone from "./ModalZone";
 
 const { Title } = Typography;
 const { Content } = Layout;
 
-const CodeZone = ({ darkTheme }) => {
+const CodeZone = () => {
   const [fileData, setFileData] = useState([]);
   const [zones, setZones] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,26 +27,25 @@ const CodeZone = ({ darkTheme }) => {
   const [showModalZone, setShowModalZone] = useState(false);
   const [selectedZone, setSelectedZone] = useState(null);
 
-
   const fetchZones = () => {
     setLoading(true);
-    fetch('http://192.168.88.53:8088/zones/all')
-      .then(response => response.json())
-      .then(data => {
+    fetch("http://localhost:8087/zones/all")
+      .then((response) => response.json())
+      .then((data) => {
         setZones(data);
         setFilteredData(data);
         setLoading(false);
       })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des rubriques:', error);
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des rubriques:", error);
         setLoading(false);
       });
   };
 
   useEffect(() => {
     fetchZones();
-    setZones(prevZones =>
-      prevZones.map(zone => ({
+    setZones((prevZones) =>
+      prevZones.map((zone) => ({
         district: zone.district || "",
         zone0: zone.zone0 || "",
         zone1: zone.zone1 || "",
@@ -49,7 +57,6 @@ const CodeZone = ({ darkTheme }) => {
       }))
     );
   }, []);
-
 
   const handleShowEditModal = (zone) => {
     Swal.fire({
@@ -72,12 +79,12 @@ const CodeZone = ({ darkTheme }) => {
     const reader = new FileReader();
     reader.onload = () => {
       const abuf = reader.result;
-      const wb = XLSX.read(abuf, { type: 'array' });
+      const wb = XLSX.read(abuf, { type: "array" });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws);
 
       // Filtrer uniquement les colonnes nécessaires (id_corps, libelle, categorie)
-      const formattedData = data.map(item => ({
+      const formattedData = data.map((item) => ({
         district: item["District"] || "Aucun",
         zone0: item["Zone 0"] || "Aucun",
         zone1: item["Zone 1"] || "Aucun",
@@ -88,35 +95,43 @@ const CodeZone = ({ darkTheme }) => {
         codeZone3: item["Code Zone 3"] || "Aucun",
       }));
 
-      setFileData(formattedData);  // Mise à jour des données affichées
-      sendToBackend(formattedData);  // Envoi des données filtrées au backend
+      setFileData(formattedData); // Mise à jour des données affichées
+      sendToBackend(formattedData); // Envoi des données filtrées au backend
     };
     reader.readAsArrayBuffer(file);
     return false; // Empêche l'action par défaut de l'Upload
   };
 
-
-
   const sendToBackend = (data) => {
-    fetch('http://192.168.88.53:8088/zones/import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("http://localhost:8087/zones/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-      .then(response => response.json())
+      .then((response) => response.json())
       .then((data) => {
-        Swal.fire({ title: 'Succès!', text: data.message, icon: 'success', confirmButtonText: 'OK' });
+        Swal.fire({
+          title: "Succès!",
+          text: data.message,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
         fetchZones();
       })
       .catch((error) => {
-        Swal.fire({ title: 'Erreur!', text: "Erreur lors de l'importation des données", icon: 'error', confirmButtonText: 'OK' });
-        console.error('Erreur:', error);
+        Swal.fire({
+          title: "Erreur!",
+          text: "Erreur lors de l'importation des données",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        console.error("Erreur:", error);
       });
   };
   const handleSearch = (e) => {
     const searchTerm = e.target.value.toLowerCase();
 
-    const filtered = zones.filter(zones => {
+    const filtered = zones.filter((zones) => {
       const district = zones.district ? zones.district.toLowerCase() : "";
       const zone0 = zones.zone0 ? zones.zone0.toLowerCase() : "";
       const zone1 = zones.zone1 ? zones.zone1.toLowerCase() : "";
@@ -125,7 +140,6 @@ const CodeZone = ({ darkTheme }) => {
       const codeZone2 = zones.codeZone2 ? zones.codeZone2.toLowerCase() : "";
       const zone3 = zones.zone3 ? zones.zone3.toLowerCase() : "";
       const codeZone3 = zones.codeZone3 ? zones.codeZone3.toLowerCase() : "";
-
 
       return (
         district.includes(searchTerm) ||
@@ -144,55 +158,55 @@ const CodeZone = ({ darkTheme }) => {
 
   const columns = [
     {
-      title: 'District',
-      dataIndex: 'district',
-      key: 'district',
+      title: "District",
+      dataIndex: "district",
+      key: "district",
       sorter: (a, b) => a.district.localeCompare(b.district),
-      defaultSortOrder: 'ascend',  // Tri croissant par défaut
+      defaultSortOrder: "ascend", // Tri croissant par défaut
     },
     {
-      title: 'Zone 0',
-      dataIndex: 'zone0',
-      key: 'zone0',
-      sorter: (a, b) => a.zone0.localeCompare(b.zone0)
+      title: "Zone 0",
+      dataIndex: "zone0",
+      key: "zone0",
+      sorter: (a, b) => a.zone0.localeCompare(b.zone0),
     },
     {
-      title: 'Zone 1',
-      dataIndex: 'zone1',
-      key: 'zone1',
-      sorter: (a, b) => a.zone1.localeCompare(b.zone1)
-    },
-
-    {
-      title: 'Zone 2',
-      dataIndex: 'zone2',
-      key: 'zone2',
-      sorter: (a, b) => a.zone2.localeCompare(b.zone2)
+      title: "Zone 1",
+      dataIndex: "zone1",
+      key: "zone1",
+      sorter: (a, b) => a.zone1.localeCompare(b.zone1),
     },
 
     {
-      title: 'Code Zone 2',
-      dataIndex: 'codeZone2',
-      key: 'codeZone2',
-      sorter: (a, b) => a.codeZone2.localeCompare(b.codeZone2)
+      title: "Zone 2",
+      dataIndex: "zone2",
+      key: "zone2",
+      sorter: (a, b) => a.zone2.localeCompare(b.zone2),
     },
 
     {
-      title: 'Zone 3',
-      dataIndex: 'zone3',
-      key: 'zone3',
-      sorter: (a, b) => a.zone3.localeCompare(b.zone3)
+      title: "Code Zone 2",
+      dataIndex: "codeZone2",
+      key: "codeZone2",
+      sorter: (a, b) => a.codeZone2.localeCompare(b.codeZone2),
     },
 
     {
-      title: 'Code Zone 3',
-      dataIndex: 'codeZone3',
-      key: 'codeZone3',
-      sorter: (a, b) => a.codeZone3.localeCompare(b.codeZone3)
+      title: "Zone 3",
+      dataIndex: "zone3",
+      key: "zone3",
+      sorter: (a, b) => a.zone3.localeCompare(b.zone3),
+    },
+
+    {
+      title: "Code Zone 3",
+      dataIndex: "codeZone3",
+      key: "codeZone3",
+      sorter: (a, b) => a.codeZone3.localeCompare(b.codeZone3),
     },
     {
       title: "Actions",
-      fixed: 'right',
+      fixed: "right",
       width: 100,
       render: (_, record) => (
         <Button type="primary" onClick={() => handleShowEditModal(record)}>
@@ -203,25 +217,59 @@ const CodeZone = ({ darkTheme }) => {
   ];
 
   return (
-    <Content style={{
-      marginLeft: "10px", marginTop: "10px", padding: "24px",
-      background: darkTheme ? "#001529" : "#fff",
-      color: darkTheme ? "#ffffff" : "#000000",
-      borderRadius: "10px 0 0 0", minHeight: "280px"
-    }}>
-      <Title level={2} style={{ color: darkTheme ? "#fff" : "#000" }}>Liste des Codes Zones</Title>
+    <Content
+      style={{
+        marginLeft: "10px",
+        marginTop: "10px",
+        padding: "24px",
+        background: "#f4f6fc",
+        color: "#000",
+        borderRadius: "12px",
+        minHeight: "280px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+      }}
+    >
+      <Title
+        level={2}
+        style={{
+          color: "#1e88e5",
+          marginBottom: "20px",
+        }}
+      >
+        Liste des Codes Zones
+      </Title>
       {loading ? (
-        <Spin size="large" style={{ display: 'block', margin: '20px auto' }} />
+        <div style={{ textAlign: "center", padding: "20px" }}>
+          <Spin size="large" />
+          <p>Chargement des données...</p>
+        </div>
       ) : (
         <Card>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "10px",
+            }}
+          >
             <Input
               type="search"
-              placeholder="Rechercher..."
+              placeholder="🔍 Rechercher..."
               onChange={handleSearch}
-              style={{ width: "200px" }} />
-            <Upload beforeUpload={handleFileUpload} showUploadList={false} accept=".xls,.xlsx">
-              <Button type='primary' icon={<UploadOutlined />}>Importer un fichier Excel</Button>
+              style={{
+                width: "200px",
+                borderRadius: "6px",
+                borderColor: "#cfd8dc",
+              }}
+            />
+            <Upload
+              beforeUpload={handleFileUpload}
+              showUploadList={false}
+              accept=".xls,.xlsx"
+            >
+              <Button type="primary" icon={<UploadOutlined />}>
+                Importer un fichier Excel
+              </Button>
             </Upload>
           </div>
 
@@ -230,16 +278,22 @@ const CodeZone = ({ darkTheme }) => {
               <p>Aucune code corps trouvée.</p>
             </div>
           ) : (
-            <Table dataSource={filteredData}
+            <Table
+              bordered
+              size="middle"
+              scroll={{ y: 410 }}
+              rowClassName={() => "table-row-hover"}
+              className="styled-table"
+              dataSource={filteredData}
               columns={columns}
-              rowKey={(record, index) => `${record.district}-${index}`}  // Générer des clés uniques
-              pagination={{ position: ["bottomRight"], showSizeChanger: false }} scroll={{ y: 230 }} />
+              rowKey={(record, index) => `${record.district}-${index}`} // Générer des clés uniques
+              pagination={{ position: ["bottomRight"], showSizeChanger: false }}
+            />
           )}
         </Card>
       )}
 
       <ModalZone
-        darkTheme={darkTheme}
         open={showModalZone}
         onClose={() => setShowModalZone(false)}
         zone={selectedZone}

@@ -6,12 +6,12 @@ import {
 
 const { SubMenu } = Menu;
 
-const MenuList = ({ darkTheme, setSelectedPage }) => {
+const MenuList = ({ setSelectedPage }) => {
   const menuItems = [
     { key: "users", icon: <UserAddOutlined />, label: "Utilisateurs" },
     {
       key: "code",
-      label: "Référentiels",
+      label: "Codes",
       icon: <CodepenOutlined />,
       children: [
         { key: "corps", label: "Corps" },
@@ -31,18 +31,18 @@ const MenuList = ({ darkTheme, setSelectedPage }) => {
 
   return (
     <Menu
-      theme={darkTheme ? "dark" : "light"}
+      theme="light" // ← forcé en clair
       mode="inline"
       className="menu-bar"
       defaultSelectedKeys={["home"]}
-      onClick={(e) => setSelectedPage(e.key)} // ✅ Sélectionner une page au clic
+      onClick={(e) => setSelectedPage(e.key)}
     >
       {menuItems.map((item) =>
-        item.children ? ( // ✅ Vérifier si l'élément a des enfants (sous-menu)
+        item.children ? (
           <SubMenu key={item.key} icon={item.icon} title={item.label}>
             {item.children.map((child) =>
-              child.children ? ( // ✅ Vérifier si l'enfant a aussi des sous-menus (comme "Rubrique")
-                <SubMenu key={child.key} icon={child.icon} title={child.label}>
+              child.children ? (
+                <SubMenu key={child.key} title={child.label}>
                   {child.children.map((subChild) => (
                     <Menu.Item key={subChild.key}>{subChild.label}</Menu.Item>
                   ))}

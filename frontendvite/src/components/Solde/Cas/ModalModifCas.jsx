@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Select, Modal, Form, Input, Button, Row, Col, message, Spin } from "antd";
+import {
+  Select,
+  Modal,
+  Form,
+  Input,
+  Button,
+  Row,
+  Col,
+  message,
+  Spin,
+} from "antd";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) => {
+const ModalModification = ({
+  open,
+  onClose,
+  formData,
+  setFormData,
+  onSuccess,
+}) => {
   const [corpsList, setCorpsList] = useState([]);
   const [gradesWithIndices, setGradesWithIndices] = useState([]);
   const [chapitreList, setChapitreList] = useState([]);
@@ -15,9 +31,9 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
       try {
         setLoading(true);
         const [corpsRes, chapitreRes, localitesRes] = await Promise.all([
-          axios.get("http://192.168.88.53:8088/CorpsGradeIndice/corps"),
-          axios.get("http://192.168.88.53:8088/chapitres"),
-          axios.get("http://192.168.88.53:8088/localites/noms"),
+          axios.get("http://localhost:8087/CorpsGradeIndice/corps"),
+          axios.get("http://localhost:8087/chapitres"),
+          axios.get("http://localhost:8087/localites/noms"),
         ]);
 
         setCorpsList(corpsRes.data);
@@ -38,7 +54,9 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
     setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" }));
 
     try {
-      const response = await axios.get(`http://192.168.88.53:8088/CorpsGradeIndice/grades?corps=${value}`);
+      const response = await axios.get(
+        `http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`
+      );
       setGradesWithIndices(response.data);
     } catch (error) {
       console.error("Erreur lors du chargement des grades :", error);
@@ -47,7 +65,9 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
   };
 
   const handleGradeChange = (selectedGrade) => {
-    const selectedGradeData = gradesWithIndices.find((item) => item.grade === selectedGrade);
+    const selectedGradeData = gradesWithIndices.find(
+      (item) => item.grade === selectedGrade
+    );
     setFormData((prev) => ({
       ...prev,
       grade: selectedGrade,
@@ -70,7 +90,15 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
   };
 
   const handleSubmit = async () => {
-    if (!formData || !formData.nom || !formData.prenom || !formData.matricule || !formData.corps || !formData.grade || !formData.indice) {
+    if (
+      !formData ||
+      !formData.nom ||
+      !formData.prenom ||
+      !formData.matricule ||
+      !formData.corps ||
+      !formData.grade ||
+      !formData.indice
+    ) {
       message.error("Veuillez remplir tous les champs obligatoires !");
       return;
     }
@@ -85,11 +113,14 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
         },
       };
 
-      const response = await fetch(`http://192.168.88.53:8088/agentsCas/modifier/${formData.matricule}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
+      const response = await fetch(
+        `http://localhost:8087/agentsCas/modifier/${formData.matricule}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedData),
+        }
+      );
 
       const responseText = await response.text();
       if (response.ok) {
@@ -122,56 +153,132 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
   if (!formData) return null;
 
   return (
-    <Modal title="Modification du Certificat" centered open={open} onCancel={onClose} width={700} footer={null}>
+    <Modal
+      title={
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: 18,
+            color: "#1268da",
+            fontWeight: 600,
+          }}
+        >
+          Modification de la Certificat Administratif du Solde
+        </div>
+      }
+      centered
+      open={open}
+      onCancel={onClose}
+      width={750}
+      className="custom-modal"
+      footer={null}
+    >
       {loading ? (
-        <Spin tip="Chargement..." style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100px" }} />
+        <Spin
+          tip="Chargement..."
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100px",
+          }}
+        />
       ) : (
         <Row gutter={16}>
-          <Col span={13} className="form-container">
+          <Col span={12} className="form-container">
             <h5>Informations de l'agent</h5>
             <Form layout="vertical">
               <Form.Item label="Matricule">
-                <Input name="matricule" value={formData.matricule || ""} disabled style={{color: "black"}} />
+                <Input
+                  name="matricule"
+                  value={formData.matricule || ""}
+                  disabled
+                  style={{ color: "black" }}
+                />
               </Form.Item>
               <Form.Item label="Nom">
-                <Input name="nom" value={formData.nom || ""} onChange={(e) => handleChangeMain(e.target.value, "nom")} />
+                <Input
+                  name="nom"
+                  value={formData.nom || ""}
+                  onChange={(e) => handleChangeMain(e.target.value, "nom")}
+                />
               </Form.Item>
               <Form.Item label="Prénom">
-                <Input name="prenom" value={formData.prenom || ""} onChange={(e) => handleChangeMain(e.target.value, "prenom")} />
+                <Input
+                  name="prenom"
+                  value={formData.prenom || ""}
+                  onChange={(e) => handleChangeMain(e.target.value, "prenom")}
+                />
               </Form.Item>
               <Row gutter={16}>
                 <Col span={8}>
                   <Form.Item label="Corps">
-                    <Select value={formData.corps || ""} onChange={handleCorpsChange} showSearch>
-                      {corpsList.map((corps) => <Select.Option key={corps} value={corps}>{corps}</Select.Option>)}
+                    <Select
+                      value={formData.corps || ""}
+                      onChange={handleCorpsChange}
+                      showSearch
+                    >
+                      {corpsList.map((corps) => (
+                        <Select.Option key={corps} value={corps}>
+                          {corps}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item label="Grade">
-                    <Select value={formData.grade || ""} onChange={handleGradeChange} showSearch>
-                      {gradesWithIndices.map((item) => <Select.Option key={item.grade} value={item.grade}>{item.grade}</Select.Option>)}
+                    <Select
+                      value={formData.grade || ""}
+                      onChange={handleGradeChange}
+                      showSearch
+                    >
+                      {gradesWithIndices.map((item) => (
+                        <Select.Option key={item.grade} value={item.grade}>
+                          {item.grade}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item label="Indice">
-                    <Input name="indice" value={formData.indice || ""} disabled style={{color: "black"}}/>
+                    <Input
+                      name="indice"
+                      value={formData.indice || ""}
+                      disabled
+                      style={{ color: "black" }}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
               <Row gutter={16}>
                 <Col span={10}>
                   <Form.Item label="Chapitre">
-                    <Select name="chapitre" value={formData.chapitre || ""} onChange={(value) => handleChangeMain(value, "chapitre")}>
-                      {chapitreList.map((chapitre) => <Select.Option key={chapitre} value={chapitre}>{chapitre}</Select.Option>)}
+                    <Select
+                      name="chapitre"
+                      value={formData.chapitre || ""}
+                      onChange={(value) => handleChangeMain(value, "chapitre")}
+                    >
+                      {chapitreList.map((chapitre) => (
+                        <Select.Option key={chapitre} value={chapitre}>
+                          {chapitre}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={14}>
                   <Form.Item label="Localité">
-                    <Select value={formData.localite || ""} onChange={handleLocaliteChange}>
-                      {localites.map((localite) => <Select.Option key={localite} value={localite}>{localite}</Select.Option>)}
+                    <Select
+                      value={formData.localite || ""}
+                      onChange={handleLocaliteChange}
+                    >
+                      {localites.map((localite) => (
+                        <Select.Option key={localite} value={localite}>
+                          {localite}
+                        </Select.Option>
+                      ))}
                     </Select>
                   </Form.Item>
                 </Col>
@@ -179,32 +286,68 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label="Date de début">
-                    <Input type="date" name="dateDebut" value={formData.dateDebut || ""} onChange={(e) => handleChangeMain(e.target.value, "dateDebut")} />
+                    <Input
+                      type="date"
+                      name="dateDebut"
+                      value={formData.dateDebut || ""}
+                      onChange={(e) =>
+                        handleChangeMain(e.target.value, "dateDebut")
+                      }
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item label="Date de fin">
-                    <Input type="date" name="dateFin" value={formData.dateFin || ""} onChange={(e) => handleChangeMain(e.target.value, "dateFin")} />
+                    <Input
+                      type="date"
+                      name="dateFin"
+                      value={formData.dateFin || ""}
+                      onChange={(e) =>
+                        handleChangeMain(e.target.value, "dateFin")
+                      }
+                    />
                   </Form.Item>
                 </Col>
               </Row>
               <Form.Item label="Date de prise">
-                <Input type="date" name="datePrise" value={formData.datePrise || ""} onChange={(e) => handleChangeMain(e.target.value, "datePrise")} />
+                <Input
+                  type="date"
+                  name="datePrise"
+                  value={formData.datePrise || ""}
+                  onChange={(e) =>
+                    handleChangeMain(e.target.value, "datePrise")
+                  }
+                />
               </Form.Item>
             </Form>
           </Col>
 
-          <Col span={10} className="form-container">
+          <Col span={11} className="form-container">
             <h5>Informations des Actes</h5>
             <Form layout="vertical">
               <Form.Item label="Référence Acte">
-                <Input name="referenceActe" value={formData.referenceActe || ""} onChange={(e) => handleChangeMain(e.target.value, "referenceActe")} />
+                <Input
+                  name="referenceActe"
+                  value={formData.referenceActe || ""}
+                  onChange={(e) =>
+                    handleChangeMain(e.target.value, "referenceActe")
+                  }
+                />
               </Form.Item>
               <Form.Item label="Date de l'acte">
-                <Input type="date" name="dateActe" value={formData.dateActe || ""} onChange={(e) => handleChangeMain(e.target.value, "dateActe")} />
+                <Input
+                  type="date"
+                  name="dateActe"
+                  value={formData.dateActe || ""}
+                  onChange={(e) => handleChangeMain(e.target.value, "dateActe")}
+                />
               </Form.Item>
               <Form.Item label="Acte">
-                <Select name="acte" value={formData.acte || ""} onChange={(value) => handleChangeMain(value, "acte")}>
+                <Select
+                  name="acte"
+                  value={formData.acte || ""}
+                  onChange={(value) => handleChangeMain(value, "acte")}
+                >
                   <Select.Option value="Contract">Contract</Select.Option>
                   <Select.Option value="Arrêté">Arrêté</Select.Option>
                   <Select.Option value="Décision">Décision</Select.Option>
@@ -218,7 +361,17 @@ const ModalModification = ({ open, onClose, formData, setFormData, onSuccess }) 
       )}
 
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Button type="primary" onClick={handleSubmit}>
+        <Button
+          type="primary"
+          onClick={handleSubmit}
+          style={{
+            backgroundColor: "#1268da",
+            borderRadius: "8px",
+            padding: "6px 24px",
+            fontWeight: "bold",
+            marginTop: 16,
+          }}
+        >
           Enregistrer les modifications
         </Button>
       </div>

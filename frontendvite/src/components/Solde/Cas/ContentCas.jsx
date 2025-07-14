@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 /* import OpenPDFButton from "./Pdf"; */
 import ModalCreationCas from "./ModalCreationCas";
 import ModalModifCas from "./ModalModifCas";
-import OpenPDFButton from "./PdfCas"
+import OpenPDFButton from "./PdfCas";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -43,7 +43,7 @@ export default function ContentSection({ darkTheme }) {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://192.168.88.53:8088/agentsCas/all");
+      const response = await axios.get("http://localhost:8087/agentsCas/all");
       setUsers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -143,7 +143,6 @@ export default function ContentSection({ darkTheme }) {
       user.modifPar.toLowerCase().includes(searchTerm)
   );
 
-
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys) => {
@@ -151,7 +150,6 @@ export default function ContentSection({ darkTheme }) {
     },
     preserveSelectedRowKeys: true,
   };
-
 
   const hasSelected = selectedRowKeys.length > 0;
 
@@ -224,13 +222,20 @@ export default function ContentSection({ darkTheme }) {
         marginLeft: "10px",
         marginTop: "10px",
         padding: "24px",
-        background: darkTheme ? "#001529" : "#fff",
-        color: darkTheme ? "#ffffff" : "#000000",
-        borderRadius: "10px 0 0 0",
+        background: "#f4f6fc",
+        color: "#000",
+        borderRadius: "12px",
         minHeight: "280px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
       }}
     >
-      <Title level={2} style={{ color: darkTheme ? "#ffffff" : "#000000" }}>
+      <Title
+        level={2}
+        style={{
+          color: "#1e88e5",
+          marginBottom: "20px",
+        }}
+      >
         Certificat Administratif de la Solde
       </Title>
 
@@ -241,12 +246,22 @@ export default function ContentSection({ darkTheme }) {
         </div>
       ) : (
         <Card>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "10px",
+            }}
+          >
             <Input
               type="search"
-              placeholder="Rechercher..."
+              placeholder="🔍 Rechercher..."
               onChange={handleSearch}
-              style={{ width: "200px" }}
+              style={{
+                width: "200px",
+                borderRadius: "6px",
+                borderColor: "#cfd8dc",
+              }}
             />
             <Button type="primary" onClick={handleShowCreateModal}>
               <IoCreate size={20} />
@@ -268,26 +283,34 @@ export default function ContentSection({ darkTheme }) {
                 columns={columns}
                 rowKey="idCertificat"
                 pagination={{
-                  pageSize: 4,
+                  pageSize: 6,
                   position: ["bottomRight"],
                 }}
                 scroll={{ x: "max-content" }}
+                 rowClassName={() => "table-row-hover"}
+                className="styled-table"
               />
 
-              <div style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "10px"
-              }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
                 <OpenPDFButton
-                  data={filteredData.filter((item) => selectedRowKeys.includes(item.idCertificat))}
+                  data={filteredData.filter((item) =>
+                    selectedRowKeys.includes(item.idCertificat)
+                  )}
                   label="Imprimer"
                   disabled={selectedRowKeys.length === 0}
                 />
 
                 {hasSelected && (
-                  <span>{selectedRowKeys.length} certificat(s) sélectionné(s)</span>
+                  <span>
+                    {selectedRowKeys.length} certificat(s) sélectionné(s)
+                  </span>
                 )}
               </div>
             </>

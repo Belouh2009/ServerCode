@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button, Layout, Dropdown, Menu } from "antd";
 import Logo from "../Logo";
 import MenuList from "./MenuListSolde";
-import ToggleThemeButton from "../ToggleThemeButton";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -84,52 +83,64 @@ export default function App() {
   const renderContent = () => {
     switch (selectedPage) {
       case "cas":
-        return <ContentSection darkTheme={darkTheme} />;
+        return <ContentSection />;
       case "normal":
-        return <ContentCcps darkTheme={darkTheme} />;
+        return <ContentCcps />;
       case "rectificatif":
-        return <ContentCcpsRect darkTheme={darkTheme} />;
+        return <ContentCcpsRect />;
       case "rubrique":
-        return <CodeRubrique darkTheme={darkTheme} />;
+        return <CodeRubrique />;
       case "corps":
-        return <CodeCorps darkTheme={darkTheme} />;
+        return <CodeCorps />;
       case "zone":
-        return <CodeZone darkTheme={darkTheme} />;
+        return <CodeZone />;
       case "corps-grade-indice":
-        return <CodeCorpsGradeIndice darkTheme={darkTheme} />;
+        return <CodeCorpsGradeIndice />;
       default:
-        return <ContentDashboardSolde darkTheme={darkTheme} />;
+        return <ContentDashboardSolde />;
     }
   };
 
   return (
-    <Layout darkTheme={darkTheme}>
+    <Layout>
       <Sider
         collapsed={collapsed}
         collapsible
         trigger={null}
-        theme={darkTheme ? "dark" : "light"}
-        className="sidebar"
+        className="custom-sider"
+        theme="light"
+        breakpoint="lg"
+        width={"220px"}
+        onBreakpoint={(broken) => {
+          setCollapsed(broken);
+        }}
       >
         <Logo />
-        <MenuList darkTheme={darkTheme} setSelectedPage={setSelectedPage} />
-        <ToggleThemeButton darkTheme={darkTheme} toggleTheme={toggleTheme} />
+        <MenuList
+          selectedPage={selectedPage}
+          setSelectedPage={setSelectedPage}
+        />
       </Sider>
 
       <Layout>
         <Header
           style={{
             padding: 0,
-            background: darkTheme ? "#001529" : "#fff",
-            color: darkTheme ? "#fff" : "#000",
+            background: "linear-gradient(to right, #2196f3, #1e88e5)",
+            color: "#fff",
             display: "flex",
             alignItems: "center",
             paddingLeft: "16px",
             marginLeft: "10px",
+            marginTop: "10px",
+            marginRight: "10px",
+            height: "64px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
-          className={darkTheme ? "headers dark-theme" : "headers light-theme"}
+          className="headers"
         >
-          <Button
+
+                    <Button
             type="text"
             className="toggle"
             onClick={() => setCollapsed(!collapsed)}
@@ -151,14 +162,10 @@ export default function App() {
               )
             }
           />
-
+          
           <h1>Edition CA.S/CCP.S</h1>
 
           <div className="nav-action">
-            <div className="user-menu">
-              <FaUser className="icon" /> <span>{username}</span>
-            </div>
-
             <Dropdown
               overlay={
                 <Menu onClick={({ key }) => handleMenuClick(key)}>
@@ -183,8 +190,12 @@ export default function App() {
               placement="bottomRight"
               trigger={["click"]}
             >
-              <div className="user-menu-icon" title="Options utilisateur">
-                <MoreOutlined style={{ fontSize: 20, cursor: "pointer" }} />
+              <div
+                className="user-menu"
+                style={{ cursor: "pointer", marginRight: "12px" }}
+              >
+                <FaUser className="icon" />
+                <span style={{ marginLeft: "6px" }}>{username}</span>
               </div>
             </Dropdown>
           </div>

@@ -7,15 +7,15 @@ import {
 
 const { SubMenu } = Menu; // ✅ Déstructuration de SubMenu
 
-const MenuList = ({ darkTheme, setSelectedPage }) => {
+const MenuList = ({setSelectedPage }) => {
   const menuItems = [
     { key: "home", icon: <HomeOutlined />, label: "Acceuil" },
     { key: "cap", icon: <FileAddOutlined />, label: "CA.P" },
     { key: "cce", icon: <FileAddOutlined />, label: "CCE" },
     {
       key: "code",
-      label: "Référentiels",
-      icon:<CodepenOutlined />,
+      label: "Codes",
+      icon: <CodepenOutlined />,
       children: [
         { key: "corps", label: "Corps" },
         { key: "zone", label: "Zone" },
@@ -27,11 +27,11 @@ const MenuList = ({ darkTheme, setSelectedPage }) => {
 
   return (
     <Menu
-      theme={darkTheme ? "dark" : "light"}
+      theme="light" // ← forcé en clair
       mode="inline"
       className="menu-bar"
       defaultSelectedKeys={["home"]}
-      onClick={(e) => setSelectedPage(e.key)} // ✅ Sélectionner une page au clic
+      onClick={(e) => setSelectedPage(e.key)}
     >
       {menuItems.map((item) =>
         item.children ? ( // ✅ Vérifier si l'élément a des enfants (sous-menu)

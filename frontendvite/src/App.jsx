@@ -12,14 +12,14 @@ function App() {
 
   return (
     <div
-      style={{
+     /*  style={{
         backgroundImage: `url(${background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         height: "100vh",
         width: "100vw",
-      }}
+      }} */
     >
       <Routes>
         <Route path="/login" element={<Login />} />

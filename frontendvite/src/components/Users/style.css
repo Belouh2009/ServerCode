@@ -232,3 +232,78 @@ h2 {
 .header{
     color: #1268da;
 }
+
+
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+  background-size: cover;
+  background-position: center;
+}
+
+.login-box {
+  display: flex;
+  width: 800px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.1); /* faible opacité */
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.registre-box{
+      display: flex;
+  width: 1000px;
+  height: 600px;
+  background: rgba(255, 255, 255, 0.1); /* faible opacité */
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.login-left {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login-right {
+  width: 50%;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  backdrop-filter: blur(10px); /* encore un peu de flou */
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.login-form {
+  width: 100%;
+  max-width: 100%;
+  color: #fff; /* Contraste sur fond flou */
+}
+
+
+.login-form h2 {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+
