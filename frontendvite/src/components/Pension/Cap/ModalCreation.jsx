@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Row, Col, Select, message } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  Row,
+  Col,
+  Select,
+  message,
+  Checkbox,
+} from "antd";
 import ReactSelect from "react-select";
 import { IoMdClose, IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 import "../../../index.css";
+
+const { Option } = Select;
+
 const ModalCreation = ({
   open,
   onClose,
@@ -14,6 +27,8 @@ const ModalCreation = ({
   onSuccess,
 }) => {
   const [rubriques, setRubriques] = useState([]);
+  const [assignationType, setAssignationType] = useState(null);
+  const [options, setOptions] = useState([]);
 
   useEffect(() => {
     // Charger les rubriques disponibles
@@ -26,6 +41,26 @@ const ModalCreation = ({
         console.error("Erreur lors du chargement des rubriques :", error)
       );
   }, []);
+
+  const fetchComptables = async () => {
+    try {
+      const response = await fetch("http://localhost:8087/comptables/liste");
+      const data = await response.json();
+      setOptions(data); // data = liste de noms
+    } catch (err) {
+      console.error("Erreur lors du chargement des comptables :", err);
+    }
+  };
+
+  const fetchBanques = async () => {
+    try {
+      const response = await fetch("http://localhost:8087/comptables/banques");
+      const data = await response.json();
+      setOptions(data); // data = liste de noms
+    } catch (err) {
+      console.error("Erreur lors du chargement des banques :", err);
+    }
+  };
 
   // Générer un nouvel ID de certificat (basé sur le dernier ID récupéré)
   const generateCertificatId = (lastId) => {
@@ -70,8 +105,10 @@ const ModalCreation = ({
     updatedFields.splice(index, 1);
     setFormFields(updatedFields);
   };
-
   const handleSubmit = async () => {
+    // Déterminer l'assignation (depuis assignationType ou formData)
+    const assignationValue = assignationType || formData.assignation;
+
     // Validation des champs obligatoires
     if (
       !formData.nom ||
@@ -79,7 +116,8 @@ const ModalCreation = ({
       !formData.num_pension ||
       !formData.civilite ||
       !formData.caisse ||
-      !formData.assignation
+      !assignationValue ||
+      !formData.additional_info
     ) {
       message.error("Veuillez remplir tous les champs obligatoires !");
       return;
@@ -104,7 +142,7 @@ const ModalCreation = ({
       );
       const lastId = await lastIdResponse.text();
 
-      let id_certificat = generateCertificatId(lastId); // Générer un nouvel ID basé sur le dernier ID
+      const id_certificat = generateCertificatId(lastId);
       const username = localStorage.getItem("username") || "Utilisateur";
       const date_creation = new Date().toLocaleDateString("fr-CA");
 
@@ -115,7 +153,8 @@ const ModalCreation = ({
         num_pension: formData.num_pension,
         civilite: formData.civilite,
         caisse: formData.caisse,
-        assignation: formData.assignation,
+        assignation: assignationValue,
+        additionalInfo: formData.additional_info,
         certificat: {
           id_certificat: id_certificat,
           date_creation: date_creation,
@@ -157,6 +196,7 @@ const ModalCreation = ({
           prenom: "",
           caisse: "",
           assignation: "",
+          additional_info: "",
         });
         setFormFields([]);
         onClose();
@@ -281,31 +321,57 @@ const ModalCreation = ({
             </Form.Item>
 
             <Form.Item label="Assignation">
-              <Select
-                name="assignation"
-                value={formData.assignation || ""}
-                onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, assignation: value }))
-                }
+              <Checkbox
+                checked={assignationType === "comptable"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setAssignationType("comptable");
+                    fetchComptables();
+                    setFormData((prev) => ({
+                      ...prev,
+                      assignation: "comptable",
+                    }));
+                  } else if (assignationType === "comptable") {
+                    setAssignationType(null);
+                    setOptions([]);
+                    setFormData((prev) => ({ ...prev, assignation: "" }));
+                  }
+                }}
               >
-                <Option value="TRESORERIE GENERALE D'AMBATONDRAZAKA">
-                  TRESORERIE GENERALE D'AMBATONDRAZAKA
-                </Option>
-                <Option value="PERCEPTION PRINCIPALE ANDILAMENA">
-                  PERCEPTION PRINCIPALE ANDILAMENA
-                </Option>
-                <Option value="PERCEPTION PRINCIPALE ANOSIBE ANALA">
-                  PERCEPTION PRINCIPALE ANOSIBE ANALA
-                </Option>
-                <Option value="PERCEPTION PRINCIPALE NOSY-VARIKA">
-                  PERCEPTION PRINCIPALE NOSY-VARIKA
-                </Option>
-                <Option value="BANQUE CENTRALE ANTANANARIVO">
-                  BANQUE CENTRALE ANTANANARIVO
-                </Option>
-                <Option value="BANQUE DE DEVELOPPEMENT MAHAJANGA">
-                  BANQUE DE DEVELOPPEMENT MAHAJANGA
-                </Option>
+                Comptable Payeur
+              </Checkbox>
+
+              <Checkbox
+                checked={assignationType === "banque"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setAssignationType("banque");
+                    fetchBanques();
+                    setFormData((prev) => ({ ...prev, assignation: "banque" }));
+                  } else if (assignationType === "banque") {
+                    setAssignationType(null);
+                    setOptions([]);
+                    setFormData((prev) => ({ ...prev, assignation: "" }));
+                  }
+                }}
+              >
+                Banques
+              </Checkbox>
+
+              <Select
+                name="additional_info"
+                value={formData.additional_info || undefined}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, additional_info: value }))
+                }
+                style={{ marginTop: 10 }}
+                placeholder="Sélectionner une option"
+              >
+                {options.map((item) => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
               </Select>
             </Form.Item>
           </Form>

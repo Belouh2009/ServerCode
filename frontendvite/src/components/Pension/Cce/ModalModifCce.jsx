@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Row, Col, Select } from "antd";
+import { Modal, Form, Input, Button, Row, Col, Select, Checkbox } from "antd";
 import ReactSelect from "react-select";
 import { IoMdClose, IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
@@ -15,12 +15,15 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
   const [civilite, setCivilite] = useState("");
   const [caisse, setCaisse] = useState("");
   const [assignation, setAssignation] = useState("");
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const [dateDece, setDateDece] = useState("");
   const [dateAnnulation, setDateAnnulation] = useState("");
 
   const [formFields, setFormFields] = useState([]);
 
   const [localRubriques, setLocalRubriques] = useState([]);
+  const [assignationType, setAssignationType] = useState(null);
+  const [options, setOptions] = useState([]);
 
   // Lorsque l'agent est ouvert, récupérer ses informations et remplir les champs
   useEffect(() => {
@@ -32,8 +35,18 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       setCivilite(agent.civilite || "");
       setCaisse(agent.caisse || "");
       setAssignation(agent.assignation || "");
+      setAdditionalInfo(agent.additionalInfo || "");
       setDateDece(agent.dateDece || "");
       setDateAnnulation(agent.dateAnnulation || "");
+
+      // Détecter le type assignation
+      if (agent.assignation === "comptable") {
+        setAssignationType("comptable");
+        fetchComptables();
+      } else if (agent.assignation === "banque") {
+        setAssignationType("banque");
+        fetchBanques();
+      }
 
       const newFields =
         agent.sesituer?.map((s) => ({
@@ -71,6 +84,30 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
         });
     }
   }, [rubriques.length, localRubriques.length]); // On vérifie uniquement la longueur, ce qui évite de redemander si déjà présents
+
+  const fetchComptables = async () => {
+    try {
+      const response = await fetch("http://localhost:8087/comptables/liste");
+      const data = await response.json();
+      setOptions(data);
+      return data;
+    } catch (err) {
+      console.error("Erreur lors du chargement des comptables :", err);
+      return [];
+    }
+  };
+
+  const fetchBanques = async () => {
+    try {
+      const response = await fetch("http://localhost:8087/comptables/banques");
+      const data = await response.json();
+      setOptions(data);
+      return data;
+    } catch (err) {
+      console.error("Erreur lors du chargement des banques :", err);
+      return [];
+    }
+  };
 
   // Utiliser soit les rubriques passées en props, soit celles récupérées localement
   const availableRubriques = rubriques.length > 0 ? rubriques : localRubriques;
@@ -120,6 +157,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       num_pension,
       caisse,
       assignation,
+      additionalInfo,
       dateDece,
       dateAnnulation,
       certificat: {
@@ -249,28 +287,56 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
             </Form.Item>
 
             <Form.Item label="Assignation">
-              <Select
-                value={assignation}
-                onChange={(value) => setAssignation(value)}
+              <Checkbox
+                checked={assignationType === "comptable"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setAssignationType("comptable");
+                    fetchComptables();
+                    setAssignation("comptable");
+                  } else if (assignationType === "comptable") {
+                    setAssignationType(null);
+                    setOptions([]);
+                    setAssignation("");
+                    setAdditionalInfo("");
+                  }
+                }}
               >
-                <Option value="TRESORERIE GENERALE D'AMBATONDRAZAKA">
-                  TRESORERIE GENERALE D'AMBATONDRAZAKA
-                </Option>
-                <Option value="PERCEPTION PRINCIPALE ANDILAMENA">
-                  PERCEPTION PRINCIPALE ANDILAMENA
-                </Option>
-                <Option value="PERCEPTION PRINCIPALE ANOSIBE ANALA">
-                  PERCEPTION PRINCIPALE ANOSIBE ANALA
-                </Option>
-                <Option value="PERCEPTION PRINCIPALE NOSY-VARIKA">
-                  PERCEPTION PRINCIPALE NOSY-VARIKA
-                </Option>
-                <Option value="BANQUE CENTRALE ANTANANARIVO">
-                  BANQUE CENTRALE ANTANANARIVO
-                </Option>
-                <Option value="BANQUE DE DEVELOPPEMENT MAHAJANGA">
-                  BANQUE DE DEVELOPPEMENT MAHAJANGA
-                </Option>
+                Comptable Payeur
+              </Checkbox>
+
+              <Checkbox
+                checked={assignationType === "banque"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setAssignationType("banque");
+                    fetchBanques();
+                    setAssignation("banque");
+                  } else if (assignationType === "banque") {
+                    setAssignationType(null);
+                    setOptions([]);
+                    setAssignation("");
+                    setAdditionalInfo("");
+                  }
+                }}
+              >
+                Banques
+              </Checkbox>
+
+              <Select
+                name="additional_info"
+                value={
+                  options.includes(additionalInfo) ? additionalInfo : undefined
+                }
+                onChange={(value) => setAdditionalInfo(value)}
+                style={{ marginTop: 10 }}
+                placeholder="Sélectionner une option"
+              >
+                {options.map((item) => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
               </Select>
             </Form.Item>
 

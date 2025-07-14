@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Typography, Table, Input, Button, Spin, Card, Select } from "antd";
+import {
+  Layout,
+  Typography,
+  Table,
+  Input,
+  Button,
+  Spin,
+  Card,
+  Select,
+} from "antd";
 import { RiFileEditFill } from "react-icons/ri";
 import { IoCreate } from "react-icons/io5";
 import Swal from "sweetalert2";
@@ -18,7 +27,7 @@ export default function ContentSection() {
   const [showModalModif, setShowModalModif] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
-    const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(5);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
@@ -29,6 +38,7 @@ export default function ContentSection() {
     prenom: "",
     caisse: "",
     assignation: "",
+    additionalInfo: "",
     dateAnnulation: "",
     dateDece: "",
   });
@@ -63,6 +73,7 @@ export default function ContentSection() {
       prenom: "",
       caisse: "",
       assignation: "",
+      additionalInfo: "",
       dateAnnulation: "",
       dateDece: "",
     });
@@ -103,6 +114,7 @@ export default function ContentSection() {
       date_creation: user.certificat.date_creation || "-",
       caisse: user.caisse || "N/A",
       assignation: user.assignation || "-",
+      additionalInfo: user.additionalInfo || "-",
       dateAnnulation: user.dateAnnulation || "-",
       dateDece: user.dateDece || "-",
       ajout_par: user.certificat.ajout_par || "N/A",
@@ -120,6 +132,7 @@ export default function ContentSection() {
       user.prenom.toLowerCase().includes(searchTerm) ||
       user.num_pension.toLowerCase().includes(searchTerm) ||
       user.assignation.toLowerCase().includes(searchTerm) ||
+      user.additionalInfo.toLowerCase().includes(searchTerm) ||
       user.dateAnnulation.toLowerCase().includes(searchTerm) ||
       user.dateDece.toLowerCase().includes(searchTerm) ||
       user.ajout_par.toLowerCase().includes(searchTerm) ||
@@ -183,6 +196,11 @@ export default function ContentSection() {
       title: "Assignation",
       dataIndex: "assignation",
       sorter: (a, b) => a.assignation.localeCompare(b.assignation),
+    },
+    {
+      title: "AdditionalInfo",
+      dataIndex: "additionalInfo",
+      sorter: (a, b) => a.additionalInfo.localeCompare(b.additionalInfo),
     },
     {
       title: "Ajouté par",

@@ -38,6 +38,7 @@ export default function ContentSection() {
     prenom: "",
     caisse: "",
     assignation: "",
+    additionalInfo: "",
   });
   const [formFields, setFormFields] = useState([]);
   const [users, setUsers] = useState([]);
@@ -68,6 +69,7 @@ export default function ContentSection() {
       prenom: "",
       caisse: "",
       assignation: "",
+      additionalInfo: "",
     });
     setFormFields([]);
     setShowModal(false);
@@ -106,6 +108,7 @@ export default function ContentSection() {
       date_creation: user.certificat.date_creation || "-",
       caisse: user.caisse || "N/A",
       assignation: user.assignation || "-",
+      additionalInfo: user.additionalInfo || "-",
       ajout_par: user.certificat.ajout_par || "N/A",
       modif_par: user.certificat.modif_par || "N/A",
       sesituer: user.sesituer || [],
@@ -122,6 +125,7 @@ export default function ContentSection() {
       user.prenom.toLowerCase().includes(searchTerm) ||
       user.num_pension.toLowerCase().includes(searchTerm) ||
       user.assignation.toLowerCase().includes(searchTerm) ||
+      user.additionalInfo.toLowerCase().includes(searchTerm) ||
       user.ajout_par.toLowerCase().includes(searchTerm) ||
       user.modif_par.toLowerCase().includes(searchTerm) ||
       user.sesituer.some((item) =>
@@ -178,6 +182,11 @@ export default function ContentSection() {
       title: "Assignation",
       dataIndex: "assignation",
       sorter: (a, b) => a.assignation.localeCompare(b.assignation),
+    },
+    {
+      title: "AdditionalInfo",
+      dataIndex: "additionalInfo",
+      sorter: (a, b) => a.additionalInfo.localeCompare(b.additionalInfo),
     },
     {
       title: "Ajouté par",
