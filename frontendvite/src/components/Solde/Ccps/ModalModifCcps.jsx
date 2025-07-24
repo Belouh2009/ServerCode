@@ -279,7 +279,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
       // Si la réponse est un succès, afficher le message
       if (response.status === 200) {
-        Swal.fire("Succès", "Agent mis à jour avec succès !", "success");
+        Swal.fire("Succès", "Cértificat mis à jour avec succès !", "success");
         onClose();
         onSuccess();
       } else {
@@ -329,7 +329,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       className="custom-modal"
     >
       <Row gutter={16}>
-        <Col span={10} className="form-container">
+        <Col span={9} className="form-container">
           <h5>Informations de l'agent</h5>
           <Form layout="vertical">
             <Row gutter={16}>
@@ -376,7 +376,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                 <Select.Option value="Retraité pour limite d'âge">
                   Retraité pour limite d'âge
                 </Select.Option>
-                <Select.Option value="Décès">Décèdé</Select.Option>
+                <Select.Option value="Décèdé">Décèdé</Select.Option>
               </Select>
             </Form.Item>
 
@@ -624,7 +624,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
           </Form>
         </Col>
 
-        <Col span={6} className="form-container">
+        <Col span={7} className="form-container">
           <h5>Informations Rubrique</h5>
 
           <Button
@@ -644,25 +644,33 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
             <Row key={index} gutter={8} style={{ marginTop: "10px" }}>
               <Col span={8}>
                 <Form.Item label="Rubrique">
-                  <Select
-                    value={field.rubrique}
-                    onChange={(value) =>
-                      handleChangeField(index, "rubrique", value)
+                  <ReactSelect
+                    name="rubrique"
+                    value={
+                      field.rubrique
+                        ? { value: field.rubrique, label: field.rubrique }
+                        : null
+                    } // Utilisation de l'ID comme valeur
+                    onChange={(selectedOption) =>
+                      handleChangeField(
+                        index,
+                        "rubrique",
+                        selectedOption ? selectedOption.value : ""
+                      )
                     }
-                    placeholder="Sélectionner une rubrique"
-                  >
-                    {availableRubriques.map((rubrique) => (
-                      <Option key={rubrique} value={rubrique}>
-                        {rubrique}
-                      </Option>
-                    ))}
-                  </Select>
+                    options={availableRubriques.map((rubrique) => ({
+                      value: rubrique,
+                      label: rubrique,
+                    }))}
+                    required
+                  />
                 </Form.Item>
               </Col>
 
-              <Col span={11}>
+              <Col span={12}>
                 <Form.Item label="Montant">
                   <Input
+                    style={{ height: "39px" }}
                     type="text"
                     value={field.montant || ""}
                     onChange={(e) =>
@@ -685,7 +693,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                   danger
                   style={{
                     marginTop: "10px",
-                    height: "34px",
+                    height: "35px",
                     backgroundColor: "#ff4d4f",
                     borderColor: "#ff4d4f",
                   }}

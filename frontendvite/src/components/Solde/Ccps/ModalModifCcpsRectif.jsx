@@ -324,12 +324,12 @@ const ModalModifCcpsRect = ({
       centered
       open={open}
       onCancel={onClose}
-      width={1100}
+      width={1200}
       footer={null}
       className="custom-modal"
     >
       <Row gutter={16}>
-        <Col span={10} className="form-container">
+        <Col span={9} className="form-container">
           <h5>Informations de l'agent</h5>
           <Form layout="vertical">
             <Form.Item label="ID Certificat Réctifié">
@@ -384,7 +384,7 @@ const ModalModifCcpsRect = ({
                 <Select.Option value="Retraité pour limite d'âge">
                   Retraité pour limite d'âge
                 </Select.Option>
-                <Select.Option value="Décès">Décèdé</Select.Option>
+                <Select.Option value="Décèdé">Décèdé</Select.Option>
               </Select>
             </Form.Item>
 
@@ -571,7 +571,7 @@ const ModalModifCcpsRect = ({
           </Form>
         </Col>
 
-        <Col span={6} className="form-container">
+        <Col span={7} className="form-container">
           <h5>Ordre de Recette</h5>
           <Form layout="vertical">
             <Form.Item label="Montants">
@@ -652,25 +652,33 @@ const ModalModifCcpsRect = ({
             <Row key={index} gutter={8} style={{ marginTop: "10px" }}>
               <Col span={8}>
                 <Form.Item label="Rubrique">
-                  <Select
-                    value={field.rubrique}
-                    onChange={(value) =>
-                      handleChangeField(index, "rubrique", value)
+                  <ReactSelect
+                    name="rubrique"
+                    value={
+                      field.rubrique
+                        ? { value: field.rubrique, label: field.rubrique }
+                        : null
+                    } // Utilisation de l'ID comme valeur
+                    onChange={(selectedOption) =>
+                      handleChangeField(
+                        index,
+                        "rubrique",
+                        selectedOption ? selectedOption.value : ""
+                      )
                     }
-                    placeholder="Sélectionner une rubrique"
-                  >
-                    {availableRubriques.map((rubrique) => (
-                      <Option key={rubrique} value={rubrique}>
-                        {rubrique}
-                      </Option>
-                    ))}
-                  </Select>
+                    options={availableRubriques.map((rubrique) => ({
+                      value: rubrique,
+                      label: rubrique,
+                    }))}
+                    required
+                  />
                 </Form.Item>
               </Col>
 
-              <Col span={11}>
+              <Col span={12}>
                 <Form.Item label="Montant">
                   <Input
+                    style={{ height: "39px" }}
                     type="text"
                     value={field.montant || ""}
                     onChange={(e) =>
@@ -694,7 +702,7 @@ const ModalModifCcpsRect = ({
                   onClick={() => handleRemoveField(index)}
                   style={{
                     marginTop: "10px",
-                    height: "34px",
+                    height: "35px",
                     backgroundColor: "#ff4d4f",
                     borderColor: "#ff4d4f",
                   }}

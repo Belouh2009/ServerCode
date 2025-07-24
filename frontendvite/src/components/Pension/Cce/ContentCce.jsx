@@ -193,11 +193,6 @@ export default function ContentSection() {
       sorter: (a, b) => a.dateAnnulation.localeCompare(b.dateAnnulation),
     },
     {
-      title: "Assignation",
-      dataIndex: "assignation",
-      sorter: (a, b) => a.assignation.localeCompare(b.assignation),
-    },
-    {
       title: "AdditionalInfo",
       dataIndex: "additionalInfo",
       sorter: (a, b) => a.additionalInfo.localeCompare(b.additionalInfo),
@@ -297,17 +292,6 @@ export default function ContentSection() {
                 gap: "12px",
               }}
             >
-              <Select
-                defaultValue={10}
-                onChange={(value) => setPageSize(value)}
-                style={{ width: 120 }}
-              >
-                <Option value={10}>10</Option>
-                <Option value={20}>20</Option>
-                <Option value={30}>30</Option>
-                <Option value={50}>50</Option>
-              </Select>
-
               <Input
                 type="search"
                 placeholder="🔍 Rechercher..."
@@ -335,19 +319,38 @@ export default function ContentSection() {
               <p>Aucun certificat trouvé</p>
             </div>
           ) : (
-            <>
-              <Table
-                bordered
-                size="middle"
-                dataSource={filteredData}
-                rowSelection={rowSelection}
-                columns={columns}
-                rowKey="key"
-                pagination={{ pageSize, position: ["bottomRight"] }}
-                scroll={{ x: "max-content" }}
-                rowClassName={() => "table-row-hover"}
-                className="styled-table"
-              />
+              <div
+                style={{
+                  maxHeight: 1030,
+                  minHeight: 410,
+                  height: "calc(100vh - 250px)",
+                  overflowY: "auto", // Garde le défilement fonctionnel
+                  scrollbarWidth: "none", // Firefox
+                  msOverflowStyle: "none", // IE/Edge
+                }}
+              >
+                <style>{`
+                                ::-webkit-scrollbar {
+                                  display: none !important;
+                                }
+                              `}</style>
+                <Table
+                  bordered
+                  size="middle"
+                  dataSource={filteredData}
+                  rowSelection={rowSelection}
+                  columns={columns}
+                  rowKey="key"
+                  pagination={{
+                    pageSize: 20,
+                    position: ["bottomRight"],
+                    showSizeChanger: false,
+                  }}
+                  scroll={{ x: "max-content" }}
+                  rowClassName={() => "table-row-hover"}
+                  className="styled-table"
+                />
+              
 
               <div
                 style={{
@@ -368,8 +371,8 @@ export default function ContentSection() {
                     {selectedRowKeys.length} certificat(s) sélectionné(s)
                   </span>
                 )}
+                </div>
               </div>
-            </>
           )}
         </Card>
       )}

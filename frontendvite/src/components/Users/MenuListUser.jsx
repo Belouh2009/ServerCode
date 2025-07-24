@@ -1,8 +1,5 @@
 import { Menu } from "antd";
-import {
-  UserAddOutlined,
-  CodepenOutlined
-} from "@ant-design/icons";
+import { UserAddOutlined, CodepenOutlined } from "@ant-design/icons";
 
 const { SubMenu } = Menu;
 
@@ -14,6 +11,7 @@ const MenuList = ({ setSelectedPage }) => {
       label: "Codes",
       icon: <CodepenOutlined />,
       children: [
+        { key: "bareme", label: "Bareme" },
         { key: "corps", label: "Corps" },
         { key: "zone", label: "Zone" },
         {

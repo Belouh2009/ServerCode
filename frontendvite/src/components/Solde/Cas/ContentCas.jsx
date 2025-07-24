@@ -12,7 +12,7 @@ import OpenPDFButton from "./PdfCas";
 const { Content } = Layout;
 const { Title } = Typography;
 
-export default function ContentSection({ darkTheme }) {
+export default function ContentSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +24,7 @@ export default function ContentSection({ darkTheme }) {
     matricule: "",
     nom: "",
     prenom: "",
+    dateCreation: "",
     corps: "",
     grade: "",
     indice: "",
@@ -62,6 +63,7 @@ export default function ContentSection({ darkTheme }) {
       matricule: "",
       nom: "",
       prenom: "",
+      dateCreation: "",
       corps: "",
       grade: "",
       indice: "",
@@ -104,6 +106,7 @@ export default function ContentSection({ darkTheme }) {
       matricule: user.matricule || "-",
       nom: user.nom || "-",
       prenom: user.prenom || "-",
+      dateCreation: user.certificat.dateCreation || "-",
       corps: user.corps || "-",
       grade: user.grade || "-",
       indice: user.indice || "-",
@@ -128,6 +131,7 @@ export default function ContentSection({ darkTheme }) {
       user.idCertificat.toLowerCase().includes(searchTerm) ||
       user.nom.toLowerCase().includes(searchTerm) ||
       user.prenom.toLowerCase().includes(searchTerm) ||
+      user.dateCreation.toLowerCase().includes(searchTerm) ||
       user.corps.toLowerCase().includes(searchTerm) ||
       user.grade.toLowerCase().includes(searchTerm) ||
       user.indice.toLowerCase().includes(searchTerm) ||
@@ -163,6 +167,11 @@ export default function ContentSection({ darkTheme }) {
       title: "Matricule",
       dataIndex: "matricule",
       sorter: (a, b) => a.matricule.localeCompare(b.matricule),
+    },
+    {
+      title: "Date de création",
+      dataIndex: "dateCreation",
+      sorter: (a, b) => a.dateCreation.localeCompare(b.dateCreation),
     },
     {
       title: "Nom",
@@ -274,7 +283,23 @@ export default function ContentSection({ darkTheme }) {
               <p>Aucun certificat trouvé.</p>
             </div>
           ) : (
-            <>
+            <div
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto", // Garde le défilement fonctionnel
+                scrollbarWidth: "none", // Firefox
+                msOverflowStyle: "none", // IE/Edge
+              }}
+            >
+              {/* Style intégré pour Chrome/Safari */}
+              <style>{`
+                ::-webkit-scrollbar {
+                  display: none !important;
+                }
+              `}</style>
+
               <Table
                 bordered
                 size="middle"
@@ -283,11 +308,12 @@ export default function ContentSection({ darkTheme }) {
                 columns={columns}
                 rowKey="idCertificat"
                 pagination={{
-                  pageSize: 6,
+                   pageSize: 20,
                   position: ["bottomRight"],
+                  showSizeChanger: false,
                 }}
                 scroll={{ x: "max-content" }}
-                 rowClassName={() => "table-row-hover"}
+                rowClassName={() => "table-row-hover"}
                 className="styled-table"
               />
 
@@ -313,7 +339,7 @@ export default function ContentSection({ darkTheme }) {
                   </span>
                 )}
               </div>
-            </>
+            </div>
           )}
         </Card>
       )}

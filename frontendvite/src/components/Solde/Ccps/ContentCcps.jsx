@@ -17,7 +17,7 @@ export default function ContentSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [showModalModif, setShowModalModif] = useState(false);
+  const [showModalModif, setShowModalModif] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
 
@@ -116,7 +116,7 @@ export default function ContentSection() {
     }).then((result) => {
       if (result.isConfirmed) {
         setSelectedAgent(agent);
-        setShowModalModif(true); 
+        setShowModalModif(true);
       }
     });
   };
@@ -132,7 +132,7 @@ export default function ContentSection() {
     }).then((result) => {
       if (result.isConfirmed) {
         setSelectedAgent(agent);
-        setIsModalOpen(true); 
+        setIsModalOpen(true);
       }
     });
   };
@@ -291,7 +291,7 @@ export default function ContentSection() {
           <Button type="primary" onClick={() => handleShowEditModal(record)}>
             <RiFileEditFill size={15} />
           </Button>
-          
+
           <Button
             style={{ marginLeft: "10px" }}
             color="cyan"
@@ -364,7 +364,23 @@ export default function ContentSection() {
               <p>Aucun certificat trouvé.</p>
             </div>
           ) : (
-            <>
+            <div
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto", // Garde le défilement fonctionnel
+                scrollbarWidth: "none", // Firefox
+                msOverflowStyle: "none", // IE/Edge
+              }}
+            >
+              {/* Style intégré pour Chrome/Safari */}
+              <style>{`
+                ::-webkit-scrollbar {
+                  display: none !important;
+                }
+              `}</style>
+
               <Table
                 bordered
                 size="middle"
@@ -373,7 +389,7 @@ export default function ContentSection() {
                 columns={columns}
                 rowKey="key"
                 pagination={{
-                  pageSize: 6,
+                  pageSize: 20,
                   position: ["bottomRight"],
                 }}
                 scroll={{ x: "max-content" }}
@@ -401,7 +417,7 @@ export default function ContentSection() {
                   </span>
                 )}
               </div>
-            </>
+            </div>
           )}
         </Card>
       )}
@@ -426,7 +442,7 @@ export default function ContentSection() {
         agent={selectedAgent}
         onSuccess={() => {
           fetchAgents();
-          handleCloseModal(); 
+          handleCloseModal();
         }}
       />
 
@@ -437,7 +453,7 @@ export default function ContentSection() {
         agent={selectedAgent}
         onSuccess={() => {
           fetchAgents();
-          handleCloseModal(); 
+          handleCloseModal();
         }}
       />
     </Content>

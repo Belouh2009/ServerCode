@@ -170,18 +170,38 @@ const CodeCorps = ({ darkTheme }) => {
               }}
             />
           </div>
-
-          <Table
-            bordered
-            size="middle"
-            scroll={{ y: 410 }}
-            rowClassName={() => "table-row-hover"}
-            className="styled-table"
-            dataSource={filteredData}
-            columns={columns}
-            rowKey="idCorps"
-            pagination={{ position: ["bottomRight"], showSizeChanger: false }}
-          />
+          {filteredData.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "20px" }}>
+              <p>Aucune code trouvée.</p>
+            </div>
+          ) : (
+            <div
+              className="hide-scrollbar"
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto",
+              }}
+            >
+              {" "}
+              <Table
+                bordered
+                size="middle"
+                dataSource={filteredData}
+                columns={columns}
+                rowKey="idCorps"
+                pagination={{
+                  pageSize: 20,
+                  position: ["bottomRight"],
+                  showSizeChanger: false,
+                }}
+                scroll={{ y: "100%" }}
+                rowClassName={() => "table-row-hover"}
+                className="styled-table"
+              />
+            </div>
+          )}
         </Card>
       )}
 

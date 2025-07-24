@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Select, Modal, Form, Input, Button, Row, Col, message } from "antd";
+import ReactSelect from "react-select";
 import { IoMdClose, IoMdAdd } from "react-icons/io";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -253,7 +254,7 @@ const ModalCreation = ({
       centered
       open={open}
       onCancel={onClose}
-      width={1100}
+      width={1200}
       className="custom-modal"
       footer={null}
     >
@@ -315,7 +316,7 @@ const ModalCreation = ({
                 <Select.Option value="Retraité pour limite d'âge">
                   Retraité pour limite d'âge
                 </Select.Option>
-                <Select.Option value="Décès">Décèdé</Select.Option>
+                <Select.Option value="Décèdé">Décèdé</Select.Option>
               </Select>
             </Form.Item>
 
@@ -578,27 +579,33 @@ const ModalCreation = ({
             <Row gutter={8} key={index}>
               <Col span={8}>
                 <Form.Item label="Rubrique">
-                  <Select
-                    style={{ fontSize: 10 }}
-                    value={field.rubrique}
-                    onChange={(value) =>
-                      handleChangeField(index, "rubrique", value)
+                  <ReactSelect
+                    name="rubrique"
+                    value={
+                      field.rubrique
+                        ? { value: field.rubrique, label: field.rubrique }
+                        : null
                     }
-                    placeholder="Sélectionner une rubrique"
-                    showSearch
-                  >
-                    {rubriques.map((rubrique) => (
-                      <Option key={rubrique} value={rubrique}>
-                        {rubrique}
-                      </Option>
-                    ))}
-                  </Select>
+                    onChange={(selectedOption) =>
+                      handleChangeField(
+                        index,
+                        "rubrique",
+                        selectedOption ? selectedOption.value : ""
+                      )
+                    }
+                    options={rubriques.map((rubrique) => ({
+                      value: rubrique,
+                      label: rubrique,
+                    }))}
+                    required
+                  />
                 </Form.Item>
               </Col>
 
-              <Col span={11}>
+              <Col span={12}>
                 <Form.Item label="Montant">
                   <Input
+                    style={{ height: "39px" }}
                     value={field.montant}
                     onChange={(e) =>
                       handleChangeField(index, "montant", e.target.value)

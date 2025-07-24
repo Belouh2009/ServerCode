@@ -49,10 +49,12 @@ public class CodeZoneController {
         List<CodeZone> zoneList = zoneService.getAllZones();
         return ResponseEntity.ok(zoneList);
     }
+
+    
     
     // Endpoint pour modifier une zone existante
     @PutMapping("/modifier/{id}")
-    public ResponseEntity<Map<String, String>> modifierZone(@PathVariable("id") Long id, @RequestBody CodeZone zone) {
+    public ResponseEntity<Map<String, String>> updateZone(@PathVariable("id") Long id, @RequestBody CodeZone zone) {
         try {
             zoneService.updateZone(id, zone);  // Mettre à jour la zone
             Map<String, String> response = new HashMap<>();

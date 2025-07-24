@@ -26,9 +26,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: "Times-Roman",
     },
-    section: { marginBottom: 15 },
+    section: { marginBottom: 5 },
     title: {
-        fontSize: 11,
+        fontSize: 9,
         textAlign: "center",
         marginBottom: 10,
         fontWeight: "bold",
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
         lineHeight: 1.5,
     },
     subtitle: {
-        fontSize: 12,
+        fontSize: 10,
         textAlign: "center",
         marginBottom: 20,
         fontWeight: "bold",
@@ -46,17 +46,18 @@ const styles = StyleSheet.create({
     },
     paragraph: {
         marginBottom: 10,
+        fontSize: 10,
         textIndent: 20,
         lineHeight: 1.25,
     },
     detailsTitle: {
         textAlign: "center",
-        fontSize: 14,
+        fontSize: 10,
         fontWeight: "bold",
-        marginBottom: 20,
+        marginBottom: 5,
     },
     footer: {
-        fontSize: 12,
+        fontSize: 10,
         textAlign: "right",
         marginTop: 20,
         marginRight: 50,
@@ -100,10 +101,10 @@ const CertificatPDF = ({ dataList }) => {
                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.title}>
-                                    MINISTERE DE L'ECONOMIE ET DE FINANCE,
-                                    {"\n"}SECRETARIAT GENERAL,
-                                    {"\n"}DIRECTION GENERALE DU BUDGET ET DES FINANCES,
-                                    {"\n"}DIRECTION DE LA SOLDE ET DE PENSIONS,
+                                    MINISTERE DE L'ECONOMIE ET DE FINANCE
+                                    {"\n"}SECRETARIAT GENERAL
+                                    {"\n"}DIRECTION GENERALE DU BUDGET ET DES FINANCES
+                                    {"\n"}DIRECTION DE LA SOLDE ET DE PENSIONS
                                     {"\n"}SERVICE REGIONAL DE LA SOLDE ET DE LA PENSIONS
                                     {"\n"}HAUTE MATSIATRA
                                 </Text>
@@ -124,9 +125,7 @@ const CertificatPDF = ({ dataList }) => {
 
                         <View style={styles.section}>
                             <Text style={styles.paragraph}>
-                                L'ORDINATEUR SECONDAIRE DE LA SOLDE soussigné, certifie qu'aucun mandantement de rappel n'a été effectué au profit de
-                                {data.nom} {data.prenom} IM : {data.matricule} Chapitre : {data.chapitre}
-                                en service à {data.localite} sur la période du : {formatDate(data.dateDebut)} au {formatDate(data.dateFin)}, conformément à {data.referenceActe} du {formatDate(data.dateActe)}.
+                                L'ORDINATEUR SECONDAIRE DE LA SOLDE soussigné, certifie qu'aucun mandantement de rappel n'a été effectué au profit de {data.nom} {data.prenom} IM : {data.matricule} Chapitre : {data.chapitre} en service à {data.localite} sur la période du : {formatDate(data.dateDebut)} au {formatDate(data.dateFin)}, conformément à {data.referenceActe} du {formatDate(data.dateActe)}.
                             </Text>
                         </View>
 

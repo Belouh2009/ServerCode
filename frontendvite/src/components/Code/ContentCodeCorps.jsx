@@ -125,9 +125,9 @@ const ContentCodeCorps = ({ darkTheme }) => {
       </Title>
       {loading ? (
         <div style={{ textAlign: "center", padding: "20px" }}>
-                  <Spin size="large" />
-                  <p>Chargement des données...</p>
-                </div>
+          <Spin size="large" />
+          <p>Chargement des données...</p>
+        </div>
       ) : (
         <Card>
           <div
@@ -137,16 +137,16 @@ const ContentCodeCorps = ({ darkTheme }) => {
               marginBottom: "10px",
             }}
           >
-           <Input
-                         type="search"
-                         placeholder="🔍 Rechercher..."
-                         onChange={handleSearch}
-                         style={{
-                           width: "200px",
-                           borderRadius: "6px",
-                           borderColor: "#cfd8dc",
-                         }}
-                       />
+            <Input
+              type="search"
+              placeholder="🔍 Rechercher..."
+              onChange={handleSearch}
+              style={{
+                width: "200px",
+                borderRadius: "6px",
+                borderColor: "#cfd8dc",
+              }}
+            />
           </div>
 
           {filteredData.length === 0 ? (
@@ -154,17 +154,31 @@ const ContentCodeCorps = ({ darkTheme }) => {
               <p>Aucun code corps trouvé.</p>
             </div>
           ) : (
-            <Table
-            bordered
-              size="middle"
-              scroll={{ y: 410 }}
-              rowClassName={() => "table-row-hover"}
-              className="styled-table"
-              dataSource={filteredData}
-              columns={columns}
-              rowKey="idCorps"
-              pagination={{ position: ["bottomRight"], showSizeChanger: false }}
-            />
+            <div
+              className="hide-scrollbar"
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto",
+              }}
+            >
+              <Table
+                bordered
+                size="middle"
+                dataSource={filteredData}
+                columns={columns}
+                rowKey="idCorps"
+                pagination={{
+                  pageSize: 20,
+                  position: ["bottomRight"],
+                  showSizeChanger: false,
+                }}
+                scroll={{ y: "100%" }}
+                rowClassName={() => "table-row-hover"}
+                className="styled-table"
+              />
+            </div>
           )}
         </Card>
       )}

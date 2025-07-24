@@ -265,20 +265,31 @@ export default function ContentUsers({ status, setStatus }) {
               <p>Aucun utilisateur trouvé.</p>
             </div>
           ) : (
-            <Table
-              bordered
-              size="middle"
-              dataSource={formateTableData}
-              columns={columns}
-              rowKey="key"
-              pagination={{
-                pageSize: 8,
-                position: ["bottomRight"],
+            <div
+              className="hide-scrollbar"
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto",
               }}
-              scroll={{ x: "max-content" }}
-              rowClassName={() => "table-row-hover"}
-              className="styled-table"
-            />
+            >
+              <Table
+                bordered
+                size="middle"
+                dataSource={formateTableData}
+                columns={columns}
+                rowKey="key"
+                pagination={{
+                  pageSize: 20,
+                  position: ["bottomRight"],
+                  showSizeChanger: false,
+                }}
+                scroll={{ y: "100%" }}
+                rowClassName={() => "table-row-hover"}
+                className="styled-table"
+              />
+            </div>
           )}
         </Card>
       )}

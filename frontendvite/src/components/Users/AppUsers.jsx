@@ -18,6 +18,7 @@ import CodeRubriqueSolde from "../Code/CodeRubriqueSolde";
 import CodeZone from "../Code/CodeZone";
 import CodeCorps from "../Code/CodeCorps";
 import CorpsGradeIndice from "../Code/CodeCorpsGradeIndice";
+import Bareme from "../Code/Bareme";
 import "../../index.css";
 
 const { Header, Sider } = Layout;
@@ -77,6 +78,8 @@ export default function AppUsers() {
 
   const renderContent = () => {
     switch (selectedPage) {
+      case "bareme":
+        return <Bareme status={status} setStatus={setStatus} />;
       case "corps":
         return <CodeCorps status={status} setStatus={setStatus} />;
       case "zone":

@@ -124,17 +124,31 @@ const CodeRubrique = ({ darkTheme }) => {
               <p>Aucune rubrique trouvée.</p>
             </div>
           ) : (
-            <Table
-              bordered
-              size="middle"
-              scroll={{ y: 410 }}
-              rowClassName={() => "table-row-hover"}
-              className="styled-table"
-              dataSource={filteredData}
-              columns={columns}
-              rowKey="idRubrique"
-              pagination={{ position: ["bottomRight"], showSizeChanger: false }}
-            />
+            <div
+              className="hide-scrollbar"
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto",
+              }}
+            >
+              <Table
+                bordered
+                size="middle"
+                dataSource={filteredData}
+                columns={columns}
+                rowKey="idRubrique"
+                pagination={{
+                  pageSize: 20,
+                  position: ["bottomRight"],
+                  showSizeChanger: false,
+                }}
+                scroll={{ y: "100%" }}
+                rowClassName={() => "table-row-hover"}
+                className="styled-table"
+              />
+            </div>
           )}
         </Card>
       )}

@@ -12,44 +12,42 @@ import Finance.Backend.Repository.CodeZoneRepository;
 @Service
 public class CodeZoneService {
 
-	@Autowired
+    @Autowired
     private CodeZoneRepository zoneRepository;
 
-    // Méthode pour sauvegarder une liste de Zones
+    // Sauvegarder une liste de zones sans supprimer les existantes
     public void saveZones(List<CodeZone> zoneList) {
         for (CodeZone zone : zoneList) {
-            if (zone.getId_zone() == null) {
-                // Générer un ID unique pour la zone (auto-généré dans PostgreSQL)
-                zone.setDistrict(zone.getDistrict() != null ? zone.getDistrict() : "Inconnu");
-                zone.setZone0(zone.getZone0() != null ? zone.getZone0() : "Zone0 par défaut");
-            }
+            // Vérification minimale pour éviter les données nulles
+            if (zone.getDistrict() == null) zone.setDistrict("Inconnu");
+            if (zone.getZone() == null) zone.setZone("Zone par défaut");
+            if (zone.getLocalite() == null) zone.setLocalite("Localité inconnue");
+            if (zone.getCode_district() == null) zone.setCode_district(0);
+            if (zone.getCode_localite() == null) zone.setCode_localite(0);
         }
-        zoneRepository.saveAll(zoneList);  // Sauvegarder la liste de zones dans la base
+        zoneRepository.saveAll(zoneList);
     }
 
-    // Méthode pour récupérer toutes les zones depuis la base de données
+    // Récupérer toutes les zones
     public List<CodeZone> getAllZones() {
         return zoneRepository.findAll();
     }
 
-    // Méthode pour mettre à jour une zone existante
-    public CodeZone updateZone(Long id, CodeZone zone) throws Exception {
-        Optional<CodeZone> existingZone = zoneRepository.findById(id);
+    // Mettre à jour une zone existante
+    public CodeZone updateZone(Long id, CodeZone updatedZone) throws Exception {
+        Optional<CodeZone> existingZoneOpt = zoneRepository.findById(id);
 
-        if (!existingZone.isPresent()) {
+        if (!existingZoneOpt.isPresent()) {
             throw new Exception("Zone avec l'ID " + id + " non trouvée");
         }
 
-        CodeZone zoneToUpdate = existingZone.get();
-        zoneToUpdate.setDistrict(zone.getDistrict());   // Mettre à jour le district
-        zoneToUpdate.setZone0(zone.getZone0());         // Mettre à jour zone0
-        zoneToUpdate.setZone1(zone.getZone1());         // Mettre à jour zone1
-        zoneToUpdate.setCodeZone1(zone.getCodeZone1()); // Mettre à jour le code zone1
-        zoneToUpdate.setZone2(zone.getZone2());         // Mettre à jour zone2
-        zoneToUpdate.setCodeZone2(zone.getCodeZone2()); // Mettre à jour le code zone2
-        zoneToUpdate.setZone3(zone.getZone3());         // Mettre à jour zone3
-        zoneToUpdate.setCodeZone3(zone.getCodeZone3()); // Mettre à jour le code zone3
+        CodeZone zoneToUpdate = existingZoneOpt.get();
+        zoneToUpdate.setDistrict(updatedZone.getDistrict());
+        zoneToUpdate.setCode_district(updatedZone.getCode_district());
+        zoneToUpdate.setCode_localite(updatedZone.getCode_localite());
+        zoneToUpdate.setLocalite(updatedZone.getLocalite());
+        zoneToUpdate.setZone(updatedZone.getZone());
 
-        return zoneRepository.save(zoneToUpdate);       // Sauvegarder les modifications
+        return zoneRepository.save(zoneToUpdate);
     }
 }

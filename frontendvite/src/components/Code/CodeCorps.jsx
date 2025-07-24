@@ -168,11 +168,11 @@ const CodeCorps = () => {
         marginLeft: "10px",
         marginTop: "10px",
         padding: "24px",
-        background: "#f4f6fc", 
+        background: "#f4f6fc",
         color: "#000",
         borderRadius: "12px",
         minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)", 
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
       }}
     >
       <Title
@@ -225,20 +225,31 @@ const CodeCorps = () => {
               <p>Aucun code corps trouvé.</p>
             </div>
           ) : (
-            <Table
-              bordered
-              size="middle"
-              dataSource={filteredData}
-              columns={columns}
-              rowKey="idCorps"
-              pagination={{
-                position: ["bottomRight"],
-                showSizeChanger: false,
+            <div
+              className="hide-scrollbar"
+              style={{
+                maxHeight: 1030,
+                minHeight: 410,
+                height: "calc(100vh - 250px)",
+                overflowY: "auto",
               }}
-              scroll={{ y: 410 }}
-              rowClassName={() => "table-row-hover"}
-              className="styled-table"
-            />
+            >
+              <Table
+                bordered
+                size="middle"
+                dataSource={filteredData}
+                columns={columns}
+                rowKey="idCorps"
+                pagination={{
+                  pageSize: 20,
+                  position: ["bottomRight"],
+                  showSizeChanger: false,
+                }}
+                scroll={{ y: "100%" }} // prend 100% de la hauteur disponible
+                rowClassName={() => "table-row-hover"}
+                className="styled-table"
+              />
+            </div>
           )}
         </Card>
       )}
