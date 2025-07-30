@@ -53,7 +53,7 @@ private String matricule;
 	
 	private String idCertificatRect;
 	
-    private CertificatCcpsRectDTO certificat;
+    private CertificatCcpsDTO certificat;
     
     private List<SeSituerCcpsRectDTO> sesituer;
 
@@ -249,11 +249,11 @@ private String matricule;
 		this.idCertificatRect = idCertificatRect;
 	}
 
-	public CertificatCcpsRectDTO getCertificat() {
+	public CertificatCcpsDTO getCertificat() {
 		return certificat;
 	}
 
-	public void setCertificat(CertificatCcpsRectDTO certificat) {
+	public void setCertificat(CertificatCcpsDTO certificat) {
 		this.certificat = certificat;
 	}
 
@@ -270,7 +270,7 @@ private String matricule;
 			String chapitre, String article, String acte, String referenceActe, LocalDate dateActe,
 			LocalDate dateCessation, LocalDate dateFinPai, Double montant, String referenceRecette,
 			LocalDate dateOrdreRecette, LocalDate dateDebut, LocalDate dateDernierPai, String idCertificatRect,
-			CertificatCcpsRectDTO certificat, List<SeSituerCcpsRectDTO> sesituer) {
+			CertificatCcpsDTO certificat, List<SeSituerCcpsRectDTO> sesituer) {
 		super();
 		this.matricule = matricule;
 		this.civilite = civilite;

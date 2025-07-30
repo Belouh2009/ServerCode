@@ -366,10 +366,17 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                         selectedOption ? selectedOption.value : ""
                       )
                     }
-                    options={availableRubriques.map((rubrique) => ({
-                      value: rubrique,
-                      label: rubrique,
-                    }))}
+                    options={availableRubriques
+                      .filter(
+                        (rubrique) =>
+                          !formFields.some(
+                            (f, i) => i !== index && f.rubrique === rubrique
+                          )
+                      )
+                      .map((rubrique) => ({
+                        value: rubrique,
+                        label: rubrique,
+                      }))}
                     required
                   />
                 </Form.Item>

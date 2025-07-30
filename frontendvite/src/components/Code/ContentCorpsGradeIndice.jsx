@@ -180,7 +180,7 @@ const CodeCorps = ({ darkTheme }) => {
               style={{
                 maxHeight: 1030,
                 minHeight: 410,
-                height: "calc(100vh - 250px)",
+                height: "calc(100vh - 290px)",
                 overflowY: "auto",
               }}
             >

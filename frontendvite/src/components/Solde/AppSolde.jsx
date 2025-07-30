@@ -18,6 +18,7 @@ import CodeRubrique from "../Code/ContentCodeRubriqueSolde";
 import CodeZone from "../Code/ContentCodeZone";
 import CodeCorps from "../Code/ContentCodeCorps";
 import CodeCorpsGradeIndice from "../Code/ContentCorpsGradeIndice";
+import Bareme from "../Code/ContentBareme";
 
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -90,6 +91,8 @@ export default function App() {
         return <ContentCcpsRect />;
       case "rubrique":
         return <CodeRubrique />;
+        case "bareme":
+        return <Bareme />;
       case "corps":
         return <CodeCorps />;
       case "zone":
@@ -139,8 +142,7 @@ export default function App() {
           }}
           className="headers"
         >
-
-                    <Button
+          <Button
             type="text"
             className="toggle"
             onClick={() => setCollapsed(!collapsed)}
@@ -162,7 +164,7 @@ export default function App() {
               )
             }
           />
-          
+
           <h1>Edition CA.S/CCP.S</h1>
 
           <div className="nav-action">

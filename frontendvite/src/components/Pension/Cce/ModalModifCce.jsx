@@ -410,10 +410,17 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                         selectedOption ? selectedOption.value : ""
                       )
                     }
-                    options={availableRubriques.map((rubrique) => ({
-                      value: rubrique, // Utilisation de rubriqueCce comme value
-                      label: rubrique, // Affichage de rubriqueCce comme label
-                    }))}
+                    options={availableRubriques
+                      .filter(
+                        (rubrique) =>
+                          !formFields.some(
+                            (f, i) => i !== index && f.rubrique === rubrique
+                          )
+                      )
+                      .map((rubrique) => ({
+                        value: rubrique,
+                        label: rubrique,
+                      }))}
                     required
                   />
                 </Form.Item>

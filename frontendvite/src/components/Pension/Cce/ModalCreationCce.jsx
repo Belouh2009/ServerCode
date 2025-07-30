@@ -443,10 +443,17 @@ const ModalCreationCce = ({
                         selectedOption ? selectedOption.value : ""
                       )
                     }
-                    options={rubriques.map((rubrique) => ({
-                      value: rubrique,
-                      label: rubrique,
-                    }))}
+                    options={rubriques
+                      .filter(
+                        (rubrique) =>
+                          !formFields.some(
+                            (f, i) => i !== index && f.rubrique === rubrique
+                          )
+                      )
+                      .map((rubrique) => ({
+                        value: rubrique,
+                        label: rubrique,
+                      }))}
                   />
                 </Form.Item>
               </Col>

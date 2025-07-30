@@ -225,7 +225,7 @@ const CodeRubrique = () => {
               style={{
                 maxHeight: 1030,
                 minHeight: 410,
-                height: "calc(100vh - 250px)",
+                height: "calc(100vh - 300px)",
                 overflowY: "auto",
               }}
             >

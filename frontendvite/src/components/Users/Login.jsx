@@ -1,17 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Alert, Spin, message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import loginImage from "../image/login2.jpg";
 import background from "../image/bureau3.jpg";
 import userIcon from "../image/user.jpg";
-
 import "./style.css";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [messageError, setMessageError] = useState(null);
   const navigate = useNavigate();
+
+  // ➤ Redirection immédiate si déjà connecté
+  useEffect(() => {
+    const username = localStorage.getItem("username");
+    const role = localStorage.getItem("role");
+    const division = localStorage.getItem("division");
+
+    if (username && role) {
+      if (role === "admin") {
+        navigate("/utilisateurs", { replace: true });
+      } else if (division === "Pension") {
+        navigate("/pension", { replace: true });
+      } else if (division === "Solde") {
+        navigate("/solde", { replace: true });
+      } else {
+        navigate("/utilisateurs", { replace: true });
+      }
+    }
+  }, [navigate]);
 
   const handleLogin = async (values) => {
     const { username, password } = values;
@@ -24,10 +42,7 @@ export default function Login() {
       localStorage.setItem("role", "admin");
       window.dispatchEvent(new Event("storage"));
       message.success("Connexion réussie !");
-      setTimeout(() => {
-        navigate("/utilisateurs");
-        setLoading(false);
-      }, 1000);
+      navigate("/utilisateurs", { replace: true });
       return;
     }
 
@@ -49,22 +64,21 @@ export default function Login() {
         localStorage.setItem("role", "user");
 
         message.success(msg);
-        setTimeout(() => {
-          if (user.division === "Pension") {
-            navigate("/pension");
-          } else if (user.division === "Solde") {
-            navigate("/solde");
-          } else {
-            navigate("/utilisateurs");
-          }
-        }, 1000);
+        if (user.division === "Pension") {
+          navigate("/pension", { replace: true });
+          return;
+        } else if (user.division === "Solde") {
+          navigate("/solde", { replace: true });
+          return;
+        } else {
+          navigate("/utilisateurs", { replace: true });
+          return;
+        }
       } else {
         setMessageError("Nom d'utilisateur ou mot de passe incorrect");
       }
     } catch (error) {
       setMessageError("Nom d'utilisateur ou mot de passe incorrect");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -84,11 +98,7 @@ export default function Login() {
         </div>
         <div className="login-right">
           <Spin spinning={loading} size="large">
-            <Form
-              onFinish={handleLogin}
-              className="login-form"
-              layout="vertical"
-            >
+            <Form onFinish={handleLogin} className="login-form" layout="vertical">
               <div style={{ textAlign: "center", marginBottom: 50 }}>
                 <img
                   src={userIcon}
@@ -114,34 +124,16 @@ export default function Login() {
 
               <Form.Item
                 name="username"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez entrer votre nom d'utilisateur !",
-                  },
-                ]}
+                rules={[{ required: true, message: "Veuillez entrer votre nom d'utilisateur !" }]}
               >
-                <Input
-                  prefix={<UserOutlined />}
-                  placeholder="Nom d'utilisateur"
-                  size="large"
-                />
+                <Input prefix={<UserOutlined />} placeholder="Nom d'utilisateur" size="large" />
               </Form.Item>
 
               <Form.Item
                 name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez entrer votre mot de passe !",
-                  },
-                ]}
+                rules={[{ required: true, message: "Veuillez entrer votre mot de passe !" }]}
               >
-                <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Mot de passe"
-                  size="large"
-                />
+                <Input.Password prefix={<LockOutlined />} placeholder="Mot de passe" size="large" />
               </Form.Item>
 
               <Form.Item>

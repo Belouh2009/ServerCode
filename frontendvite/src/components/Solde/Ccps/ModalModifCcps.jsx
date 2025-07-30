@@ -641,7 +641,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
           </Button>
 
           {formFields.map((field, index) => (
-            <Row key={index} gutter={8} style={{ marginTop: "10px" }}>
+            <Row key={index} gutter={8}>
               <Col span={8}>
                 <Form.Item label="Rubrique">
                   <ReactSelect
@@ -658,10 +658,17 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                         selectedOption ? selectedOption.value : ""
                       )
                     }
-                    options={availableRubriques.map((rubrique) => ({
-                      value: rubrique,
-                      label: rubrique,
-                    }))}
+                    options={availableRubriques
+                      .filter(
+                        (rubrique) =>
+                          !formFields.some(
+                            (f, i) => i !== index && f.rubrique === rubrique
+                          )
+                      )
+                      .map((rubrique) => ({
+                        value: rubrique,
+                        label: rubrique,
+                      }))}
                     required
                   />
                 </Form.Item>

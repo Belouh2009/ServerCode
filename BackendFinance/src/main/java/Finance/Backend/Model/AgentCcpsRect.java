@@ -15,70 +15,70 @@ public class AgentCcpsRect {
 	@Id
 	@Column(unique = true)
 	private String matricule;
-	
+
 	private String civilite;
-	
+
 	private String nom;
-	
+
 	private String prenom;
-	
+
 	private String enfant;
-	
+
 	private String localite;
-	
+
 	@Column(name = "cessationservice")
 	private String cessationService;
-	
+
 	private String corps;
-	
+
 	private String grade;
-	
+
 	private String indice;
-	
+
 	private Long zone;
-	
+
 	private String chapitre;
-	
+
 	private String article;
-	
+
 	private String acte;
-	
+
 	@Column(name = "referenceacte")
 	private String referenceActe;
-	
+
 	@Column(name = "dateacte")
 	private LocalDate dateActe;
-	
+
 	@Column(name = "datecessation")
 	private LocalDate dateCessation;
-	
+
 	@Column(name = "datefinpai")
 	private LocalDate dateFinPai;
-	
+
 	private Double montant;
-	
+
 	@Column(name = "referencerecette")
 	private String referenceRecette;
-	
+
 	@Column(name = "dateordrerecette")
 	private LocalDate dateOrdreRecette;
-	
+
 	@Column(name = "datedebut")
 	private LocalDate dateDebut;
-	
+
 	@Column(name = "datedernierpai")
 	private LocalDate dateDernierPai;
-	
+
 	@Column(name = "idcertificatrect")
 	private String idCertificatRect;
-	
-    @OneToOne(cascade = CascadeType.ALL) // Prise en charge de l'insertion ou mise à jour du certificat
-    @JoinColumn(name = "id_certificat", referencedColumnName = "idCertificat", unique = true, nullable = true)
-    private CertificatCcpsRect certificat;
-    
-    @OneToMany(mappedBy = "agentccps", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonManagedReference
-    private List<SesituerCcpsRect> sesituer = new ArrayList<>();
+
+	@OneToOne(cascade = CascadeType.ALL) // Prise en charge de l'insertion ou mise à jour du certificat
+	@JoinColumn(name = "id_certificat", referencedColumnName = "idCertificat", nullable = true)
+	private CertificatCcps certificat;
+
+	@OneToMany(mappedBy = "agentccps", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JsonManagedReference
+	private List<SesituerCcpsRect> sesituer = new ArrayList<>();
 
 	public String getMatricule() {
 		return matricule;
@@ -272,11 +272,11 @@ public class AgentCcpsRect {
 		this.idCertificatRect = idCertificatRect;
 	}
 
-	public CertificatCcpsRect getCertificat() {
+	public CertificatCcps getCertificat() {
 		return certificat;
 	}
 
-	public void setCertificat(CertificatCcpsRect certificat) {
+	public void setCertificat(CertificatCcps certificat) {
 		this.certificat = certificat;
 	}
 
@@ -286,16 +286,16 @@ public class AgentCcpsRect {
 
 	public void setSesituer(List<SesituerCcpsRect> sesituer) {
 		this.sesituer = sesituer;
-        if (sesituer != null) {
-            this.sesituer.addAll(sesituer);
-        }
+		if (sesituer != null) {
+			this.sesituer.addAll(sesituer);
+		}
 	}
 
 	public AgentCcpsRect(String matricule, String civilite, String nom, String prenom, String enfant, String localite,
 			String cessationService, String corps, String grade, String indice, Long zone, String chapitre,
 			String article, String acte, String referenceActe, LocalDate dateActe, LocalDate dateCessation,
 			LocalDate dateFinPai, Double montant, String referenceRecette, LocalDate dateOrdreRecette,
-			LocalDate dateDebut, LocalDate dateDernierPai, String idCertificatRect, CertificatCcpsRect certificat,
+			LocalDate dateDebut, LocalDate dateDernierPai, String idCertificatRect, CertificatCcps certificat,
 			List<SesituerCcpsRect> sesituer) {
 		super();
 		this.matricule = matricule;
@@ -330,6 +330,4 @@ public class AgentCcpsRect {
 		super();
 	}
 
-    
-    
 }

@@ -8,16 +8,16 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import Finance.Backend.DTO.AgentCcpsRectDTO;
-import Finance.Backend.DTO.CertificatCcpsRectDTO;
+import Finance.Backend.DTO.CertificatCcpsDTO;
 import Finance.Backend.DTO.SeSituerCcpsRectDTO;
 import Finance.Backend.DTO.RubriqueSoldeDTO;
 import Finance.Backend.Exception.RubriqueNotFoundException;
 import Finance.Backend.Model.AgentCcpsRect;
-import Finance.Backend.Model.CertificatCcpsRect;
+import Finance.Backend.Model.CertificatCcps;
 import Finance.Backend.Model.RubriqueSolde;
 import Finance.Backend.Model.SesituerCcpsRect;
 import Finance.Backend.Repository.AgentCcpsRectRepository;
-import Finance.Backend.Repository.CertificatCcpsRectRepository;
+import Finance.Backend.Repository.CertificatCcpsRepository;
 import Finance.Backend.Repository.RubriqueSoldeRepository;
 import Finance.Backend.Repository.SeSituerCcpsRectRepository;
 import jakarta.transaction.Transactional;
@@ -26,11 +26,11 @@ import jakarta.transaction.Transactional;
 public class AgentCcpsRectService {
 
 	private final AgentCcpsRectRepository agentRepository;
-    private final CertificatCcpsRectRepository certificatRepository;
+     private final CertificatCcpsRepository certificatRepository;
     private final RubriqueSoldeRepository rubriqueRepository;
     private final SeSituerCcpsRectRepository seSituerRepository;
 
-    public AgentCcpsRectService(AgentCcpsRectRepository agentRepository, CertificatCcpsRectRepository certificatRepository,
+    public AgentCcpsRectService(AgentCcpsRectRepository agentRepository,  CertificatCcpsRepository certificatRepository,
                            RubriqueSoldeRepository rubriqueRepository, SeSituerCcpsRectRepository seSituerRepository) {
         this.agentRepository = agentRepository;
         this.certificatRepository = certificatRepository;
@@ -41,9 +41,9 @@ public class AgentCcpsRectService {
     @Transactional
     public AgentCcpsRect enregistrerAgent(AgentCcpsRectDTO agentDTO) {
         // 1️⃣ Enregistrement du certificat (avec Optional)
-        CertificatCcpsRect certificat = Optional.ofNullable(agentDTO.getCertificat())
+        CertificatCcps certificat = Optional.ofNullable(agentDTO.getCertificat())
                 .map(cert -> {
-                	CertificatCcpsRect newCertificat = new CertificatCcpsRect();
+                	CertificatCcps newCertificat = new CertificatCcps();
                     newCertificat.setIdCertificat(cert.getId_certificat());
                     newCertificat.setDateCreation(LocalDate.parse(cert.getDate_creation().toString()));
                     newCertificat.setAjoutPar(cert.getAjout_par());
@@ -207,9 +207,9 @@ public class AgentCcpsRectService {
         }).collect(Collectors.toList());
     }
 
-    private CertificatCcpsRectDTO mapCertificatToDTO(CertificatCcpsRect certificat) {
+    private CertificatCcpsDTO mapCertificatToDTO(CertificatCcps certificat) {
         if (certificat == null) return null;
-        CertificatCcpsRectDTO certificatDTO = new CertificatCcpsRectDTO();
+        CertificatCcpsDTO certificatDTO = new CertificatCcpsDTO();
         certificatDTO.setId_certificat(certificat.getIdCertificat());
         certificatDTO.setDate_creation(certificat.getDateCreation());
         certificatDTO.setAjout_par(certificat.getAjoutPar());
@@ -252,11 +252,11 @@ public class AgentCcpsRectService {
         
         // Mise à jour du certificat
         if (agentDTO.getCertificat() != null) {
-            CertificatCcpsRect certificat = agent.getCertificat();  // Récupérer le certificat actuel
+            CertificatCcps certificat = agent.getCertificat();  // Récupérer le certificat actuel
 
             if (certificat == null) {
                 // Si aucun certificat n'est associé, créer un nouveau certificat
-                certificat = new CertificatCcpsRect();
+                certificat = new CertificatCcps();
                 certificat.setIdCertificat(agentDTO.getCertificat().getId_certificat());
                 certificat.setAjoutPar(agentDTO.getCertificat().getAjout_par());
             }

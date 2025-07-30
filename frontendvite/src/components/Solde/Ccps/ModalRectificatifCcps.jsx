@@ -644,12 +644,21 @@ const ModalRectifCcps = ({
         <Col span={7} className="form-container">
           <h5>Informations Rubrique</h5>
 
-          <Button type="primary" block onClick={handleAddField}>
+          <Button
+            type="primary"
+            block
+            onClick={handleAddField}
+            style={{
+              backgroundColor: "#1268da",
+              borderColor: "#1268da",
+              marginBottom: 12,
+            }}
+          >
             Ajouter <IoMdAdd />
           </Button>
 
           {formFields.map((field, index) => (
-            <Row key={index} gutter={8} style={{ marginTop: "10px" }}>
+            <Row key={index} gutter={8}>
               <Col span={8}>
                 <Form.Item label="Rubrique">
                   <ReactSelect
@@ -666,7 +675,7 @@ const ModalRectifCcps = ({
                         selectedOption ? selectedOption.value : ""
                       )
                     }
-                    options={rubriques.map((rubrique) => ({
+                    options={availableRubriques.map((rubrique) => ({
                       value: rubrique,
                       label: rubrique,
                     }))}

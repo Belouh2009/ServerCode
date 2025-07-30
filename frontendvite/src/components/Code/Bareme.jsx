@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import ReactSelect from "react-select";
+import axios from "axios";
 import {
   Layout,
   Input,
@@ -9,30 +11,86 @@ import {
   Card,
   Typography,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { RiFileEditFill } from "react-icons/ri";
 import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
-import ModalBareme from "./ModalBareme"; // Assure-toi d'avoir ce composant modal
+import ModalBareme from "./ModalBareme";
 
 const { Title } = Typography;
 const { Content } = Layout;
 
 const Bareme = () => {
-  const [fileData, setFileData] = useState([]);
   const [baremes, setBaremes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedBareme, setSelectedBareme] = useState(null);
+  const [datesBareme, setDatesBareme] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [indices, setIndices] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedCategorie, setSelectedCategorie] = useState(null);
+  const [selectedIndice, setSelectedIndice] = useState(null);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+
+    // Si la date est déjà au bon format (venant du back)
+    if (dateStr.includes("/")) return dateStr;
+
+    // Si c'est une date Excel (nombre)
+    if (typeof dateStr === "number") {
+      return XLSX.SSF.format("dd/mm/yyyy", dateStr);
+    }
+
+    // Essayer différents formats de séparation
+    const separators = ["-", "/", "."];
+    for (const sep of separators) {
+      if (dateStr.includes(sep)) {
+        const parts = dateStr.split(sep);
+        // Si on a 3 parties et que la première fait 4 chiffres (année)
+        if (parts.length === 3 && parts[0].length === 4) {
+          return `${parts[2]}${sep}${parts[1]}${sep}${parts[0]}`;
+        }
+        // Si format JJ/MM/AAAA
+        if (parts.length === 3 && parts[2].length === 4) {
+          return dateStr; // déjà au bon format
+        }
+      }
+    }
+
+    return dateStr; // retourne tel quel si format non reconnu
+  };
 
   const fetchBaremes = () => {
     setLoading(true);
-    fetch("http://localhost:8087/bareme/all")
-      .then((res) => res.json())
-      .then((data) => {
-        setBaremes(data);
-        setFilteredData(data);
+    axios
+      .get("http://localhost:8087/bareme/all")
+      .then((response) => {
+        const formattedData = response.data.map((item) => {
+          // Vérification supplémentaire pour le format de date
+          let formattedDate = item.datebareme;
+          if (item.datebareme) {
+            formattedDate = formatDate(item.datebareme);
+            // Si le formatage a échoué, on garde la valeur originale
+            if (formattedDate.includes("undefined")) {
+              formattedDate = item.datebareme;
+            }
+          }
+
+          return {
+            ...item,
+            datebareme: formattedDate,
+          };
+        });
+
+        setBaremes(formattedData);
+        setFilteredData(formattedData);
         setLoading(false);
       })
       .catch((err) => {
@@ -42,8 +100,84 @@ const Bareme = () => {
   };
 
   useEffect(() => {
+    const fetchDates = async () => {
+      try {
+        const response = await axios.get("http://localhost:8087/bareme/dates");
+        const options = response.data.map((date) => ({
+          value: date,
+          label: date,
+        }));
+        setDatesBareme(options);
+      } catch (error) {
+        console.error("Erreur lors du chargement des dates", error);
+      }
+    };
+    fetchDates();
     fetchBaremes();
   }, []);
+
+  useEffect(() => {
+    if (selectedDate) {
+      const fetchCategories = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8087/bareme/categories?date=${selectedDate.value}`
+          );
+          const options = response.data.map((cat) => ({
+            value: cat,
+            label: `${cat}`,
+          }));
+          setCategories(options);
+          setSelectedCategorie(null);
+          setIndices([]);
+        } catch (error) {
+          console.error("Erreur lors du chargement des catégories", error);
+        }
+      };
+      fetchCategories();
+    }
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (selectedDate && selectedCategorie) {
+      const fetchIndices = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8087/bareme/indices?date=${selectedDate.value}&categorie=${selectedCategorie.value}`
+          );
+          const options = response.data.map((indice) => ({
+            value: indice,
+            label: `${indice}`,
+          }));
+          setIndices(options);
+          setSelectedIndice(null);
+        } catch (error) {
+          console.error("Erreur lors du chargement des indices", error);
+        }
+      };
+      fetchIndices();
+    }
+  }, [selectedDate, selectedCategorie]);
+
+  const handleFilterClick = () => {
+    let filtered = baremes;
+
+    if (selectedDate) {
+      filtered = filtered.filter(
+        (b) => b.datebareme === formatDate(selectedDate.value)
+      );
+    }
+
+    if (selectedCategorie) {
+      filtered = filtered.filter((b) => b.categorie == selectedCategorie.value);
+    }
+
+    if (selectedIndice) {
+      filtered = filtered.filter((b) => b.indice == selectedIndice.value);
+    }
+
+    setFilteredData(filtered);
+  };
 
   const handleShowEditModal = (record) => {
     Swal.fire({
@@ -59,6 +193,14 @@ const Bareme = () => {
         setShowModal(true);
       }
     });
+  };
+
+  // Nouvelle fonction pour réinitialiser les filtres
+  const handleResetFilters = () => {
+    setSelectedDate(null);
+    setSelectedCategorie(null);
+    setSelectedIndice(null);
+    setFilteredData(baremes); // Réaffiche toutes les données
   };
 
   const handleFileUpload = (file) => {
@@ -84,7 +226,6 @@ const Bareme = () => {
         solde: item.SOLDE,
       }));
 
-      setFileData(formattedData);
       sendToBackend(formattedData);
     };
     reader.readAsArrayBuffer(file);
@@ -110,7 +251,7 @@ const Bareme = () => {
 
         if (res.ok) {
           Swal.fire("Succès", result.message, "success");
-          fetchBaremes(); // recharge les données
+          fetchBaremes();
         } else {
           Swal.fire(
             "Erreur",
@@ -123,16 +264,6 @@ const Bareme = () => {
         Swal.fire("Erreur", "Erreur réseau ou serveur", "error");
         console.error("Erreur import:", err);
       });
-  };
-
-  const handleSearch = (e) => {
-    const search = e.target.value.toLowerCase();
-    const filtered = baremes.filter((b) =>
-      Object.values(b).some(
-        (v) => v && v.toString().toLowerCase().includes(search)
-      )
-    );
-    setFilteredData(filtered);
   };
 
   const columns = [
@@ -156,52 +287,158 @@ const Bareme = () => {
   ];
 
   return (
-    <Content style={{ padding: 24, minHeight: 280 }}>
-      <Title level={2}>Table des Barèmes</Title>
+    <Content
+      style={{
+        marginLeft: "10px",
+        marginTop: "10px",
+        padding: "24px",
+        background: "#f4f6fc",
+        color: "#000",
+        borderRadius: "12px",
+        minHeight: "280px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+      }}
+    >
+      <Title
+        level={2}
+        style={{
+          color: "#1e88e5",
+          marginBottom: "20px",
+        }}
+      >
+        Table des Barèmes
+      </Title>
       {loading ? (
-        <Spin size="large" />
+        <div style={{ textAlign: "center", padding: "20px" }}>
+          <Spin size="large" />
+          <p>Chargement des données...</p>
+        </div>
       ) : (
         <Card>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
-              marginBottom: 16,
+              marginBottom: 10,
             }}
           >
-            <Input
-              placeholder="🔍 Rechercher..."
-              onChange={handleSearch}
-              style={{ width: 200 }}
-            />
             <Upload
               beforeUpload={handleFileUpload}
               showUploadList={false}
               accept=".xls,.xlsx"
             >
-              <Button icon={<UploadOutlined />}>Importer Excel</Button>
+              <Button type="primary" icon={<UploadOutlined />}>Importer Excel</Button>
             </Upload>
           </div>
           <div
             style={{
-              maxHeight: 830,
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "16px",
+              marginBottom: "16px",
+              flexWrap: "wrap",
+            }}
+          >
+            {/* Date Select */}
+            <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+              <label style={{ display: "block", marginBottom: 4 }}>
+                Date du barème
+              </label>
+              <ReactSelect
+                options={datesBareme}
+                value={selectedDate}
+                onChange={setSelectedDate}
+                placeholder="Sélectionnez une date"
+              />
+            </div>
+
+            {/* Catégorie Select */}
+            <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+              <label style={{ display: "block", marginBottom: 4 }}>
+                Catégorie
+              </label>
+              <ReactSelect
+                options={categories}
+                value={selectedCategorie}
+                onChange={setSelectedCategorie}
+                isDisabled={!selectedDate}
+                placeholder={
+                  selectedDate
+                    ? "Sélectionnez une catégorie"
+                    : "Choisissez d'abord une date"
+                }
+              />
+            </div>
+
+            {/* Indice Select */}
+            <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+              <label style={{ display: "block", marginBottom: 4 }}>
+                Indice
+              </label>
+              <ReactSelect
+                options={indices}
+                value={selectedIndice}
+                onChange={setSelectedIndice}
+                isDisabled={!selectedCategorie}
+                placeholder={
+                  selectedCategorie
+                    ? "Sélectionnez un indice"
+                    : "Choisissez d'abord une catégorie"
+                }
+              />
+            </div>
+
+            {/* Boutons d'action */}
+            <div
+              style={{
+                flex: "0 0 auto",
+                display: "flex",
+                marginTop: "24px",
+                gap: "8px",
+                alignSelf: "center",
+              }}
+            >
+              <Button
+                type="primary"
+                icon={<SearchOutlined />}
+                onClick={handleFilterClick}
+                disabled={
+                  !selectedDate && !selectedCategorie && !selectedIndice
+                }
+              >
+                Rechercher
+              </Button>
+              <Button
+                onClick={handleResetFilters}
+                color="cyan"
+                variant="solid"
+                icon={<SyncOutlined />}
+              >
+                Actualiser
+              </Button>
+            </div>
+          </div>
+          <div
+            className="hide-scrollbar"
+            style={{
+              maxHeight: 950,
               minHeight: 410,
-              height: "calc(100vh - 250px)", // ajuste cette valeur selon ton layout (navbar, header, etc.)
+              height: "calc(100vh - 380px)",
               overflowY: "auto",
             }}
           >
             <Table
               bordered
               size="middle"
-              dataSource={filteredData}
               columns={columns}
-              rowKey="idCorps"
+              dataSource={filteredData}
+              rowKey="id"
               pagination={{
-                pageSize: 40,
+                pageSize: 20,
                 position: ["bottomRight"],
                 showSizeChanger: false,
               }}
-              scroll={{ y: "100%" }} // prend 100% de la hauteur disponible
+              scroll={{ y: "100%" }}
               rowClassName={() => "table-row-hover"}
               className="styled-table"
             />

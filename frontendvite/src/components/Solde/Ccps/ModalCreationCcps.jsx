@@ -593,16 +593,23 @@ const ModalCreation = ({
                         selectedOption ? selectedOption.value : ""
                       )
                     }
-                    options={rubriques.map((rubrique) => ({
-                      value: rubrique,
-                      label: rubrique,
-                    }))}
+                    options={rubriques
+                      .filter(
+                        (rubrique) =>
+                          !formFields.some(
+                            (f, i) => i !== index && f.rubrique === rubrique
+                          )
+                      )
+                      .map((rubrique) => ({
+                        value: rubrique,
+                        label: rubrique,
+                      }))}
                     required
                   />
                 </Form.Item>
               </Col>
 
-              <Col span={12}>
+              <Col span={11}>
                 <Form.Item label="Montant">
                   <Input
                     style={{ height: "39px" }}

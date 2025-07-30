@@ -266,14 +266,22 @@ export default function ContentUsers({ status, setStatus }) {
             </div>
           ) : (
             <div
-              className="hide-scrollbar"
               style={{
                 maxHeight: 1030,
                 minHeight: 410,
-                height: "calc(100vh - 250px)",
-                overflowY: "auto",
+                height: "calc(100vh - 290px)",
+                overflowY: "auto", // Garde le défilement fonctionnel
+                scrollbarWidth: "none", // Firefox
+                msOverflowStyle: "none", // IE/Edge
               }}
             >
+              {/* Style intégré pour Chrome/Safari */}
+              <style>{`
+                ::-webkit-scrollbar {
+                  display: none !important;
+                }
+              `}</style>
+
               <Table
                 bordered
                 size="middle"
@@ -285,7 +293,7 @@ export default function ContentUsers({ status, setStatus }) {
                   position: ["bottomRight"],
                   showSizeChanger: false,
                 }}
-                scroll={{ y: "100%" }}
+                scroll={{ x: "max-content" }}
                 rowClassName={() => "table-row-hover"}
                 className="styled-table"
               />

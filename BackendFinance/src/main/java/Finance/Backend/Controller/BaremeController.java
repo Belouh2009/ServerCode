@@ -19,6 +19,23 @@ public class BaremeController {
     @Autowired
     private BaremeService baremeService;
 
+    @GetMapping("/dates")
+    public List<String> getDistinctDates() {
+        return baremeService.getDistinctDatesFormatted();
+    }
+
+    @GetMapping("/categories")
+    public List<Integer> getCategoriesByDate(@RequestParam String date) {
+        return baremeService.getCategoriesForDate(date);
+    }
+
+    @GetMapping("/indices")
+    public List<Integer> getIndicesByDateAndCategory(
+            @RequestParam String date,
+            @RequestParam Integer categorie) {
+        return baremeService.getIndicesForDateAndCategory(date, categorie);
+    }
+
     // Endpoint pour importer une liste de barèmes
     @PostMapping("/import")
     public ResponseEntity<Map<String, String>> importBaremes(@RequestBody List<Bareme> baremeList) {

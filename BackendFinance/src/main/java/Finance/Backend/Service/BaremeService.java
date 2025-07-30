@@ -1,7 +1,10 @@
 package Finance.Backend.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,23 @@ import Finance.Backend.Repository.BaremeRepository;
 public class BaremeService {
     @Autowired
     private BaremeRepository baremeRepository;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    public List<String> getDistinctDatesFormatted() {
+        return baremeRepository.findDistinctDatebareme().stream()
+                .map(date -> date.format(dateFormatter))
+                .collect(Collectors.toList());
+    }
+
+    public List<Integer> getCategoriesForDate(String formattedDate) {
+        LocalDate date = LocalDate.parse(formattedDate, dateFormatter);
+        return baremeRepository.findDistinctCategorieByDatebareme(date);
+    }
+
+    public List<Integer> getIndicesForDateAndCategory(String formattedDate, Integer category) {
+        LocalDate date = LocalDate.parse(formattedDate, dateFormatter);
+        return baremeRepository.findDistinctIndiceByDatebaremeAndCategorie(date, category);
+    }
 
     // Sauvegarder une liste de barèmes
     public void saveAllBaremes(List<Bareme> baremeList) {
