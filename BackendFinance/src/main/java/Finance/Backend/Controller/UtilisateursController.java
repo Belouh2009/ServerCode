@@ -21,16 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 import Finance.Backend.DTO.LoginDTO;
 import Finance.Backend.DTO.LoginResponseDTO;
 import Finance.Backend.DTO.RegistreDTO;
+import Finance.Backend.DTO.UserInfoDTO;
 import Finance.Backend.Model.Utilisateurs;
 import Finance.Backend.Repository.UtilisateurRepository;
 import Finance.Backend.Service.UtilisateursService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/utilisateur")
 @CrossOrigin("*")
 public class UtilisateursController {
 
-	private final UtilisateursService userService;
+    private final UtilisateursService userService;
     private final UtilisateurRepository userRepository;
 
     @Autowired
@@ -46,7 +48,6 @@ public class UtilisateursController {
 
     @PostMapping("/valide/{matricule}")
     public ResponseEntity<String> validateUser(@PathVariable String matricule) {
-        // Utilisation du service pour valider l'utilisateur
         String result = userService.valideUser(matricule);
         if (result.equals("Utilisateur non trouvé")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
@@ -63,7 +64,6 @@ public class UtilisateursController {
         return ResponseEntity.ok(result);
     }
     
- // Endpoint pour supprimer un utilisateur
     @DeleteMapping("/delete/{matricule}")
     public ResponseEntity<String> supprimerUtilisateur(@PathVariable String matricule) {
         try {
@@ -74,7 +74,6 @@ public class UtilisateursController {
         }
     }
     
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         LoginResponseDTO user = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
@@ -89,8 +88,6 @@ public class UtilisateursController {
         }
     }
 
-
-
     @GetMapping
     public List<Utilisateurs> getUsers(@RequestParam String status) {
         return userService.getUsersByStatus(status);
@@ -98,20 +95,15 @@ public class UtilisateursController {
 
     @GetMapping("/non-valide/count")
     public long getNonValideCount() {
-        return userRepository.countByValide(false);  // Supposant que la méthode countByValide existe dans le repository
+        return userRepository.countByValide(false);
     }
     
-    
-    
-    // Endpoint pour enregistrer ou mettre à jour les informations d'un utilisateur
     @PutMapping("/update")
     public ResponseEntity<Utilisateurs> updateUtilisateur(@RequestBody Utilisateurs utilisateur) {
         Utilisateurs updatedUtilisateur = userService.saveOrUpdateUtilisateur(utilisateur);
         return ResponseEntity.ok(updatedUtilisateur);
     }
 
-
-    // Endpoint pour récupérer les informations d'un utilisateur
     @GetMapping("/{matricule}")
     public ResponseEntity<Utilisateurs> getUtilisateur(@PathVariable String matricule) {
         Utilisateurs utilisateur = userService.getUtilisateurByMatricule(matricule);
@@ -122,4 +114,24 @@ public class UtilisateursController {
         }
     }
 
+    // Nouvelle méthode pour récupérer les infos utilisateur par username
+    @GetMapping("/by-username/{username}")
+    public ResponseEntity<?> getUserProfile(@PathVariable String username) {
+        try {
+            UserInfoDTO userInfo = userService.getUserInfoByUsername(username);
+            return ResponseEntity.ok(userInfo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+     @PutMapping("/update-profile")
+    public ResponseEntity<?> updateUserProfile(@Valid @RequestBody UserInfoDTO userInfoDTO) {
+        try {
+            Utilisateurs updatedUser = userService.updateUserInfo(userInfoDTO);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

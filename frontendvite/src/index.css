@@ -433,3 +433,15 @@ html, body, #root {
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari & Opera */
 }
+
+.user-profile-container {
+  transition: all 0.3s ease;
+}
+
+.user-profile-container:hover {
+  transform: translateY(-2px);
+}
+
+.ant-descriptions-item-content {
+  word-break: break-word;
+}
