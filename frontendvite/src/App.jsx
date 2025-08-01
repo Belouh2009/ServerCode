@@ -7,8 +7,10 @@ import Registre from "../src/components/Users/Registre";
 import Mdp from "../src/components/Users/MotDePasseO";
 import Unauthorized from "./components/Users/Unauthorized";
 import ProtectedRoute from "../src/ProtectedRoute";
+import useIdleRedirect from "../src/useIdleRedirect";
 
 function App() {
+  useIdleRedirect(); 
   return (
     <Routes>
       {/* Routes publiques */}

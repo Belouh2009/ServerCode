@@ -98,7 +98,11 @@ export default function Login() {
         </div>
         <div className="login-right">
           <Spin spinning={loading} size="large">
-            <Form onFinish={handleLogin} className="login-form" layout="vertical">
+            <Form
+              onFinish={handleLogin}
+              className="login-form"
+              layout="vertical"
+            >
               <div style={{ textAlign: "center", marginBottom: 50 }}>
                 <img
                   src={userIcon}
@@ -124,16 +128,34 @@ export default function Login() {
 
               <Form.Item
                 name="username"
-                rules={[{ required: true, message: "Veuillez entrer votre nom d'utilisateur !" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez entrer votre nom d'utilisateur !",
+                  },
+                ]}
               >
-                <Input prefix={<UserOutlined />} placeholder="Nom d'utilisateur" size="large" />
+                <Input
+                  prefix={<UserOutlined />}
+                  placeholder="Nom d'utilisateur"
+                  size="large"
+                />
               </Form.Item>
 
               <Form.Item
                 name="password"
-                rules={[{ required: true, message: "Veuillez entrer votre mot de passe !" }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez entrer votre mot de passe !",
+                  },
+                ]}
               >
-                <Input.Password prefix={<LockOutlined />} placeholder="Mot de passe" size="large" />
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  placeholder="Mot de passe"
+                  size="large"
+                />
               </Form.Item>
 
               <Form.Item>
