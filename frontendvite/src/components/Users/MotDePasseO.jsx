@@ -13,7 +13,7 @@ const ForgotPassword = () => {
 
     const handleFetchUser = async (matricule) => {
         try {
-            const response = await axios.get(`http://192.168.88.53:8087/utilisateur/${matricule}`);
+            const response = await axios.get(`http://192.168.88.28:8087/utilisateur/${matricule}`);
             setUserData(response.data); // stocke les infos sans les afficher
         } // Dans handleFetchUser
         catch (error) {
@@ -44,7 +44,7 @@ const ForgotPassword = () => {
             }
 
             // Envoie la mise à jour avec les infos récupérées
-            const response = await axios.put('http://192.168.88.53:8087/utilisateur/update', {
+            const response = await axios.put('http://192.168.88.28:8087/utilisateur/update', {
                 matricule: values.matricule,
                 username: values.username,
                 password: values.newPassword,

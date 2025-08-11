@@ -108,7 +108,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   useEffect(() => {
     axios
-      .get("http://192.168.88.53:8087/CorpsGradeIndice/corps")
+      .get("http://192.168.88.28:8087/CorpsGradeIndice/corps")
       .then((response) => {
         setCorpsList(response.data);
         setLoadingCorps(false);
@@ -119,21 +119,21 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       });
 
     axios
-      .get("http://192.168.88.53:8087/chapitres")
+      .get("http://192.168.88.28:8087/chapitres")
       .then((response) => setChapitreList(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.53:8087/articles")
+      .get("http://192.168.88.28:8087/articles")
       .then((response) => setArticles(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.53:8087/localites/noms")
+      .get("http://192.168.88.28:8087/localites/noms")
       .then((response) => {
         setLocalites(response.data);
       })
@@ -146,7 +146,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
   useEffect(() => {
     if (rubriques.length === 0 && localRubriques.length === 0) {
       // Ajouter la condition pour vérifier si rubriques sont déjà présentes
-      fetch("http://192.168.88.53:8087/rubriquesolde/ids")
+      fetch("http://192.168.88.28:8087/rubriquesolde/ids")
         .then((response) => response.json())
         .then((data) => {
           if (Array.isArray(data)) {
@@ -191,7 +191,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
     setIndice(""); // Réinitialiser l'indice
     try {
       const response = await axios.get(
-        `http://192.168.88.53:8087/CorpsGradeIndice/grades?corps=${value}`
+        `http://192.168.88.28:8087/CorpsGradeIndice/grades?corps=${value}`
       );
       setGradesWithIndices(response.data);
     } catch (error) {
@@ -272,7 +272,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
     try {
       // Assurez-vous que l'URL est correcte
       const response = await axios.put(
-        `http://192.168.88.53:8087/agentsCcps/modifier/${agent.key}`, // Utilise 'key' dans l'URL
+        `http://192.168.88.28:8087/agentsCcps/modifier/${agent.key}`, // Utilise 'key' dans l'URL
         updatedAgentData,
         { headers: { "Content-Type": "application/json" } }
       );

@@ -64,7 +64,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
   useEffect(() => {
     if (rubriques.length === 0 && localRubriques.length === 0) {
       // Ajouter la condition pour vérifier si rubriques sont déjà présentes
-      fetch("http://192.168.88.53:8087/rubriques/ids")
+      fetch("http://192.168.88.28:8087/rubriques/ids")
         .then((response) => response.json())
         .then((data) => {
           if (Array.isArray(data)) {
@@ -79,7 +79,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const fetchComptables = async () => {
     try {
-      const response = await fetch("http://192.168.88.53:8087/comptables/liste");
+      const response = await fetch("http://192.168.88.28:8087/comptables/liste");
       const data = await response.json();
       setOptions(data);
       return data;
@@ -91,7 +91,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const fetchBanques = async () => {
     try {
-      const response = await fetch("http://192.168.88.53:8087/comptables/banques");
+      const response = await fetch("http://192.168.88.28:8087/comptables/banques");
       const data = await response.json();
       setOptions(data);
       return data;
@@ -162,7 +162,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
     try {
       // Assurez-vous que l'URL est correcte
       const response = await axios.put(
-        `http://192.168.88.53:8087/agents/modifier/${agent.key}`, // Utilise 'key' dans l'URL
+        `http://192.168.88.28:8087/agents/modifier/${agent.key}`, // Utilise 'key' dans l'URL
         updatedAgentData,
         { headers: { "Content-Type": "application/json" } }
       );

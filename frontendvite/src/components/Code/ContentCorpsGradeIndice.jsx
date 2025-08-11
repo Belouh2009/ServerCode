@@ -31,7 +31,7 @@ const CodeCorps = ({ darkTheme }) => {
   const fetchRubriques = () => {
     setLoading(true);
     axios
-      .get("http://192.168.88.53:8087/CorpsGradeIndice/all")
+      .get("http://192.168.88.28:8087/CorpsGradeIndice/all")
       .then((response) => {
         setRubriques(response.data);
         setFilteredData(response.data);

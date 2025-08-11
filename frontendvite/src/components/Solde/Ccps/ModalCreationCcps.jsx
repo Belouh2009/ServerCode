@@ -24,7 +24,7 @@ const ModalCreation = ({
 
   useEffect(() => {
     axios
-      .get("http://192.168.88.53:8087/CorpsGradeIndice/corps")
+      .get("http://192.168.88.28:8087/CorpsGradeIndice/corps")
       .then((response) => {
         setCorpsList(response.data);
         setLoadingCorps(false);
@@ -35,21 +35,21 @@ const ModalCreation = ({
       });
 
     axios
-      .get("http://192.168.88.53:8087/chapitres")
+      .get("http://192.168.88.28:8087/chapitres")
       .then((response) => setChapitreList(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.53:8087/articles")
+      .get("http://192.168.88.28:8087/articles")
       .then((response) => setArticles(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.53:8087/localites/noms")
+      .get("http://192.168.88.28:8087/localites/noms")
       .then((response) => {
         setLocalites(response.data);
       })
@@ -58,7 +58,7 @@ const ModalCreation = ({
       });
 
     axios
-      .get("http://192.168.88.53:8087/rubriquesolde/ids")
+      .get("http://192.168.88.28:8087/rubriquesolde/ids")
       .then((response) => {
         const data = response.data;
         if (Array.isArray(data)) setRubriques(data);
@@ -72,7 +72,7 @@ const ModalCreation = ({
   const handleCorpsChange = (value) => {
     setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" })); // Réinitialiser grade et indice
     axios
-      .get(`http://192.168.88.53:8087/CorpsGradeIndice/grades?corps=${value}`)
+      .get(`http://192.168.88.28:8087/CorpsGradeIndice/grades?corps=${value}`)
       .then((response) => setGradesWithIndices(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des grades :", error)
@@ -164,7 +164,7 @@ const ModalCreation = ({
     try {
       // Récupérer le dernier ID
       const lastIdResponse = await fetch(
-        "http://192.168.88.53:8087/certificatsCcps/lastId"
+        "http://192.168.88.28:8087/certificatsCcps/lastId"
       );
       if (!lastIdResponse.ok) {
         throw new Error("Impossible de récupérer le dernier ID");
@@ -195,7 +195,7 @@ const ModalCreation = ({
 
       // Envoi de la requête pour enregistrer l'agent
       const response = await fetch(
-        "http://192.168.88.53:8087/agentsCcps/enregistre",
+        "http://192.168.88.28:8087/agentsCcps/enregistre",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

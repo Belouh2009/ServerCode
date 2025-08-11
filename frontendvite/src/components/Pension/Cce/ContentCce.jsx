@@ -49,7 +49,7 @@ export default function ContentSection() {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://192.168.88.53:8087/agentsCce/all");
+      const response = await axios.get("http://192.168.88.28:8087/agentsCce/all");
       console.log(response.data); // Vérifie la structure des données renvoyées
       setUsers(response.data);
     } catch (error) {

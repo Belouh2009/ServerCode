@@ -65,7 +65,7 @@ export default function App() {
       const username = localStorage.getItem("username");
 
       const response = await axios.get(
-        `http://192.168.88.53:8087/utilisateur/by-username/${username}`,
+        `http://192.168.88.28:8087/utilisateur/by-username/${username}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,7 +140,7 @@ export default function App() {
   
         // 2. Envoyer la requête
         const response = await axios.put(
-          "http://192.168.88.53:8087/utilisateur/update-profile",
+          "http://192.168.88.28:8087/utilisateur/update-profile",
           dataToSend
         );
   

@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 // Fonction pour récupérer le libellé du corps en fonction de son ID
 const fetchLibelleCorps = async (corps) => {
     try {
-        const response = await axios.get(`http://192.168.88.53:8087/corps/libelle/${corps}`);
+        const response = await axios.get(`http://192.168.88.28:8087/corps/libelle/${corps}`);
         return response.data || "Non disponible";
     } catch (error) {
         console.error("Erreur lors de la récupération du libellé du corps :", error);

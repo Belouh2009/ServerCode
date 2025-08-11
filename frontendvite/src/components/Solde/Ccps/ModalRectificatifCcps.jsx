@@ -116,7 +116,7 @@ const ModalRectifCcps = ({
 
   useEffect(() => {
     axios
-      .get("http://192.168.88.53:8087/CorpsGradeIndice/corps")
+      .get("http://192.168.88.28:8087/CorpsGradeIndice/corps")
       .then((response) => {
         setCorpsList(response.data);
         setLoadingCorps(false);
@@ -127,21 +127,21 @@ const ModalRectifCcps = ({
       });
 
     axios
-      .get("http://192.168.88.53:8087/chapitres")
+      .get("http://192.168.88.28:8087/chapitres")
       .then((response) => setChapitreList(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.53:8087/articles")
+      .get("http://192.168.88.28:8087/articles")
       .then((response) => setArticles(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.53:8087/localites/noms")
+      .get("http://192.168.88.28:8087/localites/noms")
       .then((response) => {
         setLocalites(response.data);
       })
@@ -154,7 +154,7 @@ const ModalRectifCcps = ({
   useEffect(() => {
     if (rubriques.length === 0 && localRubriques.length === 0) {
       // Ajouter la condition pour vérifier si rubriques sont déjà présentes
-      fetch("http://192.168.88.53:8087/rubriquesolde/ids")
+      fetch("http://192.168.88.28:8087/rubriquesolde/ids")
         .then((response) => response.json())
         .then((data) => {
           if (Array.isArray(data)) {
@@ -199,7 +199,7 @@ const ModalRectifCcps = ({
     setIndice(""); // Réinitialiser l'indice
     try {
       const response = await axios.get(
-        `http://192.168.88.53:8087/CorpsGradeIndice/grades?corps=${value}`
+        `http://192.168.88.28:8087/CorpsGradeIndice/grades?corps=${value}`
       );
       setGradesWithIndices(response.data);
     } catch (error) {
@@ -241,7 +241,7 @@ const ModalRectifCcps = ({
     try {
       // Récupération du dernier ID
       const lastIdResponse = await fetch(
-        "http://192.168.88.53:8087/certificatsCcps/lastId"
+        "http://192.168.88.28:8087/certificatsCcps/lastId"
       );
       if (!lastIdResponse.ok)
         throw new Error("Impossible de récupérer le dernier ID");
@@ -291,7 +291,7 @@ const ModalRectifCcps = ({
       };
 
       const response = await axios.post(
-        `http://192.168.88.53:8087/agentsCcpsRect/enregistre`,
+        `http://192.168.88.28:8087/agentsCcpsRect/enregistre`,
         updatedAgentData,
         { headers: { "Content-Type": "application/json" } }
       );

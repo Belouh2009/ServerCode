@@ -22,7 +22,7 @@ const ModalModifCorpsGradeIndice = ({ open, onClose, corpsgradeindice, onSuccess
 
         try {
             const response = await axios.put(
-                `http://192.168.88.53:8087/CorpsGradeIndice/modifier/${corpsgradeindice.id}`,
+                `http://192.168.88.28:8087/CorpsGradeIndice/modifier/${corpsgradeindice.id}`,
                 updatedCorpsData,
                 { headers: { "Content-Type": "application/json" } }
             );

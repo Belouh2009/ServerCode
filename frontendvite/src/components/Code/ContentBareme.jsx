@@ -57,7 +57,7 @@ const Bareme = () => {
   useEffect(() => {
     const fetchDates = async () => {
       try {
-        const response = await axios.get("http://192.168.88.53:8087/bareme/dates");
+        const response = await axios.get("http://192.168.88.28:8087/bareme/dates");
         const options = response.data.map((date) => ({
           value: date,
           label: date,
@@ -75,7 +75,7 @@ const Bareme = () => {
       const fetchCategories = async () => {
         try {
           const response = await axios.get(
-            `http://192.168.88.53:8087/bareme/categories?date=${selectedDate.value}`
+            `http://192.168.88.28:8087/bareme/categories?date=${selectedDate.value}`
           );
           const options = response.data.map((cat) => ({
             value: cat,
@@ -97,7 +97,7 @@ const Bareme = () => {
       const fetchIndices = async () => {
         try {
           const response = await axios.get(
-            `http://192.168.88.53:8087/bareme/indices?date=${selectedDate.value}&categorie=${selectedCategorie.value}`
+            `http://192.168.88.28:8087/bareme/indices?date=${selectedDate.value}&categorie=${selectedCategorie.value}`
           );
           const options = response.data.map((indice) => ({
             value: indice,
@@ -116,7 +116,7 @@ const Bareme = () => {
   const handleFilterClick = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://192.168.88.53:8087/bareme/all");
+      const response = await axios.get("http://192.168.88.28:8087/bareme/all");
       let filtered = response.data;
 
       if (selectedDate) {

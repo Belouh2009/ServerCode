@@ -52,7 +52,7 @@ export default function ContentSection({ darkTheme }) {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://192.168.88.53:8087/agentsCcpsRect/all"
+        "http://192.168.88.28:8087/agentsCcpsRect/all"
       );
       setUsers(response.data);
     } catch (error) {

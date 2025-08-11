@@ -47,7 +47,7 @@ export default function Login() {
     }
 
     try {
-      const response = await fetch(`http://192.168.88.53:8087/utilisateur/login`, {
+      const response = await fetch(`http://192.168.88.28:8087/utilisateur/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

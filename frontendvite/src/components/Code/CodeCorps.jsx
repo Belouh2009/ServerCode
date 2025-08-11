@@ -29,7 +29,7 @@ const CodeCorps = () => {
   // Fonction pour récupérer les rubriques depuis le backend
   const fetchRubriques = () => {
     setLoading(true);
-    fetch("http://192.168.88.53:8087/corps/all")
+    fetch("http://192.168.88.28:8087/corps/all")
       .then((response) => response.json())
       .then((data) => {
         setRubriques(data);
@@ -85,7 +85,7 @@ const CodeCorps = () => {
   };
 
   const sendToBackend = (data) => {
-    fetch("http://192.168.88.53:8087/corps/import", {
+    fetch("http://192.168.88.28:8087/corps/import", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

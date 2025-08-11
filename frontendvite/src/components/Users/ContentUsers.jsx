@@ -31,7 +31,7 @@ export default function ContentUsers({ status, setStatus }) {
   const updateNonValideCount = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.88.53:8087/utilisateur/non-valide/count"
+        "http://192.168.88.28:8087/utilisateur/non-valide/count"
       );
       setNonValideCount(response.data);
     } catch (error) {
@@ -46,7 +46,7 @@ export default function ContentUsers({ status, setStatus }) {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://192.168.88.53:8087/utilisateur?status=${status}`
+        `http://192.168.88.28:8087/utilisateur?status=${status}`
       );
       setUsers(response.data);
     } catch (error) {
@@ -69,7 +69,7 @@ export default function ContentUsers({ status, setStatus }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.post(
-            `http://192.168.88.53:8087/utilisateur/valide/${matricule}`
+            `http://192.168.88.28:8087/utilisateur/valide/${matricule}`
           );
           if (response.status === 200) {
             Swal.fire("Succès", "Utilisateur validé avec succès !", "success");
@@ -96,7 +96,7 @@ export default function ContentUsers({ status, setStatus }) {
       if (result.isConfirmed) {
         try {
           const response = await axios.post(
-            `http://192.168.88.53:8087/utilisateur/blocke/${matricule}`
+            `http://192.168.88.28:8087/utilisateur/blocke/${matricule}`
           );
           if (response.status === 200) {
             Swal.fire("Bloqué", "Utilisateur bloqué avec succès !", "success");
