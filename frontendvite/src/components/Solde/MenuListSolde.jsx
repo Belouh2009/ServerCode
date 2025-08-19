@@ -26,10 +26,9 @@ const MenuList = ({ darkTheme, setSelectedPage }) => {
       icon: <CodepenOutlined />,
       children: [
         { key: "bareme", label: "Bareme" },
-        { key: "corps", label: "Corps" },
+        { key: "corps", label: "Corps Grade Indice" },
         { key: "zone", label: "Zone" },
         { key: "rubrique", label: "Rubrique" },
-        { key: "corps-grade-indice", label: "Corps-Grade-Indice" },
       ],
     },
   ];

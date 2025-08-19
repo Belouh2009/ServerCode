@@ -21,10 +21,11 @@ const ModalCreation = ({
   const [localites, setLocalites] = useState([]);
   const [articles, setArticles] = useState([]);
   const [rubriques, setRubriques] = useState([]);
+  const [loadingCorps, setLoadingCorps] = useState(true);
 
   useEffect(() => {
     axios
-      .get("http://localhost:8087/CorpsGradeIndice/corps")
+      .get("http://localhost:8087/corps/distinct")
       .then((response) => {
         setCorpsList(response.data);
         setLoadingCorps(false);
@@ -72,7 +73,7 @@ const ModalCreation = ({
   const handleCorpsChange = (value) => {
     setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" })); // Réinitialiser grade et indice
     axios
-      .get(`http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`)
+      .get(`http://localhost:8087/corps/grades?corps=${value}`)
       .then((response) => setGradesWithIndices(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des grades :", error)
@@ -329,6 +330,12 @@ const ModalCreation = ({
                     value={formData.enfant || ""}
                     onChange={handleChangeMain}
                     placeholder="00"
+                    min={0}
+                    onKeyPress={(e) => {
+                      if (e.key === "-" || e.key === "e" || e.key === "E") {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </Form.Item>
               </Col>
@@ -341,6 +348,12 @@ const ModalCreation = ({
                     value={formData.zone || ""}
                     onChange={handleChangeMain}
                     placeholder="00"
+                    min={0}
+                    onKeyPress={(e) => {
+                      if (e.key === "-" || e.key === "e" || e.key === "E") {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                 </Form.Item>
               </Col>

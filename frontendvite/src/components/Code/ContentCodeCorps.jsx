@@ -16,13 +16,10 @@ import Swal from "sweetalert2";
 const { Title } = Typography;
 const { Content } = Layout;
 
-const ContentCodeCorps = ({ darkTheme }) => {
-  const [fileData, setFileData] = useState([]);
+const ContentCodeCorps = () => {
   const [rubriques, setRubriques] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [showModalCorps, setShowModalCorps] = useState(false); // Correction de la variable pour afficher le modal
-  const [selectedCorps, setSelectedCorps] = useState(null); // Correction de l'orthographe de "selectedCorps"
 
   // Fonction pour récupérer les rubriques depuis le backend
   const fetchCorps = () => {
@@ -44,35 +41,28 @@ const ContentCodeCorps = ({ darkTheme }) => {
     fetchCorps();
   }, []);
 
-  const handleShowEditModal = (corps) => {
-    Swal.fire({
-      title: "Êtes-vous sûr ?",
-      text: "Vous allez modifier ce corps !",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Oui",
-      cancelButtonText: "Annuler",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setSelectedCorps(corps);
-        setShowModalCorps(true);
-      }
-    });
-  };
-
   const handleSearch = (e) => {
     const searchTerm = e.target.value.toLowerCase();
+
     const filtered = rubriques.filter((corps) => {
-      const idCorps = corps.idCorps ? corps.idCorps.toLowerCase() : "";
+      const codeCorps = corps.corps ? corps.corps.toLowerCase() : "";
       const libelleCorps = corps.libelleCorps
         ? corps.libelleCorps.toLowerCase()
         : "";
       const categorie = corps.categorie ? corps.categorie.toLowerCase() : "";
+      const grade = corps.grade ? corps.grade.toLowerCase() : "";
+      // indice est un nombre, on le convertit en chaîne, sinon chaîne vide
+      const indice =
+        corps.indice !== null && corps.indice !== undefined
+          ? String(corps.indice).toLowerCase()
+          : "";
 
       return (
-        idCorps.includes(searchTerm) ||
+        codeCorps.includes(searchTerm) ||
         libelleCorps.includes(searchTerm) ||
-        categorie.includes(searchTerm)
+        categorie.includes(searchTerm) ||
+        grade.includes(searchTerm) ||
+        indice.includes(searchTerm)
       );
     });
 
@@ -81,11 +71,10 @@ const ContentCodeCorps = ({ darkTheme }) => {
 
   const columns = [
     {
-      title: "ID Corps",
-      dataIndex: "idCorps",
-      key: "idCorps",
-      sorter: (a, b) => a.idCorps.localeCompare(b.idCorps),
-      defaultSortOrder: "ascend",
+      title: "Code Corps",
+      dataIndex: "corps",
+      key: "corps",
+      sorter: (a, b) => a.corps.localeCompare(b.corps),
     },
     {
       title: "Libellé",
@@ -99,20 +88,23 @@ const ContentCodeCorps = ({ darkTheme }) => {
       key: "categorie",
       sorter: (a, b) => a.categorie.localeCompare(b.categorie),
     },
+    {
+      title: "Grade",
+      dataIndex: "grade",
+      key: "grade",
+      sorter: (a, b) => a.grade.localeCompare(b.grade),
+    },
+    {
+      title: "Indice",
+      dataIndex: "indice",
+      key: "indice",
+      sorter: (a, b) => a.indice.localeCompare(b.indice),
+    },
   ];
 
   return (
     <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
+      className="content"
     >
       <Title
         level={2}
@@ -155,13 +147,7 @@ const ContentCodeCorps = ({ darkTheme }) => {
             </div>
           ) : (
             <div
-              className="hide-scrollbar"
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                 height: "calc(100vh - 290px)",
-                overflowY: "auto",
-              }}
+             className="tableau"
             >
               <Table
                 bordered

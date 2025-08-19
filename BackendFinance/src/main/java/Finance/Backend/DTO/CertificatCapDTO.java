@@ -8,6 +8,8 @@ public class CertificatCapDTO {
     private LocalDate date_creation;
     private String ajout_par;
     private String modif_par;
+    private LocalDate dateImpression;
+    
 
     public String getId_certificat() {
         return id_certificat;
@@ -41,13 +43,23 @@ public class CertificatCapDTO {
         this.modif_par = modif_par;
     }
 
-    public CertificatCapDTO(String id_certificat, LocalDate date_creation, String ajout_par, String modif_par) {
+    public CertificatCapDTO() {
+    }
+
+    public CertificatCapDTO(String id_certificat, LocalDate date_creation, String ajout_par, String modif_par,
+            LocalDate dateImpression) {
         this.id_certificat = id_certificat;
         this.date_creation = date_creation;
         this.ajout_par = ajout_par;
         this.modif_par = modif_par;
+        this.dateImpression = dateImpression;
     }
 
-    public CertificatCapDTO() {
+    public LocalDate getDateImpression() {
+        return dateImpression;
+    }
+
+    public void setDateImpression(LocalDate dateImpression) {
+        this.dateImpression = dateImpression;
     }
 }

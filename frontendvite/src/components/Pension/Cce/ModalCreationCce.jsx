@@ -365,6 +365,7 @@ const ModalCreationCce = ({
               </Checkbox>
 
               <Select
+                showSearch
                 name="additional_info"
                 value={formData.additional_info || undefined}
                 onChange={(value) =>

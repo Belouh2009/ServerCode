@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Button, Layout, Dropdown, Menu } from "antd";
+import { useState, useEffect, useRef } from "react";
+import { Button, Layout, Dropdown, Menu, message } from "antd";
 import Logo from "../Logo";
 import MenuListUser from "./MenuListUser";
 import {
@@ -7,11 +7,12 @@ import {
   MenuUnfoldOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { FaBell, FaPowerOff, FaUser } from "react-icons/fa";
+import { FaBell, FaPowerOff, FaUser, FaAngleDown } from "react-icons/fa";
 import axios from "axios";
 import ContentUsers from "./ContentUsers";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { SmileOutlined } from "@ant-design/icons";
 
 import CodeRubrique from "../Code/CodeRubrique";
 import CodeRubriqueSolde from "../Code/CodeRubriqueSolde";
@@ -29,6 +30,33 @@ export default function AppUsers() {
   const [selectedPage, setSelectedPage] = useState("users");
   const [nonValideCount, setNonValideCount] = useState(0);
   const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
+  const welcomeShown = useRef(false);
+
+  useEffect(() => {
+    if (!welcomeShown.current) {
+      welcomeShown.current = true;
+      messageApi.success({
+        content: (
+          <div className="welcome-message-content">
+            <SmileOutlined className="welcome-icon" />
+            <span>Bienvenue, Administrateur !</span>
+          </div>
+        ),
+        duration: 5,
+        className: "custom-welcome-message",
+        style: {
+          marginTop: "60px",
+          maxWidth: "400px",
+          animation: "slideInDown 0.5s ease-out",
+        },
+      });
+    }
+
+    updateNonValideCount();
+    const interval = setInterval(updateNonValideCount, 10000);
+    return () => clearInterval(interval);
+  });
 
   const handleLogout = () => {
     Swal.fire({
@@ -64,12 +92,6 @@ export default function AppUsers() {
     }
   };
 
-  useEffect(() => {
-    updateNonValideCount();
-    const interval = setInterval(updateNonValideCount, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
   const handleMenuClick = (key) => {
     if (key === "logout") {
       handleLogout();
@@ -78,6 +100,8 @@ export default function AppUsers() {
 
   const renderContent = () => {
     switch (selectedPage) {
+      case "users":
+        return <ContentUsers status={status} setStatus={setStatus} />;
       case "bareme":
         return <Bareme status={status} setStatus={setStatus} />;
       case "corps":
@@ -95,8 +119,20 @@ export default function AppUsers() {
     }
   };
 
+  const handleNotificationClick = () => {
+    setStatus("invalid");
+    setSelectedPage("users");
+
+    // Ajout d'un feedback visuel
+    messageApi.info({
+      content: "Affichage des comptes en attente de validation",
+      duration: 3,
+    });
+  };
+
   return (
     <Layout>
+      {contextHolder}
       <Sider
         collapsed={collapsed}
         collapsible
@@ -117,22 +153,7 @@ export default function AppUsers() {
       </Sider>
 
       <Layout>
-        <Header
-          style={{
-            padding: 0,
-            background: "linear-gradient(to right, #2196f3, #1e88e5)",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: "16px",
-            marginLeft: "10px",
-            marginTop: "10px",
-            marginRight: "10px",
-            height: "64px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-          }}
-          className="headers"
-        >
+        <Header className="headers">
           <Button
             type="text"
             className="toggle"
@@ -148,49 +169,43 @@ export default function AppUsers() {
             }
           />
 
-          <h1 style={{ marginLeft: "15px", color: "#fff", fontSize: "20px" }}>
-            Edition CSP
-          </h1>
+          <h1 className="header-title">Edition CSP</h1>
 
           <div className="nav-action">
+            {/* Notification badge */}
             <div
-              className="notify-icon"
-              id="btnNonValide"
-              onClick={() => setStatus("invalid")}
+              className="notification-badge"
+              onClick={handleNotificationClick}
+              title={`${nonValideCount} compte(s) en attente de validation`}
             >
-              <FaBell
-                size={19}
-                className="btn-action"
-                title={`Il y a ${nonValideCount} nouveau(x) compte(s) !`}
-                style={{ color: "#fff" }}
-              />
-              <span style={{ background: "#ff4d4f", color: "#fff" }}>
-                {nonValideCount}
-              </span>
+              <FaBell className="notification-icon" />
+              {nonValideCount > 0 && (
+                <span className="badge-count">{nonValideCount}</span>
+              )}
             </div>
-
+            {/* User dropdown */}
             <Dropdown
               overlay={
                 <Menu onClick={({ key }) => handleMenuClick(key)}>
                   <Menu.Item key="logout" danger>
-                    <span style={{ display: "flex", alignItems: "center" }}>
-                      <FaPowerOff
-                        style={{ marginRight: "8px", fontSize: "15px" }}
-                      />
+                    <div className="menu-item">
+                      <FaPowerOff className="menu-icon" />
                       Se déconnecter
-                    </span>
+                    </div>
                   </Menu.Item>
                 </Menu>
               }
               placement="bottomRight"
               trigger={["click"]}
             >
-              <div
-                className="user-menu"
-                style={{ cursor: "pointer", marginRight: "12px" }}
-              >
-                <FaUser className="icon" />
-                <span style={{ marginLeft: "6px", marginRight: "15px" }}>Administrateur</span>
+              <div className="dropdown-trigger">
+                <div className="user-avatar">
+                  <FaUser />
+                </div>
+                <div className="user-info">
+                  <span className="username">Administrateur</span>
+                  <FaAngleDown className="dropdown-icon" />
+                </div>
               </div>
             </Dropdown>
           </div>

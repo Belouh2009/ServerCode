@@ -9,7 +9,7 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import { IoPrint } from "react-icons/io5";
-import { Button } from "antd";
+import { Button, Tooltip, message } from "antd";
 import logo from "../../image/icon.jpg";
 import Swal from "sweetalert2";
 
@@ -73,7 +73,8 @@ const styles = StyleSheet.create({
 });
 
 const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("fr-FR");
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("fr-FR");
 };
 
 const CertificatPDF = ({ dataList }) => {
@@ -122,7 +123,7 @@ const CertificatPDF = ({ dataList }) => {
               {data?.sesituer?.map((cap, index) => (
                 <View key={index}>
                   <Text style={styles.detailsText}>
-                    - {cap?.rubrique?.id_rubrique} ({cap?.rubrique?.libelle}) :
+                    - {cap?.rubrique?.id_rubrique} ({cap?.rubrique?.libelle}) :{" "}
                     {typeof cap.montant === "number"
                       ? cap.montant.toLocaleString("fr-FR").replace(/\s/g, ".")
                       : "N/A"}{" "}
@@ -145,21 +146,35 @@ const CertificatPDF = ({ dataList }) => {
   );
 };
 
-// ✅ Fonction pour générer et ouvrir le PDF immédiatement
-const generateAndOpenPDF = async (dataList) => {
-  const blob = await pdf(<CertificatPDF dataList={dataList} />).toBlob();
-  const url = URL.createObjectURL(blob);
-  window.open(url, "_blank");
-};
+const OpenPDFButton = ({ data, label = "PDF", onBeforePrint }) => {
+  const [loading, setLoading] = React.useState(false);
 
-// ✅ Bouton de génération et ouverture automatique du PDF
-const OpenPDFButton = ({ data, label = "PDF" }) => {
+  const generateAndOpenPDF = async (dataList) => {
+    try {
+      setLoading(true);
+      
+      // Appel de la fonction avant impression si elle existe
+      if (onBeforePrint) {
+        await onBeforePrint();
+      }
+
+      const blob = await pdf(<CertificatPDF dataList={dataList} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error("Erreur lors de la génération du PDF:", error);
+      message.error("Erreur lors de la génération du PDF");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGenerate = () => {
-    if (!data || data.length === 0) {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
       Swal.fire({
         icon: "warning",
         title: "Aucune sélection",
-        text: "Veuillez sélectionner au moins un certificat avant d’imprimer.",
+        text: "Veuillez sélectionner au moins un certificat avant d'imprimer.",
       });
       return;
     }
@@ -169,14 +184,17 @@ const OpenPDFButton = ({ data, label = "PDF" }) => {
   };
 
   return (
-    <Button
-      style={{ marginLeft: "10px" }}
-      type="default"
-      icon={<IoPrint />}
-      onClick={handleGenerate}
-    >
-      {label}
-    </Button>
+    <Tooltip title="Imprimer ce certificat">
+      <Button
+        style={{ marginLeft: "10px" }}
+        type="default"
+        icon={<IoPrint />}
+        onClick={handleGenerate}
+        loading={loading}
+      >
+        {label}
+      </Button>
+    </Tooltip>
   );
 };
 

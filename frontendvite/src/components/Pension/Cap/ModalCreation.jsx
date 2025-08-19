@@ -359,12 +359,14 @@ const ModalCreation = ({
               </Checkbox>
 
               <Select
+                showSearch
+                optionFilterProp="children"
                 name="additional_info"
                 value={formData.additional_info || undefined}
                 onChange={(value) =>
                   setFormData((prev) => ({ ...prev, additional_info: value }))
                 }
-                style={{ marginTop: 10 }}
+                style={{ marginTop: 10, width: "100%" }}
                 placeholder="Sélectionner une option"
               >
                 {options.map((item) => (

@@ -187,17 +187,7 @@ const Bareme = () => {
 
   return (
     <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-        position: 'relative', // Ajouté pour le positionnement du spinner
-      }}
+      className="content"
     >
       <Title level={2} style={{ color: "#1e88e5", marginBottom: "20px" }}>
         Table des Barèmes

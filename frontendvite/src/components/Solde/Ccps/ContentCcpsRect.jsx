@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Typography, Table, Input, Button, Spin, Card } from "antd";
+import {
+  Layout,
+  Typography,
+  Table,
+  Input,
+  Button,
+  Spin,
+  Card,
+  Tooltip,
+} from "antd";
 import { RiFileEditFill } from "react-icons/ri";
 import Swal from "sweetalert2";
 import ModalModifCcpsRect from "./ModalModifCcpsRectif";
@@ -9,11 +18,9 @@ import OpenPDFButton from "./PdfCcpsRect";
 const { Content } = Layout;
 const { Title } = Typography;
 
-export default function ContentSection({ darkTheme }) {
+export default function ContentSection() {
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Pour gérer l'ouverture du modal
-  const [isEditing, setIsEditing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const [selectedAgent, setSelectedAgent] = useState(null);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -44,7 +51,6 @@ export default function ContentSection({ darkTheme }) {
     dateDebut: "",
     dateDernierPai: "",
   });
-  const [formFields, setFormFields] = useState([]);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -66,38 +72,6 @@ export default function ContentSection({ darkTheme }) {
     fetchAgentsRect();
   }, []);
 
-  const handleShowCreateModal = () => setShowModal(true);
-  const handleCloseModal = () => {
-    setFormData({
-      matricule: "",
-      idCertificatRect: "",
-      civilite: "",
-      nom: "",
-      prenom: "",
-      enfant: "",
-      localite: "",
-      cessationService: "",
-      corps: "",
-      grade: "",
-      indice: "",
-      zone: "",
-      chapitre: "",
-      article: "",
-      acte: "",
-      referenceActe: "",
-      dateActe: "",
-      dateCessation: "",
-      dateFinPai: "",
-      montant: "",
-      referenceRecette: "",
-      dateOrdreRecette: "",
-      dateDebut: "",
-      dateDernierPai: "",
-    });
-    setFormFields([]);
-    setShowModal(false);
-  };
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
   };
@@ -118,55 +92,48 @@ export default function ContentSection({ darkTheme }) {
     });
   };
 
-  const handleShowRectificatifModal = (agent) => {
-    Swal.fire({
-      title: "Êtes-vous sûr?",
-      text: "Vous allez réctifier ce certificat !",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Oui",
-      cancelButtonText: "Annuler",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setSelectedAgent(agent);
-        setIsModalOpen(true); // Ouvre le modal de modification
-      }
-    });
-  };
-
   const formatTableData = () => {
     return users.map((user) => ({
       key: user.matricule,
-      matricule: user.matricule || "-",
-      civilite: user.civilite || "-",
-      idCertificatRect: user.idCertificatRect || "-",
-      nom: user.nom || "-",
-      prenom: user.prenom || "-",
-      enfant: user.enfant || "-",
-      localite: user.localite || "-",
-      cessationService: user.cessationService || "-",
-      corps: user.corps || "-",
-      grade: user.grade || "-",
-      indice: user.indice || "-",
-      zone: user.zone || "-",
-      chapitre: user.chapitre || "-",
-      article: user.article || "-",
-      acte: user.acte || "-",
-      referenceActe: user.referenceActe || "-",
-      dateActe: user.dateActe || "-",
+      matricule: user.matricule || "",
+      civilite: user.civilite || "",
+      idCertificatRect: user.idCertificatRect || "",
+      nom: user.nom || "",
+      prenom: user.prenom || "",
+      enfant: user.enfant || "",
+      localite: user.localite || "",
+      cessationService: user.cessationService || "",
+      corps: user.corps || "",
+      grade: user.grade || "",
+      indice: user.indice || "",
+      zone: user.zone || "",
+      chapitre: user.chapitre || "",
+      article: user.article || "",
+      acte: user.acte || "",
+      referenceActe: user.referenceActe || "",
+      dateActe: user.dateActe || "",
       dateCessation: user.dateCessation || "-",
-      dateFinPai: user.dateFinPai || "-",
-      montant: user.montant || "-",
-      referenceRecette: user.referenceRecette || "-",
-      dateOrdreRecette: user.dateOrdreRecette || "-",
-      dateDebut: user.dateDebut || "-",
-      dateDernierPai: user.dateDernierPai || "-",
-      idCertificat: user.certificat.id_certificat || "-",
-      dateCreation: user.certificat.date_creation || "-",
+      dateFinPai: user.dateFinPai || "",
+      montant: user.montant || "",
+      referenceRecette: user.referenceRecette || "",
+      dateOrdreRecette: user.dateOrdreRecette || "",
+      dateDebut: user.dateDebut || "",
+      dateDernierPai: user.dateDernierPai || "",
+      idCertificat: user.certificat.id_certificat || "",
+      dateCreation: user.certificat.date_creation || "",
       ajoutPar: user.certificat.ajout_par || "N/A",
       modifPar: user.certificat.modif_par || "N/A",
       sesituer: user.sesituer || [],
     }));
+  };
+
+  const searchInDate = (dateString, searchTerm) => {
+    if (!dateString) return false;
+    try {
+      return new Date(dateString).toLocaleDateString().includes(searchTerm);
+    } catch {
+      return false;
+    }
   };
 
   const filteredData = formatTableData().filter(
@@ -189,15 +156,15 @@ export default function ContentSection({ darkTheme }) {
       user.article.toLowerCase().includes(searchTerm) ||
       user.acte.toLowerCase().includes(searchTerm) ||
       user.referenceActe.toLowerCase().includes(searchTerm) ||
-      user.dateActe.toLowerCase().includes(searchTerm) ||
-      user.dateCessation.toLowerCase().includes(searchTerm) ||
-      user.dateFinPai.toLowerCase().includes(searchTerm) ||
+      searchInDate(user.dateActe, searchTerm) ||
+      searchInDate(user.dateCessation, searchTerm) ||
+      searchInDate(user.dateFinPai, searchTerm) ||
+      searchInDate(user.dateOrdreRecette, searchTerm) ||
+      searchInDate(user.dateDebut, searchTerm) ||
+      searchInDate(user.dateDernierPai, searchTerm) ||
+      searchInDate(user.dateCreation, searchTerm) ||
       user.montant.toString().toLowerCase().includes(searchTerm) ||
       user.referenceRecette.toLowerCase().includes(searchTerm) ||
-      user.dateOrdreRecette.toLowerCase().includes(searchTerm) ||
-      user.dateDebut.toLowerCase().includes(searchTerm) ||
-      user.dateDernierPai.toLowerCase().includes(searchTerm) ||
-      user.dateCreation.toLowerCase().includes(searchTerm) ||
       user.ajoutPar.toLowerCase().includes(searchTerm) ||
       user.modifPar.toLowerCase().includes(searchTerm) ||
       user.sesituer.some((item) =>
@@ -215,16 +182,22 @@ export default function ContentSection({ darkTheme }) {
 
   const hasSelected = selectedRowKeys.length > 0;
 
+  const formatDate = (date) => {
+    return date ? new Date(date).toLocaleDateString("fr-FR") : "Aucun";
+  };
+
   const columns = [
     {
       title: "N°Certificat",
       dataIndex: "idCertificat",
       sorter: (a, b) => a.idCertificat.localeCompare(b.idCertificat),
+      defaultSortOrder: "ascend",
     },
     {
       title: "Date de Création",
       dataIndex: "dateCreation",
       sorter: (a, b) => a.dateCreation.localeCompare(b.dateCreation),
+      render: (date) => formatDate(date),
     },
     {
       title: "Matricule",
@@ -245,11 +218,13 @@ export default function ContentSection({ darkTheme }) {
       title: "Date Début",
       dataIndex: "dateDebut",
       sorter: (a, b) => a.dateDebut.localeCompare(b.dateDebut),
+      render: (date) => formatDate(date),
     },
     {
       title: "Date Fin",
       dataIndex: "dateFinPai",
       sorter: (a, b) => a.dateFinPai.localeCompare(b.dateFinPai),
+      render: (date) => formatDate(date),
     },
     {
       title: "Réctifié par",
@@ -262,35 +237,19 @@ export default function ContentSection({ darkTheme }) {
       dataIndex: "idCertificatRect",
       sorter: (a, b) => a.idCertificatRect.localeCompare(b.idCertificatRect),
     },
-    /*         {
-                    title: "Rubriques et Montants",
-                    render: (_, record) => (
-                        <div>
-                            {record.sesituer && record.sesituer.length > 0 ? (
-                                record.sesituer.map((item, index) => (
-                                    <div key={index}>
-                                        <span>
-                                            <strong>({item.rubrique.id_rubrique})</strong>: {item.montant.toLocaleString()} Ar
-                                        </span>
-                                    </div>
-                                ))
-                            ) : (
-                                <span>Aucune rubrique</span>
-                            )}
-                        </div>
-                    ),
-                }, */
     {
       title: "Actions",
       fixed: "right",
       width: 100,
       render: (_, record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Button type="primary" onClick={() => handleShowEditModal(record)}>
-            <RiFileEditFill size={15} />
-          </Button>
+          <Tooltip title="Modifier cette certificat">
+            <Button type="primary" onClick={() => handleShowEditModal(record)}>
+              <RiFileEditFill size={15} />
+            </Button>
+          </Tooltip>
 
-          <OpenPDFButton data={record} />
+          <OpenPDFButton data={record} label="Imprimer" />
         </div>
       ),
     },
@@ -300,6 +259,7 @@ export default function ContentSection({ darkTheme }) {
     <Content
       style={{
         marginLeft: "10px",
+        marginRight: "10px",
         marginTop: "10px",
         padding: "24px",
         background: "#f4f6fc",
@@ -395,11 +355,11 @@ export default function ContentSection({ darkTheme }) {
       <ModalModifCcpsRect
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        isEditing={isEditing}
-        agent={selectedAgent}
+        formData={selectedAgent}
+        setFormData={setSelectedAgent}
         onSuccess={() => {
           fetchAgentsRect();
-          setIsModalOpen(false); // Fermer le modal après une modification réussie
+          setIsModalOpen(false);
         }}
       />
     </Content>

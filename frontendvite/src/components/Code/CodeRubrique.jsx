@@ -130,8 +130,7 @@ const CodeRubrique = () => {
       title: "ID Rubrique",
       dataIndex: "idRubrique",
       key: "idRubrique",
-      sorter: (a, b) => a.idRubrique.localeCompare(b.idRubrique), // Tri alphabétique
-      defaultSortOrder: "ascend", // Tri croissant par défaut
+      sorter: (a, b) => a.idRubrique.localeCompare(b.idRubrique),
     },
     {
       title: "Libellé",
@@ -155,16 +154,7 @@ const CodeRubrique = () => {
 
   return (
     <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
+      className="content"
     >
       <Title
         level={2}
@@ -221,13 +211,7 @@ const CodeRubrique = () => {
             </div>
           ) : (
             <div
-              className="hide-scrollbar"
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                height: "calc(100vh - 300px)",
-                overflowY: "auto",
-              }}
+              className="tableau"
             >
               <Table
                 bordered

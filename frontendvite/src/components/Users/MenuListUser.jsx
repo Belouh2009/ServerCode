@@ -3,7 +3,8 @@ import { UserAddOutlined, CodepenOutlined } from "@ant-design/icons";
 
 const { SubMenu } = Menu;
 
-const MenuList = ({ setSelectedPage }) => {
+const MenuList = ({ selectedPage, setSelectedPage }) => {
+  // Ajout de selectedPage en prop
   const menuItems = [
     { key: "users", icon: <UserAddOutlined />, label: "Utilisateurs" },
     {
@@ -12,7 +13,7 @@ const MenuList = ({ setSelectedPage }) => {
       icon: <CodepenOutlined />,
       children: [
         { key: "bareme", label: "Bareme" },
-        { key: "corps", label: "Corps" },
+        { key: "corps", label: "Corps Grade Indice" },
         { key: "zone", label: "Zone" },
         {
           key: "rubrique",
@@ -22,17 +23,16 @@ const MenuList = ({ setSelectedPage }) => {
             { key: "solde", label: "Solde" },
           ],
         },
-        { key: "corpsGradeIndice", label: "Corps Grade Indice" },
       ],
     },
   ];
 
   return (
     <Menu
-      theme="light" // ← forcé en clair
+      theme="light"
       mode="inline"
       className="menu-bar"
-      defaultSelectedKeys={["home"]}
+      selectedKeys={[selectedPage]} // Utilise selectedPage pour la sélection active
       onClick={(e) => setSelectedPage(e.key)}
     >
       {menuItems.map((item) =>

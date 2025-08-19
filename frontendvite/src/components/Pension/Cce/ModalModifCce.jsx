@@ -324,6 +324,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
               </Checkbox>
 
               <Select
+                showSearch
                 name="additional_info"
                 value={
                   options.includes(additionalInfo) ? additionalInfo : undefined
@@ -480,7 +481,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
             marginTop: 16,
           }}
         >
-          Mettre à jour
+          Enregistrer les modifications
         </Button>
       </div>
     </Modal>

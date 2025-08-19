@@ -9,58 +9,51 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import { IoPrint } from "react-icons/io5";
-import { Button } from "antd";
+import { Button, Tooltip, message } from "antd";
 import logo from "../../image/icon.jpg";
 import Swal from "sweetalert2";
 
+// Styles optimisés
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 30,
-    paddingBottom: 50,
-    paddingLeft: 50,
-    paddingRight: 50,
+    padding: "30pt 50pt",
     fontSize: 12,
     fontFamily: "Times-Roman",
+    lineHeight: 1.5,
   },
-  section: { marginBottom: 5 },
+  section: { 
+    marginBottom: 10,
+  },
+  header: {
+    marginBottom: 20,
+    textAlign: "center",
+  },
   title: {
     fontSize: 10,
-    textAlign: "center",
-    marginBottom: 10,
     fontWeight: "bold",
     color: "#000",
-    lineHeight: 1.5,
   },
   subtitle: {
     fontSize: 10,
-    textAlign: "center",
-    marginBottom: 20,
     fontWeight: "bold",
     color: "#333",
     textTransform: "uppercase",
-    lineHeight: 1.5,
+    marginTop: 10,
   },
   paragraph: {
     marginBottom: 10,
     textIndent: 20,
     fontSize: 10,
-    lineHeight: 1.25,
-  },
-  detailsTitle: {
-    fontSize: 10,
-    fontWeight: "bold",
-    marginBottom: 5,
   },
   detailsText: {
     fontSize: 10,
-    marginBottom: 5,
     marginLeft: 30,
+    marginBottom: 5,
   },
   footer: {
     fontSize: 10,
     textAlign: "right",
     marginTop: 20,
-    marginRight: 50,
   },
   logoContainer: {
     alignItems: "center",
@@ -72,64 +65,74 @@ const styles = StyleSheet.create({
   },
 });
 
-
+// Fonction de formatage de date sécurisée
 const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("fr-FR");
+  if (!dateString) return "N/A";
+  try {
+    const date = new Date(dateString);
+    return isNaN(date) ? "N/A" : date.toLocaleDateString("fr-FR");
+  } catch {
+    return "N/A";
+  }
 };
 
+// Composant PDF principal
 const CertificatPDF = ({ dataList }) => {
+  const currentDate = new Date().toLocaleDateString("fr-FR", {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
   return (
     <Document>
-      {dataList.map((data, i) => {
-        const annee = data?.date_creation
-          ? new Date(data.date_creation).getFullYear()
+      {dataList.map((data, index) => {
+        const year = data?.date_creation 
+          ? new Date(data.date_creation).getFullYear() 
           : "N/A";
-        const dateActuelle = new Date().toLocaleDateString("fr-FR");
 
         return (
-          <Page size="A4" style={styles.page}>
+          <Page key={`page-${index}`} size="A4" style={styles.page}>
             <View style={styles.logoContainer}>
               <Image src={logo} style={styles.logo} />
             </View>
 
-            <View>
+            <View style={styles.header}>
               <Text style={styles.title}>
-                MINISTERE DE L'ECONOMIE ET DE FINANCE
-                {"\n"}SECRETARIAT GENERAL
-                {"\n"}DIRECTION GENERALE DU BUDGET ET DES FINANCES
-                {"\n"}DIRECTION DE LA SOLDE ET DE PENSIONS
-                {"\n"}SERVICE REGIONAL DE LA SOLDE ET DE LA PENSIONS
-                {"\n"}HAUTE MATSIATRA
+                MINISTERE DE L'ECONOMIE ET DE FINANCE{"\n"}
+                SECRETARIAT GENERAL{"\n"}
+                DIRECTION GENERALE DU BUDGET ET DES FINANCES{"\n"}
+                DIRECTION DE LA SOLDE ET DE PENSIONS{"\n"}
+                SERVICE REGIONAL DE LA SOLDE ET DE LA PENSIONS{"\n"}
+                HAUTE MATSIATRA
               </Text>
 
               <Text style={styles.subtitle}>
-                CERTIFICAT ADMINISTRATIF DE LA PENSION
-                {"\n"}N° {data.id_certificat || "N/A"}/MEF/SG/DGBF/SRSP.HM/CCE
+                CERTIFICAT ADMINISTRATIF DE LA PENSION{"\n"}
+                N° {data.id_certificat || "N/A"}/MEF/SG/DGBF/SRSP.HM/CCE
               </Text>
             </View>
 
             <View style={styles.section}>
               <Text style={styles.paragraph}>
                 Le Chef du SERVICE REGIONAL DE LA SOLDE ET DES PENSIONS HAUTE
-                MATSIATRA soussigné, certifie que {data.civilite} {data.nom}{" "}
-                {data.prenom} est titulaire de la Pension n° {data.num_pension},
-                servie par la {data.caisse}, assignée payable à{" "}
-                {data.assignation}, est décédé le {formatDate(data.dateDece)}, pour l'année{" "}
-                {annee} comme suit :
+                MATSIATRA soussigné, certifie que {data.civilite || ""} {data.nom || ""}{" "}
+                {data.prenom || ""} est titulaire de la Pension n° {data.num_pension || "N/A"},
+                servie par la {data.caisse || "N/A"}, assignée payable à{" "}
+                {data.assignation || "N/A"}, est décédé le {formatDate(data.dateDece)},
+                pour l'année {year} comme suit :
               </Text>
             </View>
 
             <View style={styles.section}>
-              {data?.sesituer?.map((cce, index) => (
-                <View key={index}>
-                  <Text style={styles.detailsText}>
-                    - {cce?.rubrique?.id_rubrique} ({cce?.rubrique?.libelle}) :
-                    {typeof cce.montant === "number"
-                      ? cce.montant.toLocaleString("fr-FR").replace(/\s/g, ".")
-                      : "N/A"}{" "}
-                    Ariary
-                  </Text>
-                </View>
+              {data?.sesituer?.map((cce, idx) => (
+                <Text key={`cce-${idx}`} style={styles.detailsText}>
+                  - {cce?.rubrique?.id_rubrique || "N/A"} ({cce?.rubrique?.libelle || "N/A"}):{" "}
+                  {typeof cce.montant === "number"
+                    ? cce.montant.toLocaleString("fr-FR").replace(/\s/g, ".")
+                    : "N/A"}{" "}
+                  Ariary
+                </Text>
               ))}
             </View>
 
@@ -138,7 +141,7 @@ const CertificatPDF = ({ dataList }) => {
               servir et valoir ce que de droit.
             </Text>
 
-            <Text style={styles.footer}>Fianarantsoa, le {dateActuelle}</Text>
+            <Text style={styles.footer}>Fianarantsoa, le {currentDate}</Text>
           </Page>
         );
       })}
@@ -146,21 +149,40 @@ const CertificatPDF = ({ dataList }) => {
   );
 };
 
-// ✅ Fonction pour générer et ouvrir le PDF immédiatement
-const generateAndOpenPDF = async (dataList) => {
-  const blob = await pdf(<CertificatPDF dataList={dataList} />).toBlob();
-  const url = URL.createObjectURL(blob);
-  window.open(url, "_blank");
-};
+// Composant bouton PDF optimisé
+const OpenPDFButtonCce = ({ data, label = "PDF", onBeforePrint }) => {
+  const [loading, setLoading] = React.useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
-// ✅ Bouton de génération et ouverture automatique du PDF
-const OpenPDFButtonCce = ({ data, label = "PDF" }) => {
+  const generateAndOpenPDF = async (dataList) => {
+    try {
+      setLoading(true);
+      
+      if (onBeforePrint) {
+        await onBeforePrint();
+      }
+
+      const blob = await pdf(<CertificatPDF dataList={dataList} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      
+      const newWindow = window.open(url, "_blank");
+      if (!newWindow) {
+        messageApi.warning("Veuillez autoriser les popups pour afficher le PDF");
+      }
+    } catch (error) {
+      console.error("Erreur PDF:", error);
+      messageApi.error("Erreur lors de la génération du PDF");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGenerate = () => {
-    if (!data || data.length === 0) {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
       Swal.fire({
         icon: "warning",
         title: "Aucune sélection",
-        text: "Veuillez sélectionner au moins un certificat avant d’imprimer.",
+        text: "Veuillez sélectionner au moins un certificat avant d'imprimer.",
       });
       return;
     }
@@ -170,14 +192,20 @@ const OpenPDFButtonCce = ({ data, label = "PDF" }) => {
   };
 
   return (
-    <Button
-      style={{ marginLeft: "10px" }}
-      type="default"
-      icon={<IoPrint />}
-      onClick={handleGenerate}
-    >
-      {label}
-    </Button>
+    <>
+      {contextHolder}
+      <Tooltip title="Imprimer ce certificat">
+        <Button
+          style={{ marginLeft: 10 }}
+          type="default"
+          icon={<IoPrint />}
+          onClick={handleGenerate}
+          loading={loading}
+        >
+          {label}
+        </Button>
+      </Tooltip>
+    </>
   );
 };
 

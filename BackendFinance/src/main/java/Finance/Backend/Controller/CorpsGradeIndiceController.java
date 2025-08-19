@@ -29,27 +29,26 @@ public class CorpsGradeIndiceController {
 
     @Autowired
     private CorpsGradeIndiceService corpsGradeIndiceService;
-    
+
     @Autowired
     private CorpsGradeIndiceRepository corpsGradeIndiceRepository;
 
+    @PostMapping("/import")
+    public ResponseEntity<Map<String, String>> importCorpsGradeIndice(@RequestBody List<CorpsGradeIndice> corpsList) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            corpsGradeIndiceService.saveCorpsGradeIndice(corpsList);
+            response.put("message", "Les données Corps Grade Indice ont été importées avec succès !");
+            return ResponseEntity.ok(response);
 
-@PostMapping("/import")
-public ResponseEntity<Map<String, String>> importCorpsGradeIndice(@RequestBody List<CorpsGradeIndice> corpsList) {
-    Map<String, String> response = new HashMap<>();
-    try {
-        corpsGradeIndiceService.saveCorpsGradeIndice(corpsList);
-        response.put("message", "Les données Corps Grade Indice ont été importées avec succès !");
-        return ResponseEntity.ok(response);
-
-    } catch (DataIntegrityViolationException e) {
-        response.put("message", "Erreur : Une ou plusieurs valeurs de 'corps' existent déjà.");
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    } catch (Exception e) {
-        response.put("message", "Erreur lors de l'importation des données");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (DataIntegrityViolationException e) {
+            response.put("message", "Erreur : Une ou plusieurs valeurs de 'corps' existent déjà.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        } catch (Exception e) {
+            response.put("message", "Erreur lors de l'importation des données");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
-}
 
     @GetMapping("/all")
     public ResponseEntity<List<CorpsGradeIndice>> getAllCorpsGradeIndice() {
@@ -58,7 +57,8 @@ public ResponseEntity<Map<String, String>> importCorpsGradeIndice(@RequestBody L
     }
 
     @PutMapping("/modifier/{id}")
-    public ResponseEntity<Map<String, String>> modifierCorpsGradeIndice(@PathVariable("id") Long id, @RequestBody CorpsGradeIndice corps) {
+    public ResponseEntity<Map<String, String>> modifierCorpsGradeIndice(@PathVariable("id") Long id,
+            @RequestBody CorpsGradeIndice corps) {
         try {
             CorpsGradeIndice updatedCorps = corpsGradeIndiceService.updateCorpsGradeIndice(id, corps);
             Map<String, String> response = new HashMap<>();
@@ -71,15 +71,13 @@ public ResponseEntity<Map<String, String>> importCorpsGradeIndice(@RequestBody L
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
-    
 
     @GetMapping("/corps")
     public List<String> getAllCorps() {
         // Récupère distinctement les valeurs de la colonne "corps"
         return corpsGradeIndiceRepository.findDistinctCorps();
     }
-    
-    
+
     @GetMapping("/grades")
     public List<Map<String, Object>> getGradesWithIndices(@RequestParam String corps) {
         return corpsGradeIndiceRepository.findGradesWithIndices(corps);

@@ -22,7 +22,7 @@ const ModalCreation = ({
 
   useEffect(() => {
     axios
-      .get("http://localhost:8087/CorpsGradeIndice/corps")
+      .get("http://localhost:8087/corps/distinct")
       .then((response) => {
         setCorpsList(response.data);
         setLoadingCorps(false);
@@ -53,7 +53,7 @@ const ModalCreation = ({
   const handleCorpsChange = (value) => {
     setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" })); // Réinitialiser grade et indice
     axios
-      .get(`http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`)
+      .get(`http://localhost:8087/corps/grades?corps=${value}`)
       .then((response) => setGradesWithIndices(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des grades :", error)

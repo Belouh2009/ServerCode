@@ -35,6 +35,8 @@ public class Utilisateurs {
 	@NotBlank
 	private String email;
 
+	private String image;
+
 	public String getMatricule() {
 		return matricule;
 	}
@@ -106,11 +108,18 @@ public class Utilisateurs {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
 	public Utilisateurs(String matricule, @NotBlank String nom, @NotBlank String prenom, @NotBlank String username,
 			@NotBlank String division, @NotBlank String region, @NotBlank String password, boolean valide,
-			@NotBlank String email) {
-		super();
+			@NotBlank String email, String image) {
 		this.matricule = matricule;
 		this.nom = nom;
 		this.prenom = prenom;
@@ -120,11 +129,10 @@ public class Utilisateurs {
 		this.password = password;
 		this.valide = valide;
 		this.email = email;
+		this.image = image;
 	}
 
 	public Utilisateurs() {
-		super();
 	}
-	
 	
 }

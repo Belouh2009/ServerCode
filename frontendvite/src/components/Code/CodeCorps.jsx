@@ -70,11 +70,13 @@ const CodeCorps = () => {
       const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws);
 
-      // Filtrer uniquement les colonnes nécessaires (id_corps, libelle, categorie)
+      // Adapter aux champs du modèle CodeCorps (sans id, qui est auto-généré)
       const formattedData = data.map((item) => ({
-        idCorps: String(item["Code Corps"] || "").substring(0, 10) || "Aucun",
-        libelleCorps: item["Corps Libelle"] || "Aucun",
-        categorie: item["Categorie"] || "Aucun",
+        corps: String(item["corps"] || "").substring(0, 10) || "Aucun",
+        libelleCorps: item["libelle"] || "Aucun",
+        categorie: item["categorie"] || "Aucun",
+        grade: item["grade"] || "Aucun",
+        indice: item["indice"] ? parseInt(item["indice"], 10) : null,
       }));
 
       setFileData(formattedData);
@@ -90,7 +92,12 @@ const CodeCorps = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
         Swal.fire({
           title: "Succès!",
@@ -98,7 +105,7 @@ const CodeCorps = () => {
           icon: "success",
           confirmButtonText: "OK",
         });
-        fetchRubriques();
+        fetchRubriques(); // Recharge les données
       })
       .catch((error) => {
         Swal.fire({
@@ -113,17 +120,26 @@ const CodeCorps = () => {
 
   const handleSearch = (e) => {
     const searchTerm = e.target.value.toLowerCase();
+
     const filtered = rubriques.filter((corps) => {
-      const idCorps = corps.idCorps ? corps.idCorps.toLowerCase() : "";
+      const codeCorps = corps.corps ? corps.corps.toLowerCase() : "";
       const libelleCorps = corps.libelleCorps
         ? corps.libelleCorps.toLowerCase()
         : "";
       const categorie = corps.categorie ? corps.categorie.toLowerCase() : "";
+      const grade = corps.grade ? corps.grade.toLowerCase() : "";
+      // indice est un nombre, on le convertit en chaîne, sinon chaîne vide
+      const indice =
+        corps.indice !== null && corps.indice !== undefined
+          ? String(corps.indice).toLowerCase()
+          : "";
 
       return (
-        idCorps.includes(searchTerm) ||
+        codeCorps.includes(searchTerm) ||
         libelleCorps.includes(searchTerm) ||
-        categorie.includes(searchTerm)
+        categorie.includes(searchTerm) ||
+        grade.includes(searchTerm) ||
+        indice.includes(searchTerm)
       );
     });
 
@@ -132,11 +148,10 @@ const CodeCorps = () => {
 
   const columns = [
     {
-      title: "ID Corps",
-      dataIndex: "idCorps",
-      key: "idCorps",
-      sorter: (a, b) => a.idCorps.localeCompare(b.idCorps),
-      defaultSortOrder: "ascend",
+      title: "Code Corps",
+      dataIndex: "corps",
+      key: "corps",
+      sorter: (a, b) => a.corps.localeCompare(b.corps),
     },
     {
       title: "Libellé",
@@ -149,6 +164,18 @@ const CodeCorps = () => {
       dataIndex: "categorie",
       key: "categorie",
       sorter: (a, b) => a.categorie.localeCompare(b.categorie),
+    },
+    {
+      title: "Grade",
+      dataIndex: "grade",
+      key: "grade",
+      sorter: (a, b) => a.grade.localeCompare(b.grade),
+    },
+    {
+      title: "Indice",
+      dataIndex: "indice",
+      key: "indice",
+      sorter: (a, b) => a.indice.localeCompare(b.indice),
     },
     {
       title: "Actions",
@@ -164,16 +191,7 @@ const CodeCorps = () => {
 
   return (
     <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
+     className="content"
     >
       <Title
         level={2}
@@ -226,20 +244,14 @@ const CodeCorps = () => {
             </div>
           ) : (
             <div
-              className="hide-scrollbar"
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                height: "calc(100vh - 290px)",
-                overflowY: "auto",
-              }}
+              className="tableau"
             >
               <Table
                 bordered
                 size="middle"
                 dataSource={filteredData}
                 columns={columns}
-                rowKey="idCorps"
+                rowKey="id"
                 pagination={{
                   pageSize: 20,
                   position: ["bottomRight"],

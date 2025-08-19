@@ -9,8 +9,9 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import { IoPrint } from "react-icons/io5";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import logo from "../../image/icon.jpg";
+import Swal from "sweetalert2";
 
 const styles = StyleSheet.create({
   page: {
@@ -93,6 +94,29 @@ const CertificatPDF = ({ dataList }) => {
   return (
     <Document>
       {dataList.map((data, i) => {
+        const renderRecetteText = () => {
+          const hasAllData =
+            data.montant &&
+            data.dateDebut &&
+            data.dateDernierPai &&
+            data.referenceRecette &&
+            data.dateOrdreRecette;
+
+          if (!hasAllData) {
+            return "Aucun ordre de recette n'a été émis à l'encontre de l'agent.";
+          }
+
+          return `Un ordre de recette ${
+            data.montant
+          } AR représentant solde et accessoires indument perçues du ${formatDate(
+            data.dateDebut
+          )} au ${formatDate(
+            data.dateDernierPai
+          )} est émis à l'encontre de l'intéressé(e) sous N° ${
+            data.referenceRecette
+          } du ${formatDate(data.dateOrdreRecette)}`;
+        };
+
         // Récupérer l'année de la date de création
         const annee = data?.date_creation
           ? new Date(data.date_creation).getFullYear()
@@ -161,7 +185,7 @@ const CertificatPDF = ({ dataList }) => {
                 Actuellement {data.cessationService} suivant :{" "}
                 {data.referenceActe} du {formatDate(data.dateActe)}
                 {"\n"}A cessé ses activités pour compter du :{" "}
-                 {formatDate(data.dateCessation)}
+                {formatDate(data.dateCessation)}
                 {"\n"}A été payé jusqu'au : {formatDate(data.dateFinPai)}
                 {"\n"}
                 Sur chapitre : {data.chapitre} Article : {data.article} du
@@ -186,9 +210,7 @@ const CertificatPDF = ({ dataList }) => {
               ))}
             </View>
 
-            <Text style={styles.paragraph}>
-              Aucun ordre de recette, n'a été emis à l'encontre de l'agent.
-            </Text>
+            <Text style={styles.paragraph}>{renderRecetteText()}</Text>
 
             <Text style={styles.footer}>Fianarantsoa, le {dateActuelle}</Text>
           </Page>
@@ -222,14 +244,16 @@ const OpenPDFButtonCcps = ({ data, label = "PDF" }) => {
   };
 
   return (
-    <Button
-      style={{ marginLeft: "10px" }}
-      type="default"
-      icon={<IoPrint />}
-      onClick={handleGenerate}
-    >
-      {label}
-    </Button>
+    <Tooltip title="Imprimer cette ccertificat">
+      <Button
+        style={{ marginLeft: "10px" }}
+        type="default"
+        icon={<IoPrint />}
+        onClick={handleGenerate}
+      >
+        {label}
+      </Button>
+    </Tooltip>
   );
 };
 

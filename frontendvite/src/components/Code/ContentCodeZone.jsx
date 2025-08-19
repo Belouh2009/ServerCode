@@ -83,7 +83,6 @@ const CodeZone = ({ darkTheme }) => {
       dataIndex: "district",
       key: "district",
       sorter: (a, b) => a.district.localeCompare(b.district),
-      defaultSortOrder: "ascend", // Tri croissant par défaut
     },
     {
       title: "Zone 0",

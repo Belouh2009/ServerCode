@@ -9,6 +9,9 @@ import {
   Spin,
   Card,
   Select,
+  Tooltip,
+  message,
+  Tag,
 } from "antd";
 import { RiFileEditFill } from "react-icons/ri";
 import { IoCreate } from "react-icons/io5";
@@ -27,10 +30,7 @@ export default function ContentSection() {
   const [showModalModif, setShowModalModif] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const [pageSize, setPageSize] = useState(5); // valeur par défaut
-
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
   const [formData, setFormData] = useState({
     civilite: "",
     num_pension: "",
@@ -43,6 +43,7 @@ export default function ContentSection() {
   const [formFields, setFormFields] = useState([]);
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
 
   const fetchAgents = async () => {
     try {
@@ -97,39 +98,78 @@ export default function ContentSection() {
     });
   };
 
+  const handlePrint = async (certificatId) => {
+    try {
+      const username = localStorage.getItem("username");
+      const token = localStorage.getItem("token");
+
+      // Mettre à jour la date d'impression
+      await axios.put(
+        `http://localhost:8087/certificats/${certificatId}/imprimer`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-User": username,
+          },
+        }
+      );
+
+      // Rafraîchir les données
+      await fetchAgents();
+      messageApi.success("Certificat imprimé avec succès");
+    } catch (error) {
+      console.error("Erreur d'impression:", error);
+      messageApi.error(
+        error.response?.data?.message || "Erreur lors de l'impression"
+      );
+    }
+  };
+
   const formatTableData = () => {
     return users.map((user) => ({
       key: user.idAgent,
       civilite: user.civilite || "-",
-      id_certificat: user.certificat.id_certificat || "-",
+      id_certificat: user.certificat?.id_certificat || "-",
       nom: user.nom || "-",
       prenom: user.prenom || "-",
       num_pension: user.num_pension || "-",
-      date_creation: user.certificat.date_creation || "-",
+      date_creation: user.certificat?.date_creation || "-",
+      date_impression: user.certificat?.dateImpression || "-",
       caisse: user.caisse || "N/A",
       assignation: user.assignation || "-",
       additionalInfo: user.additionalInfo || "-",
-      ajout_par: user.certificat.ajout_par || "N/A",
-      modif_par: user.certificat.modif_par || "N/A",
+      ajout_par: user.certificat?.ajout_par || "N/A",
+      modif_par: user.certificat?.modif_par || "N/A",
       sesituer: user.sesituer || [],
     }));
+  };
+
+  const searchInDate = (dateString, searchTerm) => {
+    if (!dateString) return false;
+    try {
+      return new Date(dateString).toLocaleDateString().includes(searchTerm);
+    } catch {
+      return false;
+    }
   };
 
   const filteredData = formatTableData().filter(
     (user) =>
       searchTerm === "" ||
-      user.civilite.toLowerCase().includes(searchTerm) ||
-      user.id_certificat.toString().includes(searchTerm) ||
-      user.date_creation.toString().includes(searchTerm) ||
-      user.nom.toLowerCase().includes(searchTerm) ||
-      user.prenom.toLowerCase().includes(searchTerm) ||
-      user.num_pension.toLowerCase().includes(searchTerm) ||
-      user.assignation.toLowerCase().includes(searchTerm) ||
-      user.additionalInfo.toLowerCase().includes(searchTerm) ||
-      user.ajout_par.toLowerCase().includes(searchTerm) ||
-      user.modif_par.toLowerCase().includes(searchTerm) ||
-      user.sesituer.some((item) =>
-        item.rubrique?.id_rubrique.toString().includes(searchTerm)
+      user.civilite?.toLowerCase().includes(searchTerm) ||
+      user.id_certificat?.toString().includes(searchTerm) ||
+      searchInDate(user.date_creation, searchTerm) ||
+      searchInDate(user.date_impression, searchTerm) ||
+      user.nom?.toLowerCase().includes(searchTerm) ||
+      user.prenom?.toLowerCase().includes(searchTerm) ||
+      user.num_pension?.toLowerCase().includes(searchTerm) ||
+      user.assignation?.toLowerCase().includes(searchTerm) ||
+      user.additionalInfo?.toLowerCase().includes(searchTerm) ||
+      user.ajout_par?.toLowerCase().includes(searchTerm) ||
+      user.modif_par?.toLowerCase().includes(searchTerm) ||
+      user.sesituer?.some((item) =>
+        item?.rubrique?.id_rubrique?.toString().includes(searchTerm)
       )
   );
 
@@ -148,13 +188,14 @@ export default function ContentSection() {
       title: "ID Certificat",
       dataIndex: "id_certificat",
       sorter: (a, b) => a.id_certificat.localeCompare(b.id_certificat),
-      defaultSortOrder: "ascend", // Tri croissant par défaut
+      defaultSortOrder: "ascend",
     },
     {
       title: "Date de Création",
       dataIndex: "date_creation",
       sorter: (a, b) => new Date(a.date_creation) - new Date(b.date_creation),
-      render: (text) => text || "Non spécifié",
+      render: (date) =>
+        date ? new Date(date).toLocaleDateString("fr-FR") : "Non spécifié",
     },
     {
       title: "Nom",
@@ -171,7 +212,6 @@ export default function ContentSection() {
       dataIndex: "num_pension",
       sorter: (a, b) => a.num_pension.localeCompare(b.num_pension),
     },
-
     {
       title: "Caisse",
       dataIndex: "caisse",
@@ -195,19 +235,40 @@ export default function ContentSection() {
       sorter: (a, b) => a.modif_par.localeCompare(b.modif_par),
       render: (text) => text || "N/A",
     },
-
+    {
+      title: "Statut Impression",
+      dataIndex: "date_impression",
+      render: (date) => (
+        <Tag color={date && date !== "-" ? "green" : "orange"}>
+          {date && date !== "-"
+            ? `Imprimé le ${new Date(date).toLocaleDateString()}`
+            : "Non Imprimé"}
+        </Tag>
+      ),
+    },
     {
       title: "Actions",
       fixed: "right",
-      width: 100,
+      width: 120,
       render: (_, record) => {
         return (
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Button type="primary" onClick={() => handleShowEditModal(record)}>
-              <RiFileEditFill size={15} />
-            </Button>
+          <div
+            style={{ display: "flex", justifyContent: "center", gap: "8px" }}
+          >
+            <Tooltip title="Modifier ce certificat">
+              <Button
+                type="primary"
+                onClick={() => handleShowEditModal(record)}
+              >
+                <RiFileEditFill size={15} />
+              </Button>
+            </Tooltip>
 
-            <OpenPDFButton data={record} />
+            <OpenPDFButton
+              data={record}
+              onBeforePrint={() => handlePrint(record.id_certificat)}
+              label="Imprimer"
+            />
           </div>
         );
       },
@@ -215,18 +276,8 @@ export default function ContentSection() {
   ];
 
   return (
-    <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
-    >
+    <Content className="content">
+      {contextHolder}
       <Title
         level={2}
         style={{
@@ -263,7 +314,7 @@ export default function ContentSection() {
             >
               <Input
                 type="search"
-                placeholder="🔍 Rechercher..."
+                placeholder="🔍 Rechercher... "
                 onChange={handleSearch}
                 style={{
                   width: "220px",
@@ -279,7 +330,7 @@ export default function ContentSection() {
               style={{ whiteSpace: "nowrap" }}
             >
               <IoCreate size={20} style={{ marginRight: 6 }} />
-              Créer un nouveau certificat
+              Nouveau certificat
             </Button>
           </div>
 
@@ -288,23 +339,7 @@ export default function ContentSection() {
               <p>Aucun certificat trouvé.</p>
             </div>
           ) : (
-            <div
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                height: "calc(100vh - 290px)",
-                overflowY: "auto", // Garde le défilement fonctionnel
-                scrollbarWidth: "none", // Firefox
-                msOverflowStyle: "none", // IE/Edge
-              }}
-            >
-              {/* Style intégré pour Chrome/Safari */}
-              <style>{`
-                ::-webkit-scrollbar {
-                  display: none !important;
-                }
-              `}</style>
-
+            <div className="tableau">
               <Table
                 bordered
                 size="middle"
@@ -335,6 +370,13 @@ export default function ContentSection() {
                     selectedRowKeys.includes(item.key)
                   )}
                   label="Imprimer"
+                  onBeforePrint={() => {
+                    const certificatIds = filteredData
+                      .filter((item) => selectedRowKeys.includes(item.key))
+                      .map((item) => item.id_certificat);
+
+                    Promise.all(certificatIds.map((id) => handlePrint(id)));
+                  }}
                 />
                 {hasSelected && (
                   <span>

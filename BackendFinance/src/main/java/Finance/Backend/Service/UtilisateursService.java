@@ -1,5 +1,6 @@
 package Finance.Backend.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,6 @@ public class UtilisateursService {
 
 	private final UtilisateurRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-
 	private final EmailService emailService;
 
 	public UtilisateursService(UtilisateurRepository userRepository,
@@ -49,7 +49,14 @@ public class UtilisateursService {
 		user.setRegion(registerDTO.getRegion());
 		user.setEmail(registerDTO.getEmail());
 		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-		user.setValide(false); // Initialisation en tant qu'utilisateur non validé
+		user.setValide(false);
+
+		String imageName = registerDTO.getImage();
+		if (imageName == null || imageName.trim().isEmpty()) {
+			imageName = "user.jpg"; // Toujours une image par défaut
+		}
+		user.setImage(imageName);
+
 		userRepository.save(user);
 
 		return "Compte créé avec succès. En attente de validation!";
@@ -74,9 +81,9 @@ public class UtilisateursService {
 		if (userOptional.isPresent()) {
 			Utilisateurs user = userOptional.get();
 			if (!user.isValide()) {
-				return "L'utilisateur est déjà bloqué"; // ici on vérifie si DEJA bloqué
+				return "L'utilisateur est déjà bloqué";
 			}
-			user.setValide(false); // on le bloque
+			user.setValide(false);
 			userRepository.save(user);
 			return "Compte bloqué avec succès";
 		}
@@ -94,33 +101,32 @@ public class UtilisateursService {
 
 	public List<Utilisateurs> getUsersByStatus(String status) {
 		if ("valid".equalsIgnoreCase(status)) {
-			return userRepository.findByValide(true); // Recherche des utilisateurs validés
+			return userRepository.findByValide(true);
 		} else {
-			return userRepository.findByValide(false); // Recherche des utilisateurs non validés
+			return userRepository.findByValide(false);
 		}
 	}
 
-	// Méthode pour supprimer un utilisateur par matricule
 	public void supprimerUtilisateur(String matricule) {
-		// Vérifie si l'utilisateur existe avant de le supprimer
 		Utilisateurs user = userRepository.findByMatricule(matricule)
 				.orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-		userRepository.delete(user); // Supprime l'utilisateur
+		userRepository.delete(user);
 	}
 
-	// Méthode pour enregistrer ou mettre à jour un utilisateur avec password encodé
 	public Utilisateurs saveOrUpdateUtilisateur(Utilisateurs utilisateur) {
 		// Encodage du mot de passe avant d'enregistrer
 		String encodedPassword = passwordEncoder.encode(utilisateur.getPassword());
 		utilisateur.setPassword(encodedPassword);
-		utilisateur.setValide(false); // Remettre valide à false
+		utilisateur.setValide(false);
 
-		// Enregistrement ou mise à jour dans la base
+		// Si l'image est null, on peut assigner une image par défaut
+		if (utilisateur.getImage() == null || utilisateur.getImage().isEmpty()) {
+			utilisateur.setImage("default.jpg");
+		}
+
 		return userRepository.save(utilisateur);
 	}
 
-	// Méthode pour récupérer un utilisateur par son matricule
 	public Utilisateurs getUtilisateurByMatricule(String matricule) {
 		return userRepository.findById(matricule).orElse(null);
 	}
@@ -135,10 +141,12 @@ public class UtilisateursService {
 						user.getDivision(),
 						user.getRegion(),
 						user.getNom(),
-						user.getPrenom());
+						user.getPrenom(),
+						user.getImage() // si tu souhaites envoyer l'image aussi
+				);
 			}
 		}
-		return null; // ou tu peux lever une exception custom si besoin
+		return null;
 	}
 
 	public Utilisateurs getUtilisateurByUsername(String username) {
@@ -149,7 +157,6 @@ public class UtilisateursService {
 	public UserInfoDTO getUserInfoByUsername(String username) {
 		Utilisateurs user = getUtilisateurByUsername(username);
 
-		// Ne jamais exposer le mot de passe, même hashé
 		return new UserInfoDTO(
 				user.getNom(),
 				user.getPrenom(),
@@ -157,27 +164,36 @@ public class UtilisateursService {
 				user.getDivision(),
 				user.getEmail(),
 				user.getUsername(),
-				null // Password toujours null en lecture
-		);
+				null, // Ne jamais exposer le mot de passe
+				user.getImage());
 	}
 
 	public Utilisateurs updateUserInfo(UserInfoDTO userInfoDTO) {
-		// Récupérer l'utilisateur existant
 		Utilisateurs utilisateur = userRepository.findByUsername(userInfoDTO.getUsername())
 				.orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-		// Mettre à jour les champs modifiables
 		utilisateur.setNom(userInfoDTO.getNom());
 		utilisateur.setPrenom(userInfoDTO.getPrenom());
 		utilisateur.setEmail(userInfoDTO.getEmail());
 		utilisateur.setDivision(userInfoDTO.getDivision());
+		utilisateur.setMatricule(userInfoDTO.getMatricule());
 
-		// Si un nouveau mot de passe est fourni, l'encoder et le mettre à jour
 		if (userInfoDTO.getPassword() != null && !userInfoDTO.getPassword().isEmpty()) {
 			utilisateur.setPassword(passwordEncoder.encode(userInfoDTO.getPassword()));
 		}
 
-		// Enregistrer les modifications
+		// Mettre à jour l'image si elle est présente
+		if (userInfoDTO.getImage() != null && !userInfoDTO.getImage().isEmpty()) {
+			// Supprime l'ancienne image si elle existe
+			if (utilisateur.getImage() != null && !utilisateur.getImage().equals("user.jpg")) {
+				File oldImage = new File("uploads/" + utilisateur.getImage());
+				if (oldImage.exists()) {
+					oldImage.delete();
+				}
+			}
+			utilisateur.setImage(userInfoDTO.getImage());
+		}
+
 		return userRepository.save(utilisateur);
 	}
 }

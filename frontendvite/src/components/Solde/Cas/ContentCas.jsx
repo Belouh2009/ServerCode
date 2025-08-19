@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Typography, Table, Input, Button, Spin, Card } from "antd";
+import {
+  Layout,
+  Typography,
+  Table,
+  Input,
+  Button,
+  Spin,
+  Card,
+  Tooltip,
+  message,
+} from "antd";
 import { RiFileEditFill } from "react-icons/ri";
 import { IoCreate } from "react-icons/io5";
 import Swal from "sweetalert2";
@@ -13,6 +23,7 @@ const { Content } = Layout;
 const { Title } = Typography;
 
 export default function ContentSection() {
+  const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -157,11 +168,16 @@ export default function ContentSection() {
 
   const hasSelected = selectedRowKeys.length > 0;
 
+  const formatDate = (date) => {
+    return date ? new Date(date).toLocaleDateString("fr-FR") : "Non spécifié";
+  };
+
   const columns = [
     {
       title: "N°Certificat",
       dataIndex: "idCertificat",
       sorter: (a, b) => a.idCertificat.localeCompare(b.idCertificat),
+      defaultSortOrder: "ascend",
     },
     {
       title: "Matricule",
@@ -172,6 +188,7 @@ export default function ContentSection() {
       title: "Date de création",
       dataIndex: "dateCreation",
       sorter: (a, b) => a.dateCreation.localeCompare(b.dateCreation),
+      render: (date) => formatDate(date),
     },
     {
       title: "Nom",
@@ -197,6 +214,7 @@ export default function ContentSection() {
       title: "Date de prise en Charge",
       dataIndex: "datePrise",
       sorter: (a, b) => a.datePrise.localeCompare(b.datePrise),
+      render: (date) => formatDate(date),
     },
     {
       title: "Ajouté par",
@@ -216,28 +234,21 @@ export default function ContentSection() {
       width: 100,
       render: (_, record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Button type="primary" onClick={() => handleShowEditModal(record)}>
-            <RiFileEditFill size={15} />
-          </Button>
-          <OpenPDFButton data={record} />
+          <Tooltip title="Modifier cette certificat">
+            <Button type="primary" onClick={() => handleShowEditModal(record)}>
+              <RiFileEditFill size={15} />
+            </Button>
+          </Tooltip>
+
+          <OpenPDFButton data={record} label="Imprimer" />
         </div>
       ),
     },
   ];
 
   return (
-    <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
-    >
+    <Content className="content">
+      {contextHolder}
       <Title
         level={2}
         style={{
@@ -274,7 +285,7 @@ export default function ContentSection() {
             />
             <Button type="primary" onClick={handleShowCreateModal}>
               <IoCreate size={20} />
-              Créer un nouveau certificat
+              Nouveau certificat
             </Button>
           </div>
 
@@ -283,23 +294,7 @@ export default function ContentSection() {
               <p>Aucun certificat trouvé.</p>
             </div>
           ) : (
-            <div
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                height: "calc(100vh - 290px)",
-                overflowY: "auto", // Garde le défilement fonctionnel
-                scrollbarWidth: "none", // Firefox
-                msOverflowStyle: "none", // IE/Edge
-              }}
-            >
-              {/* Style intégré pour Chrome/Safari */}
-              <style>{`
-                ::-webkit-scrollbar {
-                  display: none !important;
-                }
-              `}</style>
-
+            <div className="tableau">
               <Table
                 bordered
                 size="middle"
@@ -308,7 +303,7 @@ export default function ContentSection() {
                 columns={columns}
                 rowKey="idCertificat"
                 pagination={{
-                   pageSize: 20,
+                  pageSize: 20,
                   position: ["bottomRight"],
                   showSizeChanger: false,
                 }}

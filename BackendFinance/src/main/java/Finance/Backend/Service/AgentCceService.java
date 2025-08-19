@@ -25,19 +25,19 @@ import jakarta.transaction.Transactional;
 @Service
 public class AgentCceService {
 
-	private final AgentCceRepository agentRepository;
+    private final AgentCceRepository agentRepository;
     private final CertificatCceRepository certificatRepository;
     private final RubriquePensionRepository rubriqueRepository;
     private final SeSituerCceRepository seSituerRepository;
 
     public AgentCceService(AgentCceRepository agentRepository, CertificatCceRepository certificatRepository,
-                           RubriquePensionRepository rubriqueRepository, SeSituerCceRepository seSituerRepository) {
+            RubriquePensionRepository rubriqueRepository, SeSituerCceRepository seSituerRepository) {
         this.agentRepository = agentRepository;
         this.certificatRepository = certificatRepository;
         this.rubriqueRepository = rubriqueRepository;
         this.seSituerRepository = seSituerRepository;
     }
-    
+
     @Transactional
     public AgentCce enregistrerAgent(AgentCceDTO agentDTO) {
         // 1️⃣ Enregistrement du certificat (avec Optional)
@@ -68,8 +68,8 @@ public class AgentCceService {
         // 3️⃣ Enregistrement des relations `SeSituer` avec exception personnalisée
         for (SeSituerCceDTO seSituerDTO : agentDTO.getSesituer()) {
             RubriquePension rubrique = rubriqueRepository.findById(seSituerDTO.getRubrique().getId_rubrique())
-                .orElseThrow(() -> new RubriqueNotFoundException("Rubrique avec id " 
-                             + seSituerDTO.getRubrique().getId_rubrique() + " non trouvée"));
+                    .orElseThrow(() -> new RubriqueNotFoundException("Rubrique avec id "
+                            + seSituerDTO.getRubrique().getId_rubrique() + " non trouvée"));
 
             SesituerCce seSituer = new SesituerCce();
             seSituer.setAgent(agent);
@@ -80,7 +80,6 @@ public class AgentCceService {
 
         return agent;
     }
-
 
     public AgentCceDTO getAgentWithSesituer(Long idAgent) {
         // Récupérer l'agent
@@ -112,7 +111,6 @@ public class AgentCceService {
 
         return agentDTO;
     }
-
 
     public List<AgentCceDTO> getAllAgentsWithSesituer() {
         // Récupérer tous les agents
@@ -146,6 +144,14 @@ public class AgentCceService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
+    public void enregistrerImpressionCertificat(String idCertificat, String username) {
+        CertificatCce certificat = certificatRepository.findById(idCertificat)
+                .orElseThrow(() -> new RuntimeException("Certificat non trouvé"));
+
+        certificat.setDateImpression(LocalDate.now());
+        certificatRepository.save(certificat);
+    }
 
     /*** MÉTHODES DE MAPPING ***/
 
@@ -163,15 +169,17 @@ public class AgentCceService {
     }
 
     private CertificatCceDTO mapCertificatToDTO(CertificatCce certificat) {
-        if (certificat == null) return null;
+        if (certificat == null)
+            return null;
         CertificatCceDTO certificatDTO = new CertificatCceDTO();
         certificatDTO.setId_certificat(certificat.getIdCertificat());
         certificatDTO.setDate_creation(certificat.getDateCreation());
+        certificatDTO.setDateImpression(certificat.getDateImpression());
         certificatDTO.setAjout_par(certificat.getAjoutPar());
         certificatDTO.setModif_par(certificat.getModifPar());
         return certificatDTO;
     }
-    
+
     @Transactional
     public AgentCceDTO saveOrUpdateAgent(AgentCceDTO agentDTO) {
         System.out.println("ID de l'agent reçu : " + agentDTO.getIdAgent());
@@ -193,19 +201,19 @@ public class AgentCceService {
 
         // Mise à jour du certificat (sans modifier l'ID ni le champ ajout_par)
         if (agentDTO.getCertificat() != null) {
-            CertificatCce certificat = agent.getCertificat();  // Récupérer le certificat actuel
+            CertificatCce certificat = agent.getCertificat(); // Récupérer le certificat actuel
 
             if (certificat == null) {
                 // Si aucun certificat n'est associé, créer un nouveau certificat
                 certificat = new CertificatCce();
-                certificat.setIdCertificat(agentDTO.getCertificat().getId_certificat());  // Conserver l'ID si présent
-                certificat.setAjoutPar(agentDTO.getCertificat().getAjout_par());  // Ajout initial
+                certificat.setIdCertificat(agentDTO.getCertificat().getId_certificat()); // Conserver l'ID si présent
+                certificat.setAjoutPar(agentDTO.getCertificat().getAjout_par()); // Ajout initial
             }
 
             // Mettre à jour uniquement les champs nécessaires
             certificat.setDateCreation(agentDTO.getCertificat().getDate_creation());
             certificat.setModifPar(agentDTO.getCertificat().getModif_par());
-            agent.setCertificat(certificat);  // Lier le certificat à l'agent
+            agent.setCertificat(certificat); // Lier le certificat à l'agent
         }
 
         // Suppression des rubriques précédentes et ajout des nouvelles
@@ -220,15 +228,13 @@ public class AgentCceService {
                 sesituerCce.setRubrique(rubrique);
                 sesituerCce.setMontant(sesituerDTO.getMontant());
 
-                agent.getSesituer().add(sesituerCce);  // Ajouter à la liste
+                agent.getSesituer().add(sesituerCce); // Ajouter à la liste
             }
         }
 
-        agent = agentRepository.save(agent);  // Sauvegarde en cascade
-        return mapAgentToDTO(agent);  // Mapper et retourner l'agent mis à jour
+        agent = agentRepository.save(agent); // Sauvegarde en cascade
+        return mapAgentToDTO(agent); // Mapper et retourner l'agent mis à jour
     }
-
-
 
     private AgentCceDTO mapAgentToDTO(AgentCce agent) {
         AgentCceDTO agentDTO = new AgentCceDTO();
@@ -247,6 +253,7 @@ public class AgentCceService {
             CertificatCceDTO certificatDTO = new CertificatCceDTO();
             certificatDTO.setId_certificat(agent.getCertificat().getIdCertificat());
             certificatDTO.setDate_creation(agent.getCertificat().getDateCreation());
+            certificatDTO.setDateImpression(agent.getCertificat().getDateImpression());
             certificatDTO.setAjout_par(agent.getCertificat().getAjoutPar());
             certificatDTO.setModif_par(agent.getCertificat().getModifPar());
             agentDTO.setCertificat(certificatDTO);

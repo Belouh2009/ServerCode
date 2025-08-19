@@ -19,7 +19,9 @@ const ModalBareme = ({ open, onClose, bareme, onSuccess }) => {
   const handleSubmit = async (values) => {
     const formattedValues = {
       ...values,
-      datebareme: values.datebareme ? values.datebareme.format("DD/MM/YYYY") : null,
+      datebareme: values.datebareme
+        ? values.datebareme.format("DD/MM/YYYY")
+        : null,
     };
 
     try {
@@ -30,24 +32,34 @@ const ModalBareme = ({ open, onClose, bareme, onSuccess }) => {
       );
 
       if (response.status === 200) {
-        Swal.fire("Succès", response.data.message || "Modification réussie !", "success");
+        Swal.fire(
+          "Succès",
+          response.data.message || "Modification réussie !",
+          "success"
+        );
         onClose();
         if (onSuccess) onSuccess();
       } else {
         Swal.fire("Erreur", "Une erreur est survenue.", "error");
       }
     } catch (error) {
-      Swal.fire("Erreur", error?.response?.data?.message || error.message, "error");
+      Swal.fire(
+        "Erreur",
+        error?.response?.data?.message || error.message,
+        "error"
+      );
     }
   };
 
   return (
     <Modal
       title="Modifier un barème"
-      open={open}
       centered
+      open={open}
       onCancel={onClose}
+      width={500}
       footer={null}
+      className="custom-modal"
     >
       <Form layout="vertical" form={form} onFinish={handleSubmit}>
         <Form.Item label="Date BAREME" name="datebareme">

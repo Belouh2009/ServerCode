@@ -162,7 +162,6 @@ const CodeZone = () => {
       dataIndex: "district",
       key: "district",
       sorter: (a, b) => a.district.localeCompare(b.district),
-      defaultSortOrder: "ascend", // Tri croissant par défaut
     },
     {
       title: "Zone 0",
@@ -218,16 +217,7 @@ const CodeZone = () => {
 
   return (
     <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
+      className="content"
     >
       <Title
         level={2}
@@ -279,18 +269,11 @@ const CodeZone = () => {
             </div>
           ) : (
             <div
-              className="hide-scrollbar"
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                height: "calc(100vh - 290px)",
-                overflowY: "auto",
-              }}
+              className="tableau"
             >
             <Table
               bordered
               size="middle"
-              scroll={{ y: 410 }}
               rowClassName={() => "table-row-hover"}
               className="styled-table"
               dataSource={filteredData}
@@ -302,8 +285,6 @@ const CodeZone = () => {
                   showSizeChanger: false,
                 }}
                 scroll={{ y: "100%" }}
-                rowClassName={() => "table-row-hover"}
-                className="styled-table"
             />
             </div>
           )}

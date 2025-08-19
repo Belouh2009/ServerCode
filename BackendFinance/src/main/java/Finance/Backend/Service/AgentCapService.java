@@ -31,13 +31,13 @@ public class AgentCapService {
     private final SeSituerCapRepository seSituerRepository;
 
     public AgentCapService(AgentCapRepository agentRepository, CertificatCapRepository certificatRepository,
-                           RubriquePensionRepository rubriqueRepository, SeSituerCapRepository seSituerRepository) {
+            RubriquePensionRepository rubriqueRepository, SeSituerCapRepository seSituerRepository) {
         this.agentRepository = agentRepository;
         this.certificatRepository = certificatRepository;
         this.rubriqueRepository = rubriqueRepository;
         this.seSituerRepository = seSituerRepository;
     }
-    
+
     @Transactional
     public AgentCap enregistrerAgent(AgentCapDTO agentDTO) {
         // 1️⃣ Enregistrement du certificat (avec Optional)
@@ -66,8 +66,8 @@ public class AgentCapService {
         // 3️⃣ Enregistrement des relations `SeSituer` avec exception personnalisée
         for (SeSituerCapDTO seSituerDTO : agentDTO.getSesituer()) {
             RubriquePension rubrique = rubriqueRepository.findById(seSituerDTO.getRubrique().getId_rubrique())
-                .orElseThrow(() -> new RubriqueNotFoundException("Rubrique avec id " 
-                             + seSituerDTO.getRubrique().getId_rubrique() + " non trouvée"));
+                    .orElseThrow(() -> new RubriqueNotFoundException("Rubrique avec id "
+                            + seSituerDTO.getRubrique().getId_rubrique() + " non trouvée"));
 
             SesituerCap seSituer = new SesituerCap();
             seSituer.setAgent(agent);
@@ -79,17 +79,12 @@ public class AgentCapService {
         return agent;
     }
 
-
     public AgentCapDTO getAgentWithSesituer(Long idAgent) {
-        // Récupérer l'agent
         AgentCap agent = agentRepository.findById(idAgent).orElseThrow(() -> new RuntimeException("Agent not found"));
-
-        // Récupérer les rubriques liées à cet agent
         List<SesituerCap> sesituerList = seSituerRepository.findByAgent_IdAgent(idAgent);
 
-        // Mapper les données dans AgentCapDTO
         AgentCapDTO agentDTO = new AgentCapDTO();
-        agentDTO.setIdAgent(agent.getIdAgent()); // Ajouter l'ID de l'agent
+        agentDTO.setIdAgent(agent.getIdAgent());
         agentDTO.setNom(agent.getNom());
         agentDTO.setPrenom(agent.getPrenom());
         agentDTO.setCivilite(agent.getCivilite());
@@ -98,10 +93,8 @@ public class AgentCapService {
         agentDTO.setAssignation(agent.getAssignation());
         agentDTO.setAdditionalInfo(agent.getAdditionalInfo());
 
-        // Associer les rubriques à l'agent
         agentDTO.setSesituer(mapSesituerToDTO(sesituerList));
 
-        // Associer le certificat
         if (agent.getCertificat() != null) {
             agentDTO.setCertificat(mapCertificatToDTO(agent.getCertificat()));
         }
@@ -109,16 +102,10 @@ public class AgentCapService {
         return agentDTO;
     }
 
-
     public List<AgentCapDTO> getAllAgentsWithSesituer() {
-        // Récupérer tous les agents
-        List<AgentCap> agents = agentRepository.findAll();
-
-        // Mapper les agents avec leurs informations
-        return agents.stream().map(agent -> {
-            // Créer le DTO de l'agent
+        return agentRepository.findAll().stream().map(agent -> {
             AgentCapDTO agentDTO = new AgentCapDTO();
-            agentDTO.setIdAgent(agent.getIdAgent()); // Ajouter l'ID de l'agent
+            agentDTO.setIdAgent(agent.getIdAgent());
             agentDTO.setNom(agent.getNom());
             agentDTO.setPrenom(agent.getPrenom());
             agentDTO.setCivilite(agent.getCivilite());
@@ -127,11 +114,9 @@ public class AgentCapService {
             agentDTO.setAssignation(agent.getAssignation());
             agentDTO.setAdditionalInfo(agent.getAdditionalInfo());
 
-            // Récupérer les rubriques liées à cet agent dans SeSituer
             List<SesituerCap> sesituerList = seSituerRepository.findByAgent_IdAgent(agent.getIdAgent());
             agentDTO.setSesituer(mapSesituerToDTO(sesituerList));
 
-            // Associer le certificat à l'agent si existant
             if (agent.getCertificat() != null) {
                 agentDTO.setCertificat(mapCertificatToDTO(agent.getCertificat()));
             }
@@ -140,9 +125,16 @@ public class AgentCapService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
+    public void enregistrerImpressionCertificat(String idCertificat, String username) {
+        CertificatCap certificat = certificatRepository.findById(idCertificat)
+                .orElseThrow(() -> new RuntimeException("Certificat non trouvé"));
+
+        certificat.setDateImpression(LocalDate.now());
+        certificatRepository.save(certificat);
+    }
 
     /*** MÉTHODES DE MAPPING ***/
-
     private List<SeSituerCapDTO> mapSesituerToDTO(List<SesituerCap> sesituerList) {
         return sesituerList.stream().map(s -> {
             SeSituerCapDTO sesituerDTO = new SeSituerCapDTO();
@@ -157,24 +149,24 @@ public class AgentCapService {
     }
 
     private CertificatCapDTO mapCertificatToDTO(CertificatCap certificat) {
-        if (certificat == null) return null;
+        if (certificat == null)
+            return null;
         CertificatCapDTO certificatDTO = new CertificatCapDTO();
         certificatDTO.setId_certificat(certificat.getIdCertificat());
         certificatDTO.setDate_creation(certificat.getDateCreation());
+        certificatDTO.setDateImpression(certificat.getDateImpression());
         certificatDTO.setAjout_par(certificat.getAjoutPar());
         certificatDTO.setModif_par(certificat.getModifPar());
         return certificatDTO;
     }
-    
+
     @Transactional
     public AgentCapDTO saveOrUpdateAgent(AgentCapDTO agentDTO) {
         System.out.println("ID de l'agent reçu : " + agentDTO.getIdAgent());
 
-        // Récupérer l'agent existant avec son certificat et ses rubriques
         AgentCap agent = agentRepository.findByIdWithSesituer(agentDTO.getIdAgent())
                 .orElseThrow(() -> new RuntimeException("Agent non trouvé avec l'ID " + agentDTO.getIdAgent()));
 
-        // Mise à jour des champs de l'agent
         agent.setNom(agentDTO.getNom());
         agent.setPrenom(agentDTO.getPrenom());
         agent.setCivilite(agentDTO.getCivilite());
@@ -183,24 +175,20 @@ public class AgentCapService {
         agent.setAssignation(agentDTO.getAssignation());
         agent.setAdditionalInfo(agentDTO.getAdditionalInfo());
 
-        // Mise à jour du certificat (sans modifier l'ID ni le champ ajout_par)
         if (agentDTO.getCertificat() != null) {
-            CertificatCap certificat = agent.getCertificat();  // Récupérer le certificat actuel
+            CertificatCap certificat = agent.getCertificat();
 
             if (certificat == null) {
-                // Si aucun certificat n'est associé, créer un nouveau certificat
                 certificat = new CertificatCap();
-                certificat.setIdCertificat(agentDTO.getCertificat().getId_certificat());  // Conserver l'ID si présent
-                certificat.setAjoutPar(agentDTO.getCertificat().getAjout_par());  // Ajout initial
+                certificat.setIdCertificat(agentDTO.getCertificat().getId_certificat());
+                certificat.setAjoutPar(agentDTO.getCertificat().getAjout_par());
             }
 
-            // Mettre à jour uniquement les champs nécessaires
             certificat.setDateCreation(agentDTO.getCertificat().getDate_creation());
             certificat.setModifPar(agentDTO.getCertificat().getModif_par());
-            agent.setCertificat(certificat);  // Lier le certificat à l'agent
+            agent.setCertificat(certificat);
         }
 
-        // Suppression des rubriques précédentes et ajout des nouvelles
         agent.getSesituer().clear();
         if (agentDTO.getSesituer() != null) {
             for (SeSituerCapDTO sesituerDTO : agentDTO.getSesituer()) {
@@ -212,15 +200,13 @@ public class AgentCapService {
                 sesituerCap.setRubrique(rubrique);
                 sesituerCap.setMontant(sesituerDTO.getMontant());
 
-                agent.getSesituer().add(sesituerCap);  // Ajouter à la liste
+                agent.getSesituer().add(sesituerCap);
             }
         }
 
-        agent = agentRepository.save(agent);  // Sauvegarde en cascade
-        return mapAgentToDTO(agent);  // Mapper et retourner l'agent mis à jour
+        agent = agentRepository.save(agent);
+        return mapAgentToDTO(agent);
     }
-
-
 
     private AgentCapDTO mapAgentToDTO(AgentCap agent) {
         AgentCapDTO agentDTO = new AgentCapDTO();
@@ -237,12 +223,12 @@ public class AgentCapService {
             CertificatCapDTO certificatDTO = new CertificatCapDTO();
             certificatDTO.setId_certificat(agent.getCertificat().getIdCertificat());
             certificatDTO.setDate_creation(agent.getCertificat().getDateCreation());
+            certificatDTO.setDateImpression(agent.getCertificat().getDateImpression());
             certificatDTO.setAjout_par(agent.getCertificat().getAjoutPar());
             certificatDTO.setModif_par(agent.getCertificat().getModifPar());
             agentDTO.setCertificat(certificatDTO);
         }
 
-        // Mapper les rubriques associées
         List<SeSituerCapDTO> sesituerDTOs = agent.getSesituer().stream().map(sesituerCap -> {
             SeSituerCapDTO sesituerDTO = new SeSituerCapDTO();
             RubriqueDTO rubriqueDTO = new RubriqueDTO();
@@ -256,5 +242,4 @@ public class AgentCapService {
 
         return agentDTO;
     }
-    
 }

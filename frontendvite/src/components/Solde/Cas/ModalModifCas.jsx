@@ -31,7 +31,7 @@ const ModalModification = ({
       try {
         setLoading(true);
         const [corpsRes, chapitreRes, localitesRes] = await Promise.all([
-          axios.get("http://localhost:8087/CorpsGradeIndice/corps"),
+          axios.get("http://localhost:8087/corps/distinct"),
           axios.get("http://localhost:8087/chapitres"),
           axios.get("http://localhost:8087/localites/noms"),
         ]);
@@ -55,7 +55,7 @@ const ModalModification = ({
 
     try {
       const response = await axios.get(
-        `http://localhost:8087/CorpsGradeIndice/grades?corps=${value}`
+        `http://localhost:8087/corps/grades?corps=${value}`
       );
       setGradesWithIndices(response.data);
     } catch (error) {

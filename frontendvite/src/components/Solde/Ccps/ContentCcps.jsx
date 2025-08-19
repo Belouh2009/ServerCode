@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Layout, Typography, Table, Input, Button, Spin, Card } from "antd";
+import {
+  Layout,
+  Typography,
+  Table,
+  Input,
+  Button,
+  Spin,
+  Card,
+  Tooltip,
+} from "antd";
 import { RiFileEditFill } from "react-icons/ri";
 import { IoCreate } from "react-icons/io5";
 import { FaFilePen } from "react-icons/fa6";
@@ -140,35 +149,44 @@ export default function ContentSection() {
   const formatTableData = () => {
     return users.map((user) => ({
       key: user.matricule,
-      matricule: user.matricule || "-",
-      civilite: user.civilite || "-",
-      nom: user.nom || "-",
-      prenom: user.prenom || "-",
-      enfant: user.enfant || "-",
-      localite: user.localite || "-",
-      cessationService: user.cessationService || "-",
-      corps: user.corps || "-",
-      grade: user.grade || "-",
-      indice: user.indice || "-",
-      zone: user.zone || "-",
-      chapitre: user.chapitre || "-",
-      article: user.article || "-",
-      acte: user.acte || "-",
-      referenceActe: user.referenceActe || "-",
-      dateActe: user.dateActe || "-",
-      dateCessation: user.dateCessation || "-",
-      dateFinPai: user.dateFinPai || "-",
-      montant: user.montant || "-",
-      referenceRecette: user.referenceRecette || "-",
-      dateOrdreRecette: user.dateOrdreRecette || "-",
-      dateDebut: user.dateDebut || "-",
-      dateDernierPai: user.dateDernierPai || "-",
-      idCertificat: user.certificat.id_certificat || "-",
-      dateCreation: user.certificat.date_creation || "-",
+      matricule: user.matricule || "",
+      civilite: user.civilite || "",
+      nom: user.nom || "",
+      prenom: user.prenom || "",
+      enfant: user.enfant || "",
+      localite: user.localite || "",
+      cessationService: user.cessationService || "",
+      corps: user.corps || "",
+      grade: user.grade || "",
+      indice: user.indice || "",
+      zone: user.zone || "",
+      chapitre: user.chapitre || "",
+      article: user.article || "",
+      acte: user.acte || "",
+      referenceActe: user.referenceActe || "",
+      dateActe: user.dateActe || "",
+      dateCessation: user.dateCessation || "",
+      dateFinPai: user.dateFinPai || "",
+      montant: user.montant || "",
+      referenceRecette: user.referenceRecette || "",
+      dateOrdreRecette: user.dateOrdreRecette || "",
+      dateDebut: user.dateDebut || "",
+      dateDernierPai: user.dateDernierPai || "",
+      idCertificat: user.certificat.id_certificat || "",
+      dateCreation: user.certificat.date_creation || "",
       ajoutPar: user.certificat.ajout_par || "N/A",
       modifPar: user.certificat.modif_par || "N/A",
       sesituer: user.sesituer || [],
     }));
+  };
+
+  const searchInDate = (dateString, searchTerm) => {
+    if (!dateString) return false;
+    try {
+      return new Date(dateString).toLocaleDateString().includes(searchTerm);
+    } catch {
+      return false;
+    }
   };
 
   const filteredData = formatTableData().filter(
@@ -190,15 +208,15 @@ export default function ContentSection() {
       user.article.toLowerCase().includes(searchTerm) ||
       user.acte.toLowerCase().includes(searchTerm) ||
       user.referenceActe.toLowerCase().includes(searchTerm) ||
-      user.dateActe.toLowerCase().includes(searchTerm) ||
-      user.dateCessation.toLowerCase().includes(searchTerm) ||
-      user.dateFinPai.toLowerCase().includes(searchTerm) ||
+      searchInDate(user.dateActe, searchTerm) ||
+      searchInDate(user.dateCessation, searchTerm) ||
+      searchInDate(user.dateFinPai, searchTerm) ||
+      searchInDate(user.dateOrdreRecette, searchTerm) ||
+      searchInDate(user.dateDebut, searchTerm) ||
+      searchInDate(user.dateDernierPai, searchTerm) ||
+      searchInDate(user.dateCreation, searchTerm) ||
       user.montant.toString().toLowerCase().includes(searchTerm) ||
       user.referenceRecette.toLowerCase().includes(searchTerm) ||
-      user.dateOrdreRecette.toLowerCase().includes(searchTerm) ||
-      user.dateDebut.toLowerCase().includes(searchTerm) ||
-      user.dateDernierPai.toLowerCase().includes(searchTerm) ||
-      user.dateCreation.toLowerCase().includes(searchTerm) ||
       user.ajoutPar.toLowerCase().includes(searchTerm) ||
       user.modifPar.toLowerCase().includes(searchTerm) ||
       user.sesituer.some((item) =>
@@ -216,16 +234,22 @@ export default function ContentSection() {
 
   const hasSelected = selectedRowKeys.length > 0;
 
+  const formatDate = (date) => {
+    return date ? new Date(date).toLocaleDateString("fr-FR") : "Aucun";
+  };
+
   const columns = [
     {
       title: "N°Certificat",
       dataIndex: "idCertificat",
       sorter: (a, b) => a.idCertificat.localeCompare(b.idCertificat),
+      defaultSortOrder: "ascend",
     },
     {
       title: "Date de Création",
       dataIndex: "dateCreation",
       sorter: (a, b) => a.dateCreation.localeCompare(b.dateCreation),
+      render: (date) => formatDate(date),
     },
     {
       title: "Matricule",
@@ -246,11 +270,19 @@ export default function ContentSection() {
       title: "Date Début",
       dataIndex: "dateDebut",
       sorter: (a, b) => a.dateDebut.localeCompare(b.dateDebut),
+      render: (date) => formatDate(date),
+    },
+    {
+      title: "Date Acte",
+      dataIndex: "dateActe",
+      sorter: (a, b) => a.dateActe.localeCompare(b.dateActe),
+      render: (date) => formatDate(date),
     },
     {
       title: "Date Fin",
       dataIndex: "dateFinPai",
       sorter: (a, b) => a.dateFinPai.localeCompare(b.dateFinPai),
+      render: (date) => formatDate(date),
     },
     {
       title: "Ajouté par",
@@ -264,61 +296,36 @@ export default function ContentSection() {
       sorter: (a, b) => a.modifPar.localeCompare(b.modifPar),
       render: (text) => text || "N/A",
     },
-    /*         {
-                    title: "Rubriques et Montants",
-                    render: (_, record) => (
-                        <div>
-                            {record.sesituer && record.sesituer.length > 0 ? (
-                                record.sesituer.map((item, index) => (
-                                    <div key={index}>
-                                        <span>
-                                            <strong>({item.rubrique.id_rubrique})</strong>: {item.montant.toLocaleString()} Ar
-                                        </span>
-                                    </div>
-                                ))
-                            ) : (
-                                <span>Aucune rubrique</span>
-                            )}
-                        </div>
-                    ),
-                }, */
     {
       title: "Actions",
       fixed: "right",
       width: 100,
       render: (_, record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Button type="primary" onClick={() => handleShowEditModal(record)}>
-            <RiFileEditFill size={15} />
-          </Button>
+          <Tooltip title="Modifier cette certificat">
+            <Button type="primary" onClick={() => handleShowEditModal(record)}>
+              <RiFileEditFill size={15} />
+            </Button>
+          </Tooltip>
+          <Tooltip title="Réctifier cette certificat">
+            <Button
+              style={{ marginLeft: "10px" }}
+              color="cyan"
+              variant="solid"
+              onClick={() => handleShowRectificatifModal(record)}
+            >
+              <FaFilePen size={15} />
+            </Button>
+          </Tooltip>
 
-          <Button
-            style={{ marginLeft: "10px" }}
-            color="cyan"
-            variant="solid"
-            onClick={() => handleShowRectificatifModal(record)}
-          >
-            <FaFilePen size={15} />
-          </Button>
-          <OpenPDFButton data={record} />
+          <OpenPDFButton data={record} label="Imprimer" />
         </div>
       ),
     },
   ];
 
   return (
-    <Content
-      style={{
-        marginLeft: "10px",
-        marginTop: "10px",
-        padding: "24px",
-        background: "#f4f6fc",
-        color: "#000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      }}
-    >
+    <Content className="content">
       <Title
         level={2}
         style={{
@@ -355,7 +362,7 @@ export default function ContentSection() {
             />
             <Button type="primary" onClick={handleShowCreateModal}>
               <IoCreate size={20} />
-              Créer un nouveau certificat
+              Nouveau certificat
             </Button>
           </div>
 
@@ -364,23 +371,7 @@ export default function ContentSection() {
               <p>Aucun certificat trouvé.</p>
             </div>
           ) : (
-            <div
-              style={{
-                maxHeight: 1030,
-                minHeight: 410,
-                height: "calc(100vh - 290px)",
-                overflowY: "auto", // Garde le défilement fonctionnel
-                scrollbarWidth: "none", // Firefox
-                msOverflowStyle: "none", // IE/Edge
-              }}
-            >
-              {/* Style intégré pour Chrome/Safari */}
-              <style>{`
-                ::-webkit-scrollbar {
-                  display: none !important;
-                }
-              `}</style>
-
+            <div className="tableau">
               <Table
                 bordered
                 size="middle"
@@ -438,8 +429,8 @@ export default function ContentSection() {
       <ModalModifCcps
         open={showModalModif}
         onClose={handleCloseModal}
-        isEditing={isEditing}
-        agent={selectedAgent}
+        formData={selectedAgent}
+        setFormData={setSelectedAgent}
         onSuccess={() => {
           fetchAgents();
           handleCloseModal();
@@ -449,8 +440,8 @@ export default function ContentSection() {
       <ModalRectificatif
         open={isModalOpen}
         onClose={handleCloseModal}
-        isEditing={isEditing}
-        agent={selectedAgent}
+        formData={selectedAgent}
+        setFormData={setSelectedAgent}
         onSuccess={() => {
           fetchAgents();
           handleCloseModal();

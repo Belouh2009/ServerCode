@@ -15,15 +15,7 @@ const cardVariants = {
 export default function ContentDashboard() {
   return (
     <Content
-      style={{
-        margin: "10px",
-        padding: "24px",
-        background: "#ffffff",
-        color: "#000000",
-        borderRadius: "12px",
-        minHeight: "280px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.05)",
-      }}
+      className="content"
     >
       <Title
         level={2}
