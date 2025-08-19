@@ -58,7 +58,7 @@ export default function ContentSection() {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:8087/agentsCcpsRect/all"
+        "http://192.168.88.28:8087/agentsCcpsRect/all"
       );
       setUsers(response.data);
     } catch (error) {

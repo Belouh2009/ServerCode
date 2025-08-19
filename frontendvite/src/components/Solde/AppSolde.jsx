@@ -28,7 +28,7 @@ import { useWelcomeMessage } from "../../useWelcomeMessage";
 const { Header, Sider } = Layout;
 
 const UserAvatar = ({ imageName, username }) => {
-  const imageBaseURL = "http://localhost:8087/uploads/";
+  const imageBaseURL = "http://192.168.88.28:8087/uploads/";
   const [avatarSrc, setAvatarSrc] = useState(userIcon);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function App() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:8087/utilisateur/by-username/${username}`,
+          `http://192.168.88.28:8087/utilisateur/by-username/${username}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             timeout: 5000,
@@ -156,7 +156,7 @@ export default function App() {
       }
 
       const response = await axios.put(
-        "http://localhost:8087/utilisateur/update-profile",
+        "http://192.168.88.28:8087/utilisateur/update-profile",
         formData,
         {
           headers: {

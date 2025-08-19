@@ -31,9 +31,9 @@ const ModalModification = ({
       try {
         setLoading(true);
         const [corpsRes, chapitreRes, localitesRes] = await Promise.all([
-          axios.get("http://localhost:8087/corps/distinct"),
-          axios.get("http://localhost:8087/chapitres"),
-          axios.get("http://localhost:8087/localites/noms"),
+          axios.get("http://192.168.88.28:8087/corps/distinct"),
+          axios.get("http://192.168.88.28:8087/chapitres"),
+          axios.get("http://192.168.88.28:8087/localites/noms"),
         ]);
 
         setCorpsList(corpsRes.data);
@@ -55,7 +55,7 @@ const ModalModification = ({
 
     try {
       const response = await axios.get(
-        `http://localhost:8087/corps/grades?corps=${value}`
+        `http://192.168.88.28:8087/corps/grades?corps=${value}`
       );
       setGradesWithIndices(response.data);
     } catch (error) {
@@ -114,7 +114,7 @@ const ModalModification = ({
       };
 
       const response = await fetch(
-        `http://localhost:8087/agentsCas/modifier/${formData.matricule}`,
+        `http://192.168.88.28:8087/agentsCas/modifier/${formData.matricule}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
