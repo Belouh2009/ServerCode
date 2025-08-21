@@ -99,7 +99,15 @@ const ModalModification = ({
       !formData.grade ||
       !formData.indice
     ) {
-      message.error("Veuillez remplir tous les champs obligatoires !");
+      Swal.fire({
+        icon: "warning",
+        title: "Champs manquants",
+        text: "Veuillez remplir tous les champs obligatoires !",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
       return;
     }
 

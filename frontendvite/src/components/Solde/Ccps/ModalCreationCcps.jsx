@@ -147,9 +147,61 @@ const ModalCreation = ({
     }
   };
 
+  const validateRubriques = () => {
+    if (!formFields || formFields.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Action impossible",
+        text: "Veuillez ajouter au moins une rubrique.",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return false;
+    }
+
+    for (let i = 0; i < formFields.length; i++) {
+      const field = formFields[i];
+
+      if (!field.rubrique || field.rubrique.trim() === "") {
+        Swal.fire({
+          icon: "warning",
+          title: "Rubrique manquante",
+          text: `La rubrique à la ligne ${i + 1} est vide.`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        return false;
+      }
+
+      if (
+        !field.montant ||
+        isNaN(parseFloat(field.montant)) ||
+        parseFloat(field.montant) <= 0
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "Montant invalide",
+          text: `Le montant à la ligne ${i + 1} est invalide.`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   // Vérification et envoi des données
   const handleSubmit = async () => {
-    // Vérification des champs obligatoires
+    if (!validateRubriques()) return;
+
     if (
       !formData.nom ||
       !formData.prenom ||
@@ -158,7 +210,15 @@ const ModalCreation = ({
       !formData.grade ||
       !formData.indice
     ) {
-      message.error("Veuillez remplir tous les champs obligatoires !");
+      Swal.fire({
+        icon: "warning",
+        title: "Champs manquants",
+        text: "Veuillez remplir tous les champs obligatoires !",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
       return;
     }
 

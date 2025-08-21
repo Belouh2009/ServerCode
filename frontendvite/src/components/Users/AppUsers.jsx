@@ -18,7 +18,6 @@ import CodeRubrique from "../Code/CodeRubrique";
 import CodeRubriqueSolde from "../Code/CodeRubriqueSolde";
 import CodeZone from "../Code/CodeZone";
 import CodeCorps from "../Code/CodeCorps";
-import CorpsGradeIndice from "../Code/CodeCorpsGradeIndice";
 import Bareme from "../Code/Bareme";
 import "../../index.css";
 

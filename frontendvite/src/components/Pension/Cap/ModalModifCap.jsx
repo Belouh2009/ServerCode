@@ -79,7 +79,9 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const fetchComptables = async () => {
     try {
-      const response = await fetch("http://192.168.88.28:8087/comptables/liste");
+      const response = await fetch(
+        "http://192.168.88.28:8087/comptables/liste"
+      );
       const data = await response.json();
       setOptions(data);
       return data;
@@ -91,7 +93,9 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const fetchBanques = async () => {
     try {
-      const response = await fetch("http://192.168.88.28:8087/comptables/banques");
+      const response = await fetch(
+        "http://192.168.88.28:8087/comptables/banques"
+      );
       const data = await response.json();
       setOptions(data);
       return data;
@@ -122,8 +126,20 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
     setFormFields(updatedFields);
   };
-
+  
   const handleRemoveField = (index) => {
+    if (formFields.length <= 1) {
+      Swal.fire({
+        icon: "warning",
+        title: "Action impossible",
+        text: "On doit enregistrer au moins un rubrique",
+        timer: 2000, // disparaît automatiquement après 2 secondes
+        showConfirmButton: false,
+        toast: true, // affichage type toast en haut à droite
+        position: "top-end",
+      });
+      return;
+    }
     setFormFields(formFields.filter((_, i) => i !== index));
   };
 
@@ -137,7 +153,6 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
         "L'ID de l'agent est manquant. Impossible de mettre à jour.",
         "error"
       );
-      console.log("Agent manquant ou ID manquant", agent); // Vérifie si l'agent est bien passé
       return; // Arrête l'exécution si l'ID est manquant
     }
 

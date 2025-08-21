@@ -25,7 +25,6 @@ import ContentDashboard from "../Pension/ContentDashboard";
 import CodeRubrique from "../Code/ContentCodeRubrique";
 import CodeZone from "../Code/ContentCodeZone";
 import CodeCorps from "../Code/ContentCodeCorps";
-import CodeCorpsGradeIndice from "../Code/ContentCorpsGradeIndice";
 import "../../index.css";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -213,8 +212,6 @@ export default function App() {
         return <CodeCorps />;
       case "zone":
         return <CodeZone />;
-      case "corps-grade-indice":
-        return <CodeCorpsGradeIndice />;
       default:
         return <ContentDashboard />;
     }

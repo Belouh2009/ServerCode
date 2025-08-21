@@ -105,9 +105,62 @@ const ModalCreationCce = ({
     setFormFields(updatedFields);
   };
 
+  const validateRubriques = () => {
+    if (!formFields || formFields.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Action impossible",
+        text: "Veuillez ajouter au moins une rubrique.",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return false;
+    }
+
+    for (let i = 0; i < formFields.length; i++) {
+      const field = formFields[i];
+
+      if (!field.rubrique || field.rubrique.trim() === "") {
+        Swal.fire({
+          icon: "warning",
+          title: "Rubrique manquante",
+          text: `La rubrique à la ligne ${i + 1} est vide.`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        return false;
+      }
+
+      if (
+        !field.montant ||
+        isNaN(parseFloat(field.montant)) ||
+        parseFloat(field.montant) <= 0
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "Montant invalide",
+          text: `Le montant à la ligne ${i + 1} est invalide.`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
     // Déterminer l'assignation (depuis assignationType ou formData)
     const assignationValue = assignationType || formData.assignation;
+
+    if (!validateRubriques()) return;
 
     // Validation des champs obligatoires
     if (
@@ -119,19 +172,15 @@ const ModalCreationCce = ({
       !assignationValue ||
       !formData.additional_info
     ) {
-      message.error("Veuillez remplir tous les champs obligatoires !");
-      return;
-    }
-
-    // Validation des rubriques et montants
-    if (
-      formFields.some(
-        (field) => !field.rubrique || !field.montant || isNaN(field.montant)
-      )
-    ) {
-      message.error(
-        "Veuillez remplir toutes les rubriques et montants correctement !"
-      );
+      Swal.fire({
+        icon: "warning",
+        title: "Champs manquants",
+        text: "Veuillez remplir tous les champs obligatoires !",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
       return;
     }
 

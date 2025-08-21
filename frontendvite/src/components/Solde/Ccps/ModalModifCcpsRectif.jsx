@@ -97,6 +97,18 @@ const ModalModifCap = ({
   };
 
   const handleRemoveField = (index) => {
+    if (formFields.length <= 1) {
+      Swal.fire({
+        icon: "warning",
+        title: "Action impossible",
+        text: "On doit enregistrer au moins un rubrique",
+        timer: 2000, // disparaît automatiquement après 2 secondes
+        showConfirmButton: false,
+        toast: true, // affichage type toast en haut à droite
+        position: "top-end",
+      });
+      return;
+    }
     setFormFields(formFields.filter((_, i) => i !== index));
   };
 
@@ -134,8 +146,10 @@ const ModalModifCap = ({
 
   const handleSubmit = async () => {
     if (!formData || !formData.matricule) {
-      message.error(
-        "L'ID de l'agent est manquant. Impossible de mettre à jour."
+      Swal.fire(
+        "Erreur",
+        "L'ID de l'agent est manquant. Impossible de mettre à jour.",
+        "error"
       );
       return;
     }
@@ -190,7 +204,8 @@ const ModalModifCap = ({
             fontWeight: 600,
           }}
         >
-          Modification de la Certificat de Cessation de Paiement de la Solde Réctificatif
+          Modification de la Certificat de Cessation de Paiement de la Solde
+          Réctificatif
         </div>
       }
       centered
@@ -433,9 +448,7 @@ const ModalModifCap = ({
                   <Form.Item label="Date de Cessation Service">
                     <Input
                       type="date"
-                      value={
-                        formData.dateCessation || ""
-                      }
+                      value={formData.dateCessation || ""}
                       onChange={(e) =>
                         handleChangeMain(e.target.value, "dateCessation")
                       }
@@ -447,9 +460,7 @@ const ModalModifCap = ({
                   <Form.Item label="Date Fin de Paiement">
                     <Input
                       type="date"
-                      value={
-                        formData.dateFinPai || ""
-                      }
+                      value={formData.dateFinPai || ""}
                       onChange={(e) =>
                         handleChangeMain(e.target.value, "dateFinPai")
                       }
@@ -483,9 +494,7 @@ const ModalModifCap = ({
               <Form.Item label="Date d'ordre de Recette">
                 <Input
                   type="date"
-                  value={
-                    formData.dateOrdreRecette || ""
-                  }
+                  value={formData.dateOrdreRecette || ""}
                   onChange={(e) =>
                     handleChangeMain(e.target.value, "dateOrdreRecette")
                   }
@@ -495,9 +504,7 @@ const ModalModifCap = ({
               <Form.Item label="Date debut paiement">
                 <Input
                   type="date"
-                  value={
-                    formData.dateDebut || ""
-                  }
+                  value={formData.dateDebut || ""}
                   onChange={(e) =>
                     handleChangeMain(e.target.value, "dateDebut")
                   }
@@ -507,9 +514,7 @@ const ModalModifCap = ({
               <Form.Item label="Date dernier paiement">
                 <Input
                   type="date"
-                  value={
-                    formData.dateDernierPai || ""
-                  }
+                  value={formData.dateDernierPai || ""}
                   onChange={(e) =>
                     handleChangeMain(e.target.value, "dateDernierPai")
                   }
