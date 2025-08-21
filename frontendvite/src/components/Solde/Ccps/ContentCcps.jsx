@@ -24,12 +24,10 @@ const { Title } = Typography;
 
 export default function ContentSection() {
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showModalCreation, setShowModalCreation] = useState(false);
   const [showModalModif, setShowModalModif] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [showModalRectificatif, setShowModalRectificatif] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
-
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -77,8 +75,21 @@ export default function ContentSection() {
     fetchAgents();
   }, []);
 
-  const handleShowCreateModal = () => setShowModal(true);
-  const handleCloseModal = () => {
+  // Fonctions d'ouverture spécifiques
+  const handleOpenModalCreation = () => setShowModalCreation(true);
+
+  const handleOpenModalModif = (agent) => {
+    setSelectedAgent(agent);
+    setShowModalModif(true);
+  };
+
+  const handleOpenModalRectificatif = (agent) => {
+    setSelectedAgent(agent);
+    setShowModalRectificatif(true);
+  };
+
+  // Fonctions de fermeture spécifiques
+  const handleCloseModalCreation = () => {
     setFormData({
       matricule: "",
       civilite: "",
@@ -105,9 +116,17 @@ export default function ContentSection() {
       dateDernierPai: "",
     });
     setFormFields([]);
-    setShowModal(false);
+    setShowModalCreation(false);
+  };
+
+  const handleCloseModalModif = () => {
     setShowModalModif(false);
-    setIsModalOpen(false);
+    setSelectedAgent(null);
+  };
+
+  const handleCloseModalRectificatif = () => {
+    setShowModalRectificatif(false);
+    setSelectedAgent(null);
   };
 
   const handleSearch = (event) => {
@@ -124,8 +143,7 @@ export default function ContentSection() {
       cancelButtonText: "Annuler",
     }).then((result) => {
       if (result.isConfirmed) {
-        setSelectedAgent(agent);
-        setShowModalModif(true);
+        handleOpenModalModif(agent);
       }
     });
   };
@@ -133,15 +151,14 @@ export default function ContentSection() {
   const handleShowRectificatifModal = (agent) => {
     Swal.fire({
       title: "Êtes-vous sûr?",
-      text: "Vous allez réctifier ce certificat !",
+      text: "Vous allez rectifier ce certificat !",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Oui",
       cancelButtonText: "Annuler",
     }).then((result) => {
       if (result.isConfirmed) {
-        setSelectedAgent(agent);
-        setIsModalOpen(true);
+        handleOpenModalRectificatif(agent);
       }
     });
   };
@@ -302,16 +319,15 @@ export default function ContentSection() {
       width: 100,
       render: (_, record) => (
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Tooltip title="Modifier cette certificat">
+          <Tooltip title="Modifier ce certificat">
             <Button type="primary" onClick={() => handleShowEditModal(record)}>
               <RiFileEditFill size={15} />
             </Button>
           </Tooltip>
-          <Tooltip title="Réctifier cette certificat">
+          <Tooltip title="Rectifier ce certificat">
             <Button
-              style={{ marginLeft: "10px" }}
-              color="cyan"
-              variant="solid"
+              style={{ marginLeft: "10px", backgroundColor: "#00bcd4", borderColor: "#00bcd4" }}
+              type="primary"
               onClick={() => handleShowRectificatifModal(record)}
             >
               <FaFilePen size={15} />
@@ -360,7 +376,7 @@ export default function ContentSection() {
                 borderColor: "#cfd8dc",
               }}
             />
-            <Button type="primary" onClick={handleShowCreateModal}>
+            <Button type="primary" onClick={handleOpenModalCreation}>
               <IoCreate size={20} />
               Nouveau certificat
             </Button>
@@ -414,37 +430,37 @@ export default function ContentSection() {
       )}
 
       <ModalCreationCcps
-        open={showModal}
-        onClose={handleCloseModal}
+        open={showModalCreation}
+        onClose={handleCloseModalCreation}
         formData={formData}
         setFormData={setFormData}
         formFields={formFields}
         setFormFields={setFormFields}
         onSuccess={() => {
           fetchAgents();
-          handleCloseModal();
+          handleCloseModalCreation();
         }}
       />
 
       <ModalModifCcps
         open={showModalModif}
-        onClose={handleCloseModal}
+        onClose={handleCloseModalModif}
         formData={selectedAgent}
         setFormData={setSelectedAgent}
         onSuccess={() => {
           fetchAgents();
-          handleCloseModal();
+          handleCloseModalModif();
         }}
       />
 
       <ModalRectificatif
-        open={isModalOpen}
-        onClose={handleCloseModal}
+        open={showModalRectificatif}
+        onClose={handleCloseModalRectificatif}
         formData={selectedAgent}
         setFormData={setSelectedAgent}
         onSuccess={() => {
           fetchAgents();
-          handleCloseModal();
+          handleCloseModalRectificatif();
         }}
       />
     </Content>

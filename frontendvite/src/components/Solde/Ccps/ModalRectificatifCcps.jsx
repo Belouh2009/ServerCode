@@ -31,7 +31,7 @@ const ModalModifCap = ({
   const [articles, setArticles] = useState([]);
   const [localRubriques, setLocalRubriques] = useState([]);
   const [formFields, setFormFields] = useState([]);
-
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -143,24 +143,61 @@ const ModalModifCap = ({
       [name]: value,
     }));
   };
-
   const handleSubmit = async () => {
     if (!formData || !formData.matricule) {
-      Swal.fire(
-        "Erreur",
-        "L'ID de l'agent est manquant. Impossible de mettre à jour.",
-        "error"
+      message.error(
+        "L'ID de l'agent est manquant. Impossible de mettre à jour."
       );
       return;
     }
 
     try {
+      setSubmitting(true);
       const username = localStorage.getItem("username") || "Utilisateur";
+
+      // Récupération du dernier ID
+      const lastIdResponse = await axios.get(
+        "http://192.168.88.28:8087/certificatsCcps/lastId"
+      );
+
+      const lastId = lastIdResponse.data;
+      const currentYear = new Date().getFullYear();
+      const newIdNum = parseInt(lastId.split("-")[0] || "0", 10) + 1;
+      const newIdFormatted = `${String(newIdNum).padStart(
+        4,
+        "0"
+      )}-${currentYear}`;
+
+      // Préparer les données pour l'envoi
       const updatedAgentData = {
-        ...formData,
+        matricule: formData.matricule,
+        civilite: formData.civilite,
+        nom: formData.nom,
+        prenom: formData.prenom,
+        enfant: formData.enfant,
+        localite: formData.localite,
+        cessationService: formData.cessationService,
+        corps: formData.corps,
+        grade: formData.grade,
+        indice: formData.indice,
+        zone: formData.zone,
+        chapitre: formData.chapitre,
+        article: formData.article,
+        acte: formData.acte,
+        referenceActe: formData.referenceActe,
+        dateActe: formData.dateActe,
+        dateCessation: formData.dateCessation,
+        dateFinPai: formData.dateFinPai,
+        montant: formData.montant,
+        referenceRecette: formData.referenceRecette,
+        dateOrdreRecette: formData.dateOrdreRecette,
+        dateDebut: formData.dateDebut,
+        dateDernierPai: formData.dateDernierPai,
+        idCertificatRect: formData.idCertificat,
         certificat: {
-          ...(formData.certificat || {}),
-          modif_par: username,
+          id_certificat: newIdFormatted,
+          date_creation: new Date().toISOString(),
+          ajout_par: username,
         },
         sesituer: formFields.map((f) => ({
           rubrique: { id_rubrique: f.rubrique },
@@ -168,14 +205,14 @@ const ModalModifCap = ({
         })),
       };
 
-      const response = await axios.put(
-        `http://192.168.88.28:8087/agentsCcps/modifier/${formData.matricule}`,
+      const response = await axios.post(
+        `http://192.168.88.28:8087/agentsCcpsRect/enregistre`,
         updatedAgentData,
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (response.status === 200) {
-        Swal.fire("Succès", "Certificat mis à jour avec succès !", "success");
+      if (response.status === 201) {
+        Swal.fire("Succès", "Certificat réctifié avec succès !", "success");
         onClose();
         onSuccess();
       } else {
@@ -188,6 +225,8 @@ const ModalModifCap = ({
         `Impossible de mettre à jour l'agent : ${errorMessage}`,
         "error"
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -204,7 +243,7 @@ const ModalModifCap = ({
             fontWeight: 600,
           }}
         >
-          Modification de la Certificat de Cessation de Paiement du Solde
+          Réctification de la Certificat de Cessation de Paiement du Solde
         </div>
       }
       centered
@@ -617,7 +656,7 @@ const ModalModifCap = ({
             marginTop: 16,
           }}
         >
-          Enregistrer les modifications
+          Enregistrer les réctifications
         </Button>
       </div>
     </Modal>
