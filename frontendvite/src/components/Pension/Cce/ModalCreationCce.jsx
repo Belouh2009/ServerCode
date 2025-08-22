@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Button,
-  Row,
-  Col,
-  Select,
-  message,
-  Checkbox,
-} from "antd";
+import { Modal, Form, Input, Button, Row, Col, Select, Checkbox } from "antd";
 import ReactSelect from "react-select";
 import { IoMdClose, IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
@@ -31,7 +21,7 @@ const ModalCreationCce = ({
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8087/rubriques/ids")
+    fetch("http://192.168.88.28:8087/rubriques/ids")
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -45,9 +35,9 @@ const ModalCreationCce = ({
 
   const fetchComptables = async () => {
     try {
-      const response = await fetch("http://localhost:8087/comptables/liste");
+      const response = await fetch("http://192.168.88.28:8087/comptables/liste");
       const data = await response.json();
-      setOptions(data); // data = liste de noms
+      setOptions(data);
     } catch (err) {
       console.error("Erreur lors du chargement des comptables :", err);
     }
@@ -55,12 +45,34 @@ const ModalCreationCce = ({
 
   const fetchBanques = async () => {
     try {
-      const response = await fetch("http://localhost:8087/comptables/banques");
+      const response = await fetch("http://192.168.88.28:8087/comptables/banques");
       const data = await response.json();
-      setOptions(data); // data = liste de noms
+      setOptions(data);
     } catch (err) {
       console.error("Erreur lors du chargement des banques :", err);
     }
+  };
+
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour convertir le format français (virgule) en format international (point)
+  const formatCurrencyForBackend = (value) => {
+    if (!value) return "0";
+    return value
+      .replace(/[^\d,.]/g, "")
+      .replace(/,/g, ".")
+      .replace(/(\..*)\./g, "$1");
   };
 
   // Générer un nouvel ID de certificat (basé sur le dernier ID récupéré)
@@ -69,22 +81,41 @@ const ModalCreationCce = ({
     let newIdNumber = 1;
 
     if (lastId && lastId.includes("-")) {
-      const lastNumber = parseInt(lastId.split("-")[0], 10); // Extraire le numéro de l'ID
-      newIdNumber = lastNumber + 1; // Incrémenter pour générer un nouvel ID
+      const lastNumber = parseInt(lastId.split("-")[0], 10);
+      newIdNumber = lastNumber + 1;
     }
 
-    return `${String(newIdNumber).padStart(4, "0")}-${currentYear}`; // Exemple : "0002-2025"
+    return `${String(newIdNumber).padStart(4, "0")}-${currentYear}`;
   };
 
+  // Gestion du changement des champs principaux du formulaire AVEC VALIDATION
   const handleChangeMain = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Validation spécifique pour le nom et prénom
+    if (name === "nom" || name === "prenom") {
+      if (value === "" || validateTextOnly(value)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
+  // Gestion du changement des champs dynamiques (rubriques et montants)
   const handleChangeField = (index, name, value) => {
     const updatedFields = [...formFields];
-    updatedFields[index][name] = value;
-    setFormFields(updatedFields);
+
+    if (name === "montant") {
+      // Valider le format avant de mettre à jour
+      if (value === "" || validateCurrency(value)) {
+        updatedFields[index][name] = value;
+        setFormFields(updatedFields);
+      }
+    } else {
+      updatedFields[index][name] = value;
+      setFormFields(updatedFields);
+    }
   };
 
   const handleAddField = () => {
@@ -135,10 +166,12 @@ const ModalCreationCce = ({
         return false;
       }
 
+      // Convertir pour la validation (accepter virgule et point)
+      const montantValue = formatCurrencyForBackend(field.montant);
       if (
         !field.montant ||
-        isNaN(parseFloat(field.montant)) ||
-        parseFloat(field.montant) <= 0
+        isNaN(parseFloat(montantValue)) ||
+        parseFloat(montantValue) <= 0
       ) {
         Swal.fire({
           icon: "warning",
@@ -170,7 +203,9 @@ const ModalCreationCce = ({
       !formData.civilite ||
       !formData.caisse ||
       !assignationValue ||
-      !formData.additional_info
+      !formData.additional_info ||
+      !formData.dateDece ||
+      !formData.dateAnnulation
     ) {
       Swal.fire({
         icon: "warning",
@@ -187,11 +222,11 @@ const ModalCreationCce = ({
     try {
       // Obtenir le dernier ID du certificat depuis l'API
       const lastIdResponse = await fetch(
-        "http://localhost:8087/certificatsCce/lastId"
+        "http://192.168.88.28:8087/certificatsCce/lastId"
       );
       const lastId = await lastIdResponse.text();
 
-      let id_certificat = generateCertificatId(lastId); // Générer un nouvel ID basé sur le dernier ID
+      let id_certificat = generateCertificatId(lastId);
       const username = localStorage.getItem("username") || "Utilisateur";
       const date_creation = new Date().toLocaleDateString("fr-CA");
 
@@ -214,15 +249,13 @@ const ModalCreationCce = ({
         },
         sesituer: formFields.map((field) => ({
           rubrique: { id_rubrique: field.rubrique },
-          montant: isNaN(parseFloat(field.montant))
-            ? 0
-            : parseFloat(field.montant),
+          montant: parseFloat(formatCurrencyForBackend(field.montant)) || 0,
         })),
       };
 
       // Envoyer les données à l'API
       const response = await fetch(
-        "http://localhost:8087/agentsCce/enregistre",
+        "http://192.168.88.28:8087/agentsCce/enregistre",
         {
           method: "POST",
           headers: {
@@ -250,11 +283,13 @@ const ModalCreationCce = ({
           prenom: "",
           caisse: "",
           assignation: "",
-          additionalInfo: "",
+          additional_info: "",
           dateDece: "",
           dateAnnulation: "",
         });
         setFormFields([]);
+        setAssignationType(null);
+        setOptions([]);
         onClose();
         onSuccess();
       } else {
@@ -338,7 +373,19 @@ const ModalCreationCce = ({
               />
             </Form.Item>
 
-            <Form.Item label="Nom">
+            <Form.Item
+              label="Nom"
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Le nom ne doit contenir que des lettres")
+                        ),
+                },
+              ]}
+            >
               <Input
                 type="text"
                 name="nom"
@@ -348,7 +395,21 @@ const ModalCreationCce = ({
               />
             </Form.Item>
 
-            <Form.Item label="Prénom">
+            <Form.Item
+              label="Prénom"
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error(
+                            "Le prénom ne doit contenir que des lettres"
+                          )
+                        ),
+                },
+              ]}
+            >
               <Input
                 type="text"
                 name="prenom"
@@ -385,11 +446,16 @@ const ModalCreationCce = ({
                     setFormData((prev) => ({
                       ...prev,
                       assignation: "comptable",
+                      additional_info: "", // Réinitialiser la sélection précédente
                     }));
                   } else if (assignationType === "comptable") {
                     setAssignationType(null);
                     setOptions([]);
-                    setFormData((prev) => ({ ...prev, assignation: "" }));
+                    setFormData((prev) => ({
+                      ...prev,
+                      assignation: "",
+                      additional_info: "",
+                    }));
                   }
                 }}
               >
@@ -402,11 +468,19 @@ const ModalCreationCce = ({
                   if (e.target.checked) {
                     setAssignationType("banque");
                     fetchBanques();
-                    setFormData((prev) => ({ ...prev, assignation: "banque" }));
+                    setFormData((prev) => ({
+                      ...prev,
+                      assignation: "banque",
+                      additional_info: "", // Réinitialiser la sélection précédente
+                    }));
                   } else if (assignationType === "banque") {
                     setAssignationType(null);
                     setOptions([]);
-                    setFormData((prev) => ({ ...prev, assignation: "" }));
+                    setFormData((prev) => ({
+                      ...prev,
+                      assignation: "",
+                      additional_info: "",
+                    }));
                   }
                 }}
               >
@@ -415,13 +489,15 @@ const ModalCreationCce = ({
 
               <Select
                 showSearch
+                optionFilterProp="children"
                 name="additional_info"
                 value={formData.additional_info || undefined}
                 onChange={(value) =>
                   setFormData((prev) => ({ ...prev, additional_info: value }))
                 }
-                style={{ marginTop: 10 }}
+                style={{ marginTop: 10, width: "100%" }}
                 placeholder="Sélectionner une option"
+                disabled={!assignationType} // Désactiver si aucun type n'est sélectionné
               >
                 {options.map((item) => (
                   <Select.Option key={item} value={item}>
@@ -433,25 +509,23 @@ const ModalCreationCce = ({
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Date de Décès">
+                <Form.Item label="Date de Décès" required>
                   <Input
                     type="date"
                     name="dateDece"
                     value={formData.dateDece || ""}
                     onChange={handleChangeMain}
-                    required
                   />
                 </Form.Item>
               </Col>
 
               <Col span={12}>
-                <Form.Item label="Date d'Annulation">
+                <Form.Item label="Date d'Annulation" required>
                   <Input
                     type="date"
                     name="dateAnnulation"
                     value={formData.dateAnnulation || ""}
                     onChange={handleChangeMain}
-                    required
                   />
                 </Form.Item>
               </Col>
@@ -504,12 +578,27 @@ const ModalCreationCce = ({
                         value: rubrique,
                         label: rubrique,
                       }))}
+                    required
                   />
                 </Form.Item>
               </Col>
 
               <Col span={11}>
-                <Form.Item label="Montant">
+                <Form.Item
+                  label="Montant"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        !value || validateCurrency(value)
+                          ? Promise.resolve()
+                          : Promise.reject(
+                              new Error(
+                                "Format monétaire invalide (ex: 123,45 ou 123.45)"
+                              )
+                            ),
+                    },
+                  ]}
+                >
                   <Input
                     type="text"
                     style={{ height: "39px" }}
@@ -517,7 +606,7 @@ const ModalCreationCce = ({
                     onChange={(e) =>
                       handleChangeField(index, "montant", e.target.value)
                     }
-                    placeholder="Entrer un montant"
+                    placeholder="Ex: 5000,41"
                   />
                 </Form.Item>
               </Col>

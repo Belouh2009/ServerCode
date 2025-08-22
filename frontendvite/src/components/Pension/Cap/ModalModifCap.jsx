@@ -22,6 +22,28 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
   const [assignationType, setAssignationType] = useState(null);
   const [options, setOptions] = useState([]);
 
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour convertir le format français (virgule) en format international (point)
+  const formatCurrencyForBackend = (value) => {
+    if (!value) return "0";
+    return value
+      .replace(/[^\d,.]/g, "") // Garder seulement chiffres, virgules et points
+      .replace(/,/g, ".") // Remplacer les virgules par des points
+      .replace(/(\..*)\./g, "$1"); // Empêcher plusieurs points décimaux
+  };
+
   // Lorsque l'agent est ouvert, récupérer ses informations et remplir les champs
   useEffect(() => {
     if (open && agent) {
@@ -46,7 +68,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       const newFields =
         agent.sesituer?.map((s) => ({
           rubrique: s.rubrique?.id_rubrique || "",
-          montant: s.montant || "",
+          montant: s.montant?.toString() || "", // Convertir en string pour l'affichage
         })) || [];
       setFormFields(newFields);
     } else {
@@ -56,7 +78,10 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       setCivilite("");
       setCaisse("");
       setAssignation("");
+      setAdditionalInfo("");
       setFormFields([]);
+      setAssignationType(null);
+      setOptions([]);
     }
   }, [open, agent]);
 
@@ -79,9 +104,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const fetchComptables = async () => {
     try {
-      const response = await fetch(
-        "http://192.168.88.28:8087/comptables/liste"
-      );
+      const response = await fetch("http://192.168.88.28:8087/comptables/liste");
       const data = await response.json();
       setOptions(data);
       return data;
@@ -93,9 +116,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const fetchBanques = async () => {
     try {
-      const response = await fetch(
-        "http://192.168.88.28:8087/comptables/banques"
-      );
+      const response = await fetch("http://192.168.88.28:8087/comptables/banques");
       const data = await response.json();
       setOptions(data);
       return data;
@@ -110,8 +131,17 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
   const handleChangeField = (index, name, value) => {
     const updatedFields = [...formFields];
-    updatedFields[index][name] = value;
-    setFormFields(updatedFields);
+
+    if (name === "montant") {
+      // Valider le format avant de mettre à jour
+      if (value === "" || validateCurrency(value)) {
+        updatedFields[index][name] = value;
+        setFormFields(updatedFields);
+      }
+    } else {
+      updatedFields[index][name] = value;
+      setFormFields(updatedFields);
+    }
   };
 
   const handleAddField = () => {
@@ -126,7 +156,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
 
     setFormFields(updatedFields);
   };
-  
+
   const handleRemoveField = (index) => {
     if (formFields.length <= 1) {
       Swal.fire({
@@ -143,7 +173,54 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
     setFormFields(formFields.filter((_, i) => i !== index));
   };
 
+  // Validation des champs nom et prénom
+  const requiredFields = {
+    nom,
+    prenom,
+    num_pension,
+    civilite,
+    caisse,
+    assignation,
+    additionalInfo,
+  };
+
   const handleSubmit = async () => {
+    if (Object.values(requiredFields).some((v) => !v)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Champs manquants",
+        text: "Veuillez remplir tous les champs obligatoires !",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
+    // Validation des montants
+    for (let i = 0; i < formFields.length; i++) {
+      const field = formFields[i];
+      const formattedValue = formatCurrencyForBackend(field.montant || "");
+      if (
+        !validateCurrency(field.montant || "") ||
+        isNaN(parseFloat(formattedValue))
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "Montant invalide",
+          text: `Le montant à la ligne ${
+            i + 1
+          } est invalide. Format attendu: 123,45 ou 123.45`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        return;
+      }
+    }
+
     const username = localStorage.getItem("username") || "Utilisateur";
 
     // Vérification de la présence de l'ID (qui est dans `key`)
@@ -153,6 +230,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
         "L'ID de l'agent est manquant. Impossible de mettre à jour.",
         "error"
       );
+      console.log("Agent manquant ou ID manquant", agent); // Vérifie si l'agent est bien passé
       return; // Arrête l'exécution si l'ID est manquant
     }
 
@@ -171,9 +249,10 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
       },
       sesituer: formFields.map((f) => ({
         rubrique: { id_rubrique: f.rubrique },
-        montant: parseFloat(f.montant) || 0,
+        montant: parseFloat(formatCurrencyForBackend(f.montant)) || 0,
       })),
     };
+
     try {
       // Assurez-vous que l'URL est correcte
       const response = await axios.put(
@@ -270,14 +349,49 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
               />
             </Form.Item>
 
-            <Form.Item label="Nom">
-              <Input value={nom} onChange={(e) => setNom(e.target.value)} />
+            <Form.Item
+              label="Nom"
+              validateStatus={
+                validateTextOnly(nom) || nom === "" ? "" : "error"
+              }
+              help={
+                validateTextOnly(nom) || nom === ""
+                  ? ""
+                  : "Le nom doit contenir uniquement des lettres"
+              }
+            >
+              <Input
+                value={nom}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "" || validateTextOnly(value)) {
+                    setNom(value);
+                  }
+                }}
+                placeholder="Entrer le nom"
+              />
             </Form.Item>
 
-            <Form.Item label="Prénom">
+            <Form.Item
+              label="Prénom"
+              validateStatus={
+                validateTextOnly(prenom) || prenom === "" ? "" : "error"
+              }
+              help={
+                validateTextOnly(prenom) || prenom === ""
+                  ? ""
+                  : "Le prénom doit contenir uniquement des lettres"
+              }
+            >
               <Input
                 value={prenom}
-                onChange={(e) => setPrenom(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "" || validateTextOnly(value)) {
+                    setPrenom(value);
+                  }
+                }}
+                placeholder="Entrer le prénom"
               />
             </Form.Item>
 
@@ -353,6 +467,7 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
           <h5>Informations Rubrique</h5>
 
           <Button
+            type="primary"
             block
             onClick={handleAddField}
             style={{
@@ -399,7 +514,19 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
               </Col>
 
               <Col span={11}>
-                <Form.Item label="Montant">
+                <Form.Item
+                  label="Montant"
+                  validateStatus={
+                    validateCurrency(field.montant) || field.montant === ""
+                      ? ""
+                      : "error"
+                  }
+                  help={
+                    validateCurrency(field.montant) || field.montant === ""
+                      ? ""
+                      : "Format monétaire invalide (ex: 123,45 ou 123.45)"
+                  }
+                >
                   <Input
                     type="text"
                     style={{ height: "39px" }}
@@ -407,7 +534,6 @@ const ModalModifCap = ({ open, onClose, agent, onSuccess, rubriques = [] }) => {
                     onChange={(e) =>
                       handleChangeField(index, "montant", e.target.value)
                     }
-                    placeholder="Entrer un montant"
                   />
                 </Form.Item>
               </Col>

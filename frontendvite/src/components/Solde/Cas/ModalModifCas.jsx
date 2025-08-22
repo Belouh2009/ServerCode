@@ -26,6 +26,28 @@ const ModalModification = ({
   const [localites, setLocalites] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour convertir le format français (virgule) en format international (point)
+  const formatCurrencyForBackend = (value) => {
+    if (!value) return "0";
+    return value
+      .replace(/[^\d,.]/g, "") // Garder seulement chiffres, virgules et points
+      .replace(/,/g, ".") // Remplacer les virgules par des points
+      .replace(/(\..*)\./g, "$1"); // Empêcher plusieurs points décimaux
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -83,6 +105,14 @@ const ModalModification = ({
   };
 
   const handleChangeMain = (value, name) => {
+    // Validation pour les champs nom et prénom
+    if ((name === "nom" || name === "prenom") && value !== "") {
+      if (!validateTextOnly(value)) {
+        // Ne pas mettre à jour si la validation échoue
+        return;
+      }
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -90,6 +120,7 @@ const ModalModification = ({
   };
 
   const handleSubmit = async () => {
+    // Validation des champs obligatoires
     if (
       !formData ||
       !formData.nom ||
@@ -111,10 +142,31 @@ const ModalModification = ({
       return;
     }
 
+    // Validation des noms et prénoms
+    if (!validateTextOnly(formData.nom)) {
+      message.error("Le nom ne doit contenir que des lettres");
+      return;
+    }
+
+    if (!validateTextOnly(formData.prenom)) {
+      message.error("Le prénom ne doit contenir que des lettres");
+      return;
+    }
+
+    // Validation des montants si présents
+    if (formData.montant && !validateCurrency(formData.montant)) {
+      message.error("Le format du montant est invalide (ex: 123,45 ou 123.45)");
+      return;
+    }
+
     try {
       const username = localStorage.getItem("username") || "Utilisateur";
       const updatedData = {
         ...formData,
+        // Si un montant est présent, le formater pour l'envoi au backend
+        ...(formData.montant && {
+          montant: parseFloat(formatCurrencyForBackend(formData.montant)) || 0,
+        }),
         certificat: {
           ...(formData.certificat || {}),
           modif_par: username,
@@ -204,14 +256,38 @@ const ModalModification = ({
                   style={{ color: "black" }}
                 />
               </Form.Item>
-              <Form.Item label="Nom">
+              <Form.Item
+                label="Nom"
+                validateStatus={
+                  validateTextOnly(formData.nom) || formData.nom === ""
+                    ? ""
+                    : "error"
+                }
+                help={
+                  validateTextOnly(formData.nom) || formData.nom === ""
+                    ? ""
+                    : "Le nom doit contenir uniquement des lettres"
+                }
+              >
                 <Input
                   name="nom"
                   value={formData.nom || ""}
                   onChange={(e) => handleChangeMain(e.target.value, "nom")}
                 />
               </Form.Item>
-              <Form.Item label="Prénom">
+              <Form.Item
+                label="Prénom"
+                validateStatus={
+                  validateTextOnly(formData.prenom) || formData.prenom === ""
+                    ? ""
+                    : "error"
+                }
+                help={
+                  validateTextOnly(formData.prenom) || formData.prenom === ""
+                    ? ""
+                    : "Le prénom doit contenir uniquement des lettres"
+                }
+              >
                 <Input
                   name="prenom"
                   value={formData.prenom || ""}
@@ -327,6 +403,32 @@ const ModalModification = ({
                   }
                 />
               </Form.Item>
+              {/* Ajout d'un champ montant si nécessaire */}
+              {formData.montant !== undefined && (
+                <Form.Item
+                  label="Montant"
+                  validateStatus={
+                    validateCurrency(formData.montant) ||
+                    formData.montant === ""
+                      ? ""
+                      : "error"
+                  }
+                  help={
+                    validateCurrency(formData.montant) ||
+                    formData.montant === ""
+                      ? ""
+                      : "Format monétaire invalide (ex: 123,45 ou 123.45)"
+                  }
+                >
+                  <Input
+                    name="montant"
+                    value={formData.montant || ""}
+                    onChange={(e) =>
+                      handleChangeMain(e.target.value, "montant")
+                    }
+                  />
+                </Form.Item>
+              )}
             </Form>
           </Col>
 

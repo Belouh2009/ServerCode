@@ -23,6 +23,28 @@ const ModalCreation = ({
   const [rubriques, setRubriques] = useState([]);
   const [loadingCorps, setLoadingCorps] = useState(true);
 
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour convertir le format français (virgule) en format international (point)
+  const formatCurrencyForBackend = (value) => {
+    if (!value) return "0";
+    return value
+      .replace(/[^\d,.]/g, "") 
+      .replace(/,/g, ".") 
+      .replace(/(\..*)\./g, "$1"); 
+  };
+
   useEffect(() => {
     axios
       .get("http://192.168.88.28:8087/corps/distinct")
@@ -99,11 +121,20 @@ const ModalCreation = ({
     }));
   };
 
-  // Gérer le changement de rubrique ou montant
+  // Gérer le changement de rubrique ou montant avec validation
   const handleChangeField = (index, key, value) => {
     const updatedFields = [...formFields];
-    updatedFields[index][key] = value;
-    setFormFields(updatedFields);
+
+    if (key === "montant") {
+      // Valider le format avant de mettre à jour
+      if (value === "" || validateCurrency(value)) {
+        updatedFields[index][key] = value;
+        setFormFields(updatedFields);
+      }
+    } else {
+      updatedFields[index][key] = value;
+      setFormFields(updatedFields);
+    }
   };
 
   const handleArticleChange = (value) => {
@@ -129,15 +160,26 @@ const ModalCreation = ({
     setFormFields(updatedFields);
   };
 
-  // Gestion des entrées générales
+  // Gestion des entrées générales avec validation pour nom et prénom
   const handleChangeMain = (value, name) => {
     if (typeof value === "object" && value.target) {
       // Cas d'un champ Input
-      const { name, value: inputValue } = value.target;
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: inputValue,
-      }));
+      const { name: fieldName, value: inputValue } = value.target;
+      
+      // Validation spécifique pour le nom et prénom
+      if (fieldName === "nom" || fieldName === "prenom") {
+        if (inputValue === "" || validateTextOnly(inputValue)) {
+          setFormData((prevData) => ({
+            ...prevData,
+            [fieldName]: inputValue,
+          }));
+        }
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          [fieldName]: inputValue,
+        }));
+      }
     } else {
       // Cas d'un Select ou d'une valeur passée directement
       setFormData((prevData) => ({
@@ -177,10 +219,12 @@ const ModalCreation = ({
         return false;
       }
 
+      // Convertir pour la validation (accepter virgule et point)
+      const montantValue = formatCurrencyForBackend(field.montant);
       if (
         !field.montant ||
-        isNaN(parseFloat(field.montant)) ||
-        parseFloat(field.montant) <= 0
+        isNaN(parseFloat(montantValue)) ||
+        parseFloat(montantValue) <= 0
       ) {
         Swal.fire({
           icon: "warning",
@@ -200,8 +244,10 @@ const ModalCreation = ({
 
   // Vérification et envoi des données
   const handleSubmit = async () => {
+    // Vérification des rubriques
     if (!validateRubriques()) return;
 
+    // Vérification des champs obligatoires
     if (
       !formData.nom ||
       !formData.prenom ||
@@ -222,17 +268,42 @@ const ModalCreation = ({
       return;
     }
 
+    // Validation des noms et prénoms
+    if (!validateTextOnly(formData.nom)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Nom invalide",
+        text: "Le nom ne doit contenir que des lettres.",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
+    if (!validateTextOnly(formData.prenom)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Prénom invalide",
+        text: "Le prénom ne doit contenir que des lettres.",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
     try {
       // Récupérer le dernier ID
       const lastIdResponse = await fetch(
         "http://192.168.88.28:8087/certificatsCcps/lastId"
       );
-      if (!lastIdResponse.ok) {
+      if (!lastIdResponse.ok)
         throw new Error("Impossible de récupérer le dernier ID");
-      }
-      const lastId = await lastIdResponse.text();
 
-      // Préparation des données
+      const lastId = await lastIdResponse.text();
       const date_creation = new Date().toLocaleDateString("fr-CA");
       const username = localStorage.getItem("username") || "Utilisateur";
 
@@ -248,9 +319,7 @@ const ModalCreation = ({
         },
         sesituer: formFields.map((field) => ({
           rubrique: { id_rubrique: field.rubrique },
-          montant: isNaN(parseFloat(field.montant))
-            ? 0
-            : parseFloat(field.montant),
+          montant: parseFloat(formatCurrencyForBackend(field.montant)) || 0,
         })),
       };
 
@@ -264,10 +333,9 @@ const ModalCreation = ({
         }
       );
 
-      // Vérification de la réponse du serveur
       const responseText = await response.text();
+
       if (response.ok) {
-        // Succès
         Swal.fire({
           icon: "success",
           title: "Succès !",
@@ -279,7 +347,6 @@ const ModalCreation = ({
         onClose();
         onSuccess();
       } else {
-        // Erreur avec réponse du serveur
         Swal.fire({
           icon: "error",
           title: "Erreur !",
@@ -288,7 +355,6 @@ const ModalCreation = ({
         });
       }
     } catch (error) {
-      // Erreur de connexion au serveur
       Swal.fire({
         icon: "error",
         title: "Erreur réseau",
@@ -349,7 +415,20 @@ const ModalCreation = ({
               </Col>
             </Row>
 
-            <Form.Item label="Nom" required>
+            <Form.Item 
+              label="Nom" 
+              required
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Le nom ne doit contenir que des lettres")
+                        ),
+                },
+              ]}
+            >
               <Input
                 name="nom"
                 value={formData.nom || ""}
@@ -357,7 +436,21 @@ const ModalCreation = ({
                 placeholder="Entrer le nom"
               />
             </Form.Item>
-            <Form.Item label="Prénom" required>
+            
+            <Form.Item 
+              label="Prénom" 
+              required
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Le prénom ne doit contenir que des lettres")
+                        ),
+                },
+              ]}
+            >
               <Input
                 name="prenom"
                 value={formData.prenom || ""}
@@ -683,7 +776,21 @@ const ModalCreation = ({
               </Col>
 
               <Col span={11}>
-                <Form.Item label="Montant">
+                <Form.Item 
+                  label="Montant"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        !value || validateCurrency(value)
+                          ? Promise.resolve()
+                          : Promise.reject(
+                              new Error(
+                                "Format monétaire invalide (ex: 123,45 ou 123.45)"
+                              )
+                            ),
+                    },
+                  ]}
+                >
                   <Input
                     style={{ height: "39px" }}
                     value={field.montant}

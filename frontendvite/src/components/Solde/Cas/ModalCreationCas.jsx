@@ -18,7 +18,20 @@ const ModalCreation = ({
   const [gradesWithIndices, setGradesWithIndices] = useState([]);
   const [chapitreList, setChapitreList] = useState([]);
   const [localites, setLocalites] = useState([]);
-  const [loadingCorps, setLoadingCorps] = useState(true); // Ajout de loadingCorps pour éviter une erreur
+  const [loadingCorps, setLoadingCorps] = useState(true);
+
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
 
   useEffect(() => {
     axios
@@ -51,7 +64,7 @@ const ModalCreation = ({
 
   // Charger la liste des grades avec indices lorsqu'un corps est sélectionné
   const handleCorpsChange = (value) => {
-    setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" })); // Réinitialiser grade et indice
+    setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" }));
     axios
       .get(`http://192.168.88.28:8087/corps/grades?corps=${value}`)
       .then((response) => setGradesWithIndices(response.data))
@@ -79,15 +92,26 @@ const ModalCreation = ({
     }));
   };
 
-  // Gestion des entrées générales
+  // Gestion des entrées générales avec validation
   const handleChangeMain = (value, name) => {
     if (typeof value === "object" && value.target) {
       // Cas d'un champ Input
-      const { name, value: inputValue } = value.target;
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: inputValue,
-      }));
+      const { name: fieldName, value: inputValue } = value.target;
+      
+      // Validation spécifique pour le nom et prénom
+      if (fieldName === "nom" || fieldName === "prenom") {
+        if (inputValue === "" || validateTextOnly(inputValue)) {
+          setFormData((prevData) => ({
+            ...prevData,
+            [fieldName]: inputValue,
+          }));
+        }
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          [fieldName]: inputValue,
+        }));
+      }
     } else {
       // Cas d'un Select ou d'une valeur passée directement
       setFormData((prevData) => ({
@@ -99,6 +123,33 @@ const ModalCreation = ({
 
   // Vérification et envoi des données
   const handleSubmit = async () => {
+    // Validation des noms et prénoms
+    if (formData.nom && !validateTextOnly(formData.nom)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Nom invalide",
+        text: "Le nom ne doit contenir que des lettres",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
+    if (formData.prenom && !validateTextOnly(formData.prenom)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Prénom invalide",
+        text: "Le prénom ne doit contenir que des lettres",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
     // Vérification des champs obligatoires
     if (
       !formData.nom ||
@@ -224,7 +275,21 @@ const ModalCreation = ({
                 placeholder="Entrer le matricule"
               />
             </Form.Item>
-            <Form.Item label="Nom" required>
+            
+            <Form.Item 
+              label="Nom" 
+              required
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Le nom ne doit contenir que des lettres")
+                        ),
+                },
+              ]}
+            >
               <Input
                 name="nom"
                 value={formData.nom || ""}
@@ -232,7 +297,21 @@ const ModalCreation = ({
                 placeholder="Entrer le nom"
               />
             </Form.Item>
-            <Form.Item label="Prénom" required>
+            
+            <Form.Item 
+              label="Prénom" 
+              required
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Le prénom ne doit contenir que des lettres")
+                        ),
+                },
+              ]}
+            >
               <Input
                 name="prenom"
                 value={formData.prenom || ""}
@@ -240,6 +319,7 @@ const ModalCreation = ({
                 placeholder="Entrer le prénom"
               />
             </Form.Item>
+            
             <Row gutter={16}>
               <Col span={8}>
                 <Form.Item label="Corps" required>
@@ -316,9 +396,9 @@ const ModalCreation = ({
                     showSearch
                   >
                     {localites.map((localite) => (
-                      <Option key={localite} value={localite}>
+                      <Select.Option key={localite} value={localite}>
                         {localite}
-                      </Option>
+                      </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>

@@ -32,6 +32,28 @@ const ModalModifCap = ({
   const [localRubriques, setLocalRubriques] = useState([]);
   const [formFields, setFormFields] = useState([]);
 
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour convertir le format français (virgule) en format international (point)
+  const formatCurrencyForBackend = (value) => {
+    if (!value) return "0";
+    return value
+      .replace(/[^\d,.]/g, "") // Garder seulement chiffres, virgules et points
+      .replace(/,/g, ".") // Remplacer les virgules par des points
+      .replace(/(\..*)\./g, "$1"); // Empêcher plusieurs points décimaux
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,7 +92,7 @@ const ModalModifCap = ({
       const newFields =
         formData.sesituer?.map((s) => ({
           rubrique: s.rubrique?.id_rubrique || "",
-          montant: s.montant || "",
+          montant: s.montant?.toString() || "", // Convertir en string pour l'affichage
         })) || [];
       setFormFields(newFields);
     } else {
@@ -82,8 +104,17 @@ const ModalModifCap = ({
 
   const handleChangeField = (index, name, value) => {
     const updatedFields = [...formFields];
-    updatedFields[index][name] = value;
-    setFormFields(updatedFields);
+
+    if (name === "montant") {
+      // Valider le format avant de mettre à jour
+      if (value === "" || validateCurrency(value)) {
+        updatedFields[index][name] = value;
+        setFormFields(updatedFields);
+      }
+    } else {
+      updatedFields[index][name] = value;
+      setFormFields(updatedFields);
+    }
   };
 
   const handleAddField = () => {
@@ -145,11 +176,81 @@ const ModalModifCap = ({
   };
 
   const handleSubmit = async () => {
+    // Validation des champs obligatoires
+    const requiredFields = {
+      matricule: formData.matricule,
+      nom: formData.nom,
+      prenom: formData.prenom,
+      civilite: formData.civilite,
+      cessationService: formData.cessationService,
+    };
+
+    if (Object.values(requiredFields).some((v) => !v)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Champs manquants",
+        text: "Veuillez remplir tous les champs obligatoires !",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
+    // Validation des noms et prénoms
+    if (!validateTextOnly(formData.nom)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Nom invalide",
+        text: "Le nom doit contenir uniquement des lettres",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
+    if (!validateTextOnly(formData.prenom)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Prénom invalide",
+        text: "Le prénom doit contenir uniquement des lettres",
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: "top-end",
+      });
+      return;
+    }
+
+    // Validation des montants
+    for (let i = 0; i < formFields.length; i++) {
+      const field = formFields[i];
+      const formattedValue = formatCurrencyForBackend(field.montant || "");
+      if (
+        !validateCurrency(field.montant || "") ||
+        isNaN(parseFloat(formattedValue))
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "Montant invalide",
+          text: `Le montant à la ligne ${
+            i + 1
+          } est invalide. Format attendu: 123,45 ou 123.45`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        return;
+      }
+    }
+
     if (!formData || !formData.matricule) {
-      Swal.fire(
-        "Erreur",
-        "L'ID de l'agent est manquant. Impossible de mettre à jour.",
-        "error"
+      message.error(
+        "L'ID de l'agent est manquant. Impossible de mettre à jour."
       );
       return;
     }
@@ -164,7 +265,7 @@ const ModalModifCap = ({
         },
         sesituer: formFields.map((f) => ({
           rubrique: { id_rubrique: f.rubrique },
-          montant: parseFloat(f.montant) || 0,
+          montant: parseFloat(formatCurrencyForBackend(f.montant)) || 0,
         })),
       };
 
@@ -241,7 +342,7 @@ const ModalModifCap = ({
             <Form layout="vertical">
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item label="Civilité">
+                  <Form.Item label="Civilité" required>
                     <Select
                       value={formData.civilite || ""}
                       onChange={(value) => handleChangeMain(value, "civilite")}
@@ -264,21 +365,55 @@ const ModalModifCap = ({
                 </Col>
               </Row>
 
-              <Form.Item label="Nom">
+              <Form.Item
+                label="Nom"
+                required
+                validateStatus={
+                  validateTextOnly(formData.nom) || !formData.nom ? "" : "error"
+                }
+                help={
+                  validateTextOnly(formData.nom) || !formData.nom
+                    ? ""
+                    : "Le nom doit contenir uniquement des lettres"
+                }
+              >
                 <Input
                   value={formData.nom || ""}
-                  onChange={(e) => handleChangeMain(e.target.value, "nom")}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || validateTextOnly(value)) {
+                      handleChangeMain(value, "nom");
+                    }
+                  }}
                 />
               </Form.Item>
 
-              <Form.Item label="Prénom">
+              <Form.Item
+                label="Prénom"
+                required
+                validateStatus={
+                  validateTextOnly(formData.prenom) || !formData.prenom
+                    ? ""
+                    : "error"
+                }
+                help={
+                  validateTextOnly(formData.prenom) || !formData.prenom
+                    ? ""
+                    : "Le prénom doit contenir uniquement des lettres"
+                }
+              >
                 <Input
                   value={formData.prenom || ""}
-                  onChange={(e) => handleChangeMain(e.target.value, "prenom")}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || validateTextOnly(value)) {
+                      handleChangeMain(value, "prenom");
+                    }
+                  }}
                 />
               </Form.Item>
 
-              <Form.Item label="Cessation du Service">
+              <Form.Item label="Cessation du Service" required>
                 <Select
                   value={formData.cessationService || ""}
                   onChange={(value) =>
@@ -567,7 +702,19 @@ const ModalModifCap = ({
                 </Col>
 
                 <Col span={12}>
-                  <Form.Item label="Montant">
+                  <Form.Item
+                    label="Montant"
+                    validateStatus={
+                      validateCurrency(field.montant) || field.montant === ""
+                        ? ""
+                        : "error"
+                    }
+                    help={
+                      validateCurrency(field.montant) || field.montant === ""
+                        ? ""
+                        : "Format monétaire invalide (ex: 123,45 ou 123.45)"
+                    }
+                  >
                     <Input
                       type="text"
                       value={field.montant || ""}

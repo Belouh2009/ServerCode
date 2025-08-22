@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Button,
-  Row,
-  Col,
-  Select,
-  message,
-  Checkbox,
-} from "antd";
+import { Modal, Form, Input, Button, Row, Col, Select, Checkbox } from "antd";
 import ReactSelect from "react-select";
 import { IoMdClose, IoMdAdd } from "react-icons/io";
 import Swal from "sweetalert2";
@@ -44,9 +34,7 @@ const ModalCreation = ({
 
   const fetchComptables = async () => {
     try {
-      const response = await fetch(
-        "http://192.168.88.28:8087/comptables/liste"
-      );
+      const response = await fetch("http://192.168.88.28:8087/comptables/liste");
       const data = await response.json();
       setOptions(data); // data = liste de noms
     } catch (err) {
@@ -56,14 +44,34 @@ const ModalCreation = ({
 
   const fetchBanques = async () => {
     try {
-      const response = await fetch(
-        "http://192.168.88.28:8087/comptables/banques"
-      );
+      const response = await fetch("http://192.168.88.28:8087/comptables/banques");
       const data = await response.json();
       setOptions(data); // data = liste de noms
     } catch (err) {
       console.error("Erreur lors du chargement des banques :", err);
     }
+  };
+
+  // Fonction pour valider que le texte ne contient que des lettres
+  const validateTextOnly = (value) => {
+    const regex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour valider le format monétaire (accepte virgules et points)
+  const validateCurrency = (value) => {
+    if (value === "") return true;
+    const regex = /^\d+([,.]\d{0,2})?$/;
+    return regex.test(value);
+  };
+
+  // Fonction pour convertir le format français (virgule) en format international (point)
+  const formatCurrencyForBackend = (value) => {
+    if (!value) return "0";
+    return value
+      .replace(/[^\d,.]/g, "") 
+      .replace(/,/g, ".") 
+      .replace(/(\..*)\./g, "$1"); 
   };
 
   // Générer un nouvel ID de certificat (basé sur le dernier ID récupéré)
@@ -82,14 +90,31 @@ const ModalCreation = ({
   // Gestion du changement des champs principaux du formulaire
   const handleChangeMain = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Validation spécifique pour le nom et prénom
+    if (name === "nom" || name === "prenom") {
+      if (value === "" || validateTextOnly(value)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  // Gestion du changement des rubriques et montants dynamiques
+  // Gestion du changement des champs dynamiques (rubriques et montants)
   const handleChangeField = (index, name, value) => {
     const updatedFields = [...formFields];
-    updatedFields[index][name] = value;
-    setFormFields(updatedFields);
+
+    if (name === "montant") {
+      // Valider le format avant de mettre à jour
+      if (value === "" || validateCurrency(value)) {
+        updatedFields[index][name] = value;
+        setFormFields(updatedFields);
+      }
+    } else {
+      updatedFields[index][name] = value;
+      setFormFields(updatedFields);
+    }
   };
 
   const handleAddField = () => {
@@ -140,10 +165,12 @@ const ModalCreation = ({
         return false;
       }
 
+      // Convertir pour la validation (accepter virgule et point)
+      const montantValue = formatCurrencyForBackend(field.montant);
       if (
         !field.montant ||
-        isNaN(parseFloat(field.montant)) ||
-        parseFloat(field.montant) <= 0
+        isNaN(parseFloat(montantValue)) ||
+        parseFloat(montantValue) <= 0
       ) {
         Swal.fire({
           icon: "warning",
@@ -217,23 +244,18 @@ const ModalCreation = ({
         },
         sesituer: formFields.map((field) => ({
           rubrique: { id_rubrique: field.rubrique },
-          montant: isNaN(parseFloat(field.montant))
-            ? 0
-            : parseFloat(field.montant),
+          montant: parseFloat(formatCurrencyForBackend(field.montant)) || 0,
         })),
       };
 
       // Envoyer les données à l'API
-      const response = await fetch(
-        "http://192.168.88.28:8087/agents/enregistre",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToSend),
-        }
-      );
+      const response = await fetch("http://192.168.88.28:8087/agents/enregistre", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
 
       const responseText = await response.text();
 
@@ -340,7 +362,19 @@ const ModalCreation = ({
               />
             </Form.Item>
 
-            <Form.Item label="Nom">
+            <Form.Item
+              label="Nom"
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Le nom ne doit contenir que des lettres")
+                        ),
+                },
+              ]}
+            >
               <Input
                 type="text"
                 name="nom"
@@ -350,7 +384,21 @@ const ModalCreation = ({
               />
             </Form.Item>
 
-            <Form.Item label="Prénom">
+            <Form.Item
+              label="Prénom"
+              rules={[
+                {
+                  validator: (_, value) =>
+                    !value || validateTextOnly(value)
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error(
+                            "Le prénom ne doit contenir que des lettres"
+                          )
+                        ),
+                },
+              ]}
+            >
               <Input
                 type="text"
                 name="prenom"
@@ -488,7 +536,21 @@ const ModalCreation = ({
               </Col>
 
               <Col span={11}>
-                <Form.Item label="Montant">
+                <Form.Item
+                  label="Montant"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        !value || validateCurrency(value)
+                          ? Promise.resolve()
+                          : Promise.reject(
+                              new Error(
+                                "Format monétaire invalide (ex: 123,45 ou 123.45)"
+                              )
+                            ),
+                    },
+                  ]}
+                >
                   <Input
                     type="text"
                     style={{ height: "39px" }}
@@ -496,7 +558,6 @@ const ModalCreation = ({
                     onChange={(e) =>
                       handleChangeField(index, "montant", e.target.value)
                     }
-                    placeholder="Entrer un montant"
                   />
                 </Form.Item>
               </Col>
