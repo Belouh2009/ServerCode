@@ -57,7 +57,7 @@ const Register = () => {
       }
 
       const response = await fetch(
-        "http://192.168.88.28:8087/utilisateur/register",
+        "http://192.168.88.51:8087/utilisateur/register",
         {
           method: "POST",
           body: formData,

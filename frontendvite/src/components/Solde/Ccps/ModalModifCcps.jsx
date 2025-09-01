@@ -60,12 +60,12 @@ const ModalModifCap = ({
         setLoading(true);
         const [corpsRes, chapitreRes, localitesRes, articlesRes, rubriquesRes] =
           await Promise.all([
-            axios.get("http://192.168.88.28:8087/corps/distinct"),
-            axios.get("http://192.168.88.28:8087/chapitres"),
-            axios.get("http://192.168.88.28:8087/localites/noms"),
-            axios.get("http://192.168.88.28:8087/articles"),
+            axios.get("http://192.168.88.51:8087/corps/distinct"),
+            axios.get("http://192.168.88.51:8087/chapitres"),
+            axios.get("http://192.168.88.51:8087/localites/noms"),
+            axios.get("http://192.168.88.51:8087/articles"),
             rubriques.length === 0
-              ? axios.get("http://192.168.88.28:8087/rubriquesolde/ids")
+              ? axios.get("http://192.168.88.51:8087/rubriquesolde/ids")
               : Promise.resolve({ data: rubriques }),
           ]);
 
@@ -148,7 +148,7 @@ const ModalModifCap = ({
 
     try {
       const response = await axios.get(
-        `http://192.168.88.28:8087/corps/grades?corps=${value}`
+        `http://192.168.88.51:8087/corps/grades?corps=${value}`
       );
       setGradesWithIndices(response.data);
     } catch (error) {
@@ -270,7 +270,7 @@ const ModalModifCap = ({
       };
 
       const response = await axios.put(
-        `http://192.168.88.28:8087/agentsCcps/modifier/${formData.matricule}`,
+        `http://192.168.88.51:8087/agentsCcps/modifier/${formData.matricule}`,
         updatedAgentData,
         { headers: { "Content-Type": "application/json" } }
       );

@@ -138,7 +138,7 @@ const CertificatPDF = ({ dataList }) => (
 
 const fetchLibelleCorps = async (corps) => {
   try {
-    const res = await axios.get(`http://192.168.88.28:8087/corps/libelle/${corps}`);
+    const res = await axios.get(`http://192.168.88.51:8087/corps/libelle/${corps}`);
     return res.data || "Non disponible";
   } catch (err) {
     console.error("Erreur récupération libellé :", err);

@@ -48,7 +48,7 @@ export default function ContentSection() {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://192.168.88.28:8087/agents/all");
+      const response = await axios.get("http://192.168.88.51:8087/agents/all");
       setUsers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -105,7 +105,7 @@ export default function ContentSection() {
 
       // Mettre à jour la date d'impression
       await axios.put(
-        `http://192.168.88.28:8087/certificats/${certificatId}/imprimer`,
+        `http://192.168.88.51:8087/certificats/${certificatId}/imprimer`,
         null,
         {
           headers: {
