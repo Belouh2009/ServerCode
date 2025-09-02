@@ -66,7 +66,7 @@ export default function ContentUsers({ status, setStatus }) {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://192.168.88.51:8087/utilisateur?status=${status}`
+        `http://192.168.88.58:8087/utilisateur?status=${status}`
       );
       setUsers(response.data);
     } catch (error) {
@@ -80,7 +80,7 @@ export default function ContentUsers({ status, setStatus }) {
   const updateNonValideCount = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.88.51:8087/utilisateur/non-valide/count"
+        "http://192.168.88.58:8087/utilisateur/non-valide/count"
       );
       setNonValideCount(response.data);
     } catch (error) {
@@ -94,7 +94,7 @@ export default function ContentUsers({ status, setStatus }) {
   // Fonctions d'action
   const validateUser = async (matricule) => {
     try {
-      await axios.post(`http://192.168.88.51:8087/utilisateur/valide/${matricule}`);
+      await axios.post(`http://192.168.88.58:8087/utilisateur/valide/${matricule}`);
       showSuccessAlert("Utilisateur validé avec succès !");
       refreshData();
     } catch (error) {
@@ -105,7 +105,7 @@ export default function ContentUsers({ status, setStatus }) {
 
   const blockUser = async (matricule) => {
     try {
-      await axios.post(`http://192.168.88.51:8087/utilisateur/blocke/${matricule}`);
+      await axios.post(`http://192.168.88.58:8087/utilisateur/blocke/${matricule}`);
       showSuccessAlert("Utilisateur bloqué avec succès !");
       refreshData();
     } catch (error) {
@@ -232,7 +232,7 @@ export default function ContentUsers({ status, setStatus }) {
       !imageName || imageName.trim() === "" || imageName === "user.jpg";
     const imgSrc = isDefaultImage
       ? userIcon
-      : `http://192.168.88.51:8087/uploads/${imageName}`;
+      : `http://192.168.88.58:8087/uploads/${imageName}`;
 
     return (
       <img
@@ -276,7 +276,7 @@ export default function ContentUsers({ status, setStatus }) {
       }
 
       const response = await axios.put(
-        "http://192.168.88.51:8087/utilisateur/update-profile",
+        "http://192.168.88.58:8087/utilisateur/update-profile",
         formData,
         {
           headers: {

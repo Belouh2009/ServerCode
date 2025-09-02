@@ -70,7 +70,7 @@ const Bareme = () => {
   const fetchBaremes = () => {
     setLoading(true);
     axios
-      .get("http://192.168.88.51:8087/bareme/all")
+      .get("http://192.168.88.58:8087/bareme/all")
       .then((response) => {
         const formattedData = response.data.map((item) => {
           // Vérification supplémentaire pour le format de date
@@ -102,7 +102,7 @@ const Bareme = () => {
   useEffect(() => {
     const fetchDates = async () => {
       try {
-        const response = await axios.get("http://192.168.88.51:8087/bareme/dates");
+        const response = await axios.get("http://192.168.88.58:8087/bareme/dates");
         const options = response.data.map((date) => ({
           value: date,
           label: date,
@@ -121,7 +121,7 @@ const Bareme = () => {
       const fetchCategories = async () => {
         try {
           const response = await axios.get(
-            `http://192.168.88.51:8087/bareme/categories?date=${selectedDate.value}`
+            `http://192.168.88.58:8087/bareme/categories?date=${selectedDate.value}`
           );
           const options = response.data.map((cat) => ({
             value: cat,
@@ -143,7 +143,7 @@ const Bareme = () => {
       const fetchIndices = async () => {
         try {
           const response = await axios.get(
-            `http://192.168.88.51:8087/bareme/indices?date=${selectedDate.value}&categorie=${selectedCategorie.value}`
+            `http://192.168.88.58:8087/bareme/indices?date=${selectedDate.value}&categorie=${selectedCategorie.value}`
           );
           const options = response.data.map((indice) => ({
             value: indice,
@@ -233,7 +233,7 @@ const Bareme = () => {
   };
 
   const sendToBackend = (data) => {
-    fetch("http://192.168.88.51:8087/bareme/import", {
+    fetch("http://192.168.88.58:8087/bareme/import", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

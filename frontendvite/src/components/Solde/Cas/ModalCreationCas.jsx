@@ -35,7 +35,7 @@ const ModalCreation = ({
 
   useEffect(() => {
     axios
-      .get("http://192.168.88.51:8087/corps/distinct")
+      .get("http://192.168.88.58:8087/corps/distinct")
       .then((response) => {
         setCorpsList(response.data);
         setLoadingCorps(false);
@@ -46,14 +46,14 @@ const ModalCreation = ({
       });
 
     axios
-      .get("http://192.168.88.51:8087/chapitres")
+      .get("http://192.168.88.58:8087/chapitres")
       .then((response) => setChapitreList(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des chapitres :", error)
       );
 
     axios
-      .get("http://192.168.88.51:8087/localites/noms")
+      .get("http://192.168.88.58:8087/localites/noms")
       .then((response) => {
         setLocalites(response.data);
       })
@@ -66,7 +66,7 @@ const ModalCreation = ({
   const handleCorpsChange = (value) => {
     setFormData((prev) => ({ ...prev, corps: value, grade: "", indice: "" }));
     axios
-      .get(`http://192.168.88.51:8087/corps/grades?corps=${value}`)
+      .get(`http://192.168.88.58:8087/corps/grades?corps=${value}`)
       .then((response) => setGradesWithIndices(response.data))
       .catch((error) =>
         console.error("Erreur lors du chargement des grades :", error)
@@ -174,7 +174,7 @@ const ModalCreation = ({
     try {
       // Récupérer le dernier ID
       const lastIdResponse = await fetch(
-        "http://192.168.88.51:8087/certificatsCas/lastId"
+        "http://192.168.88.58:8087/certificatsCas/lastId"
       );
       if (!lastIdResponse.ok) {
         throw new Error("Impossible de récupérer le dernier ID");
@@ -199,7 +199,7 @@ const ModalCreation = ({
 
       // Envoi de la requête pour enregistrer l'agent
       const response = await fetch(
-        "http://192.168.88.51:8087/agentsCas/enregistre",
+        "http://192.168.88.58:8087/agentsCas/enregistre",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

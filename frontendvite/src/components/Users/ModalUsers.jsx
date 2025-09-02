@@ -61,7 +61,7 @@ const ModalUser = ({
                       ? editedInfo.tempImageUrl
                       : userInfo.image === "user.jpg"
                       ? userIcon
-                      : `http://192.168.88.51:8087/uploads/${userInfo.image}`
+                      : `http://192.168.88.58:8087/uploads/${userInfo.image}`
                   }
                   alt="Profil"
                   className="profile-image"

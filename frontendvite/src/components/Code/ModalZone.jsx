@@ -32,7 +32,7 @@ const ModalModifZone = ({ open, onClose, zone, onSuccess }) => {
 
         try {
             const response = await axios.put(
-                `http://192.168.88.51:8087/zones/modifier/${zone.id_zone}`,  // Utiliser zone.id_zone ici
+                `http://192.168.88.58:8087/zones/modifier/${zone.id_zone}`,  // Utiliser zone.id_zone ici
                 updatedZoneData,
                 { headers: { "Content-Type": "application/json" } }
             );

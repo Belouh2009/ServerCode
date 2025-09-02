@@ -24,7 +24,7 @@ const ContentCodeCorps = () => {
   // Fonction pour récupérer les rubriques depuis le backend
   const fetchCorps = () => {
     setLoading(true);
-    fetch("http://192.168.88.51:8087/corps/all")
+    fetch("http://192.168.88.58:8087/corps/all")
       .then((response) => response.json())
       .then((data) => {
         setRubriques(data);

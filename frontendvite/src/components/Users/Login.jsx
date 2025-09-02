@@ -51,7 +51,7 @@ export default function Login() {
       }
 
       // ✅ Authentification via API
-      const response = await fetch(`http://192.168.88.51:8087/utilisateur/login`, {
+      const response = await fetch(`http://192.168.88.58:8087/utilisateur/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

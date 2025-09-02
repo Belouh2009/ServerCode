@@ -21,7 +21,7 @@ const ModalCreationCce = ({
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
-    fetch("http://192.168.88.28:8087/rubriques/ids")
+    fetch("http://192.168.88.58:8087/rubriques/ids")
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -35,7 +35,7 @@ const ModalCreationCce = ({
 
   const fetchComptables = async () => {
     try {
-      const response = await fetch("http://192.168.88.28:8087/comptables/liste");
+      const response = await fetch("http://192.168.88.58:8087/comptables/liste");
       const data = await response.json();
       setOptions(data);
     } catch (err) {
@@ -45,7 +45,7 @@ const ModalCreationCce = ({
 
   const fetchBanques = async () => {
     try {
-      const response = await fetch("http://192.168.88.28:8087/comptables/banques");
+      const response = await fetch("http://192.168.88.58:8087/comptables/banques");
       const data = await response.json();
       setOptions(data);
     } catch (err) {
@@ -222,7 +222,7 @@ const ModalCreationCce = ({
     try {
       // Obtenir le dernier ID du certificat depuis l'API
       const lastIdResponse = await fetch(
-        "http://192.168.88.28:8087/certificatsCce/lastId"
+        "http://192.168.88.58:8087/certificatsCce/lastId"
       );
       const lastId = await lastIdResponse.text();
 
@@ -255,7 +255,7 @@ const ModalCreationCce = ({
 
       // Envoyer les données à l'API
       const response = await fetch(
-        "http://192.168.88.28:8087/agentsCce/enregistre",
+        "http://192.168.88.58:8087/agentsCce/enregistre",
         {
           method: "POST",
           headers: {
