@@ -1,6 +1,6 @@
 import React from 'react';
 import {FireFilled} from '@ant-design/icons';
-import logo from './image/logo.jpg';
+import logo from './image/logo.png';
 import '../index.css'
 
 const Logo = () => {

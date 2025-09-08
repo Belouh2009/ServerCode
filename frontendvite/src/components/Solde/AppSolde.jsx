@@ -242,9 +242,11 @@ export default function App() {
             onClick={() => setCollapsed(!collapsed)}
             icon={
               collapsed ? (
-                <MenuUnfoldOutlined className="toggle-icon" />
+                <MenuUnfoldOutlined
+                  style={{ fontSize: "20px", color: "#fff" }}
+                />
               ) : (
-                <MenuFoldOutlined className="toggle-icon" />
+                <MenuFoldOutlined style={{ fontSize: "20px", color: "#fff" }} />
               )
             }
           />

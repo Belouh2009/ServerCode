@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 
-import registerImage from "../image/login2.jpg";
+import registerImage from "../image/login2.png";
 import background from "../image/bureau3.jpg";
 import "../Users/style.css";
 import userIcon from "../image/user.jpg";

@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 
 import background from "../image/bureau3.jpg"; // même fond que login/register
-import registerImage from "../image/login2.jpg"; // image à gauche
+import registerImage from "../image/login2.png";
 import "../Users/style.css";
 
 const ForgotPassword = () => {

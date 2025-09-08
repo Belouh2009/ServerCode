@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Alert, Spin, message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import loginImage from "../image/login2.jpg";
+import loginImage from "../image/login2.png";
 import background from "../image/bureau3.jpg";
 import "./style.css";
 
