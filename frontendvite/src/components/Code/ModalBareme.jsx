@@ -26,7 +26,7 @@ const ModalBareme = ({ open, onClose, bareme, onSuccess }) => {
 
     try {
       const response = await axios.put(
-        `http://192.168.88.58:8087/bareme/modifier/${bareme.id}`,
+        `http://192.168.88.47:8087/bareme/modifier/${bareme.id}`,
         formattedValues,
         { headers: { "Content-Type": "application/json" } }
       );

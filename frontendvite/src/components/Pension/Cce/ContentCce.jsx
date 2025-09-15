@@ -52,7 +52,7 @@ export default function ContentSection() {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://192.168.88.58:8087/agentsCce/all");
+      const response = await axios.get("http://192.168.88.47:8087/agentsCce/all");
       setUsers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -111,7 +111,7 @@ export default function ContentSection() {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        `http://192.168.88.58:8087/certificatsCce/${certificatId}/imprimer`,
+        `http://192.168.88.47:8087/certificatsCce/${certificatId}/imprimer`,
         null,
         {
           headers: {

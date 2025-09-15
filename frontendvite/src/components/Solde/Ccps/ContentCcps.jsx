@@ -62,7 +62,7 @@ export default function ContentSection() {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://192.168.88.58:8087/agentsCcps/all");
+      const response = await axios.get("http://192.168.88.47:8087/agentsCcps/all");
       setUsers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);

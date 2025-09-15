@@ -28,7 +28,7 @@ const ModalModifRubrique = ({ open, onClose, rubrique, onSuccess }) => {
 
         try {
             const response = await axios.put(
-                `http://192.168.88.58:8087/rubriques/modifier/${id_rubrique}`,
+                `http://192.168.88.47:8087/rubriques/modifier/${id_rubrique}`,
                 updatedRubriqueData,
                 { headers: { "Content-Type": "application/json" } }
             );

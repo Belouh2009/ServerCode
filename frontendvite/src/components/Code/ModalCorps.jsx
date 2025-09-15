@@ -38,7 +38,7 @@ const ModalModifCorps = ({ open, onClose, corps, onSuccess }) => {
 
     try {
       const response = await axios.put(
-        `http://192.168.88.58:8087/corps/modifier/${id}`, // id numérique dans l'URL
+        `http://192.168.88.47:8087/corps/modifier/${id}`, // id numérique dans l'URL
         updatedCorpsData,
         { headers: { "Content-Type": "application/json" } }
       );

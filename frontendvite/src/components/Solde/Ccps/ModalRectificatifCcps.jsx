@@ -61,12 +61,12 @@ const ModalModifCap = ({
         setLoading(true);
         const [corpsRes, chapitreRes, localitesRes, articlesRes, rubriquesRes] =
           await Promise.all([
-            axios.get("http://192.168.88.58:8087/corps/distinct"),
-            axios.get("http://192.168.88.58:8087/chapitres"),
-            axios.get("http://192.168.88.58:8087/localites/noms"),
-            axios.get("http://192.168.88.58:8087/articles"),
+            axios.get("http://192.168.88.47:8087/corps/distinct"),
+            axios.get("http://192.168.88.47:8087/chapitres"),
+            axios.get("http://192.168.88.47:8087/localites/noms"),
+            axios.get("http://192.168.88.47:8087/articles"),
             rubriques.length === 0
-              ? axios.get("http://192.168.88.58:8087/rubriquesolde/ids")
+              ? axios.get("http://192.168.88.47:8087/rubriquesolde/ids")
               : Promise.resolve({ data: rubriques }),
           ]);
 
@@ -149,7 +149,7 @@ const ModalModifCap = ({
 
     try {
       const response = await axios.get(
-        `http://192.168.88.58:8087/corps/grades?corps=${value}`
+        `http://192.168.88.47:8087/corps/grades?corps=${value}`
       );
       setGradesWithIndices(response.data);
     } catch (error) {
@@ -262,7 +262,7 @@ const ModalModifCap = ({
 
       // Récupération du dernier ID
       const lastIdResponse = await axios.get(
-        "http://192.168.88.58:8087/certificatsCcps/lastId"
+        "http://192.168.88.47:8087/certificatsCcps/lastId"
       );
 
       const lastId = lastIdResponse.data;
@@ -311,7 +311,7 @@ const ModalModifCap = ({
       };
 
       const response = await axios.post(
-        `http://192.168.88.58:8087/agentsCcpsRect/enregistre`,
+        `http://192.168.88.47:8087/agentsCcpsRect/enregistre`,
         updatedAgentData,
         { headers: { "Content-Type": "application/json" } }
       );
