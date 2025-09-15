@@ -28,39 +28,46 @@ public class UtilisateursService {
 		this.emailService = emailService;
 	}
 
-	public String registerUser(RegistreDTO registerDTO) {
-		if (userRepository.findByUsername(registerDTO.getUsername()).isPresent()) {
-			return "Nom Utilisateur déjà utilisé";
-		}
+public String registerUser(RegistreDTO registerDTO) {
+    // Vérification username existant
+    if (userRepository.findByUsername(registerDTO.getUsername()).isPresent()) {
+        throw new RuntimeException("Nom d'utilisateur déjà utilisé");
+    }
 
-		emailService.sendRegistrationNotification(
-				registerDTO.getNom(),
-				registerDTO.getPrenom(),
-				registerDTO.getUsername(),
-				registerDTO.getEmail(),
-				registerDTO.getDivision());
+    // Vérification matricule existant
+    if (userRepository.findByMatricule(registerDTO.getMatricule()).isPresent()) {
+        throw new RuntimeException("Matricule déjà utilisé");
+    }
 
-		Utilisateurs user = new Utilisateurs();
-		user.setMatricule(registerDTO.getMatricule());
-		user.setNom(registerDTO.getNom());
-		user.setPrenom(registerDTO.getPrenom());
-		user.setUsername(registerDTO.getUsername());
-		user.setDivision(registerDTO.getDivision());
-		user.setRegion(registerDTO.getRegion());
-		user.setEmail(registerDTO.getEmail());
-		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-		user.setValide(false);
+    // Envoi notification
+    emailService.sendRegistrationNotification(
+            registerDTO.getNom(),
+            registerDTO.getPrenom(),
+            registerDTO.getUsername(),
+            registerDTO.getEmail(),
+            registerDTO.getDivision());
 
-		String imageName = registerDTO.getImage();
-		if (imageName == null || imageName.trim().isEmpty()) {
-			imageName = "user.jpg"; // Toujours une image par défaut
-		}
-		user.setImage(imageName);
+    // Création utilisateur
+    Utilisateurs user = new Utilisateurs();
+    user.setMatricule(registerDTO.getMatricule());
+    user.setNom(registerDTO.getNom());
+    user.setPrenom(registerDTO.getPrenom());
+    user.setUsername(registerDTO.getUsername());
+    user.setDivision(registerDTO.getDivision());
+    user.setRegion(registerDTO.getRegion());
+    user.setEmail(registerDTO.getEmail());
+    user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+    user.setValide(false);
 
-		userRepository.save(user);
+    String imageName = registerDTO.getImage();
+    if (imageName == null || imageName.trim().isEmpty()) {
+        imageName = "user.jpg"; // image par défaut
+    }
+    user.setImage(imageName);
 
-		return "Compte créé avec succès. En attente de validation!";
-	}
+    userRepository.save(user);
+    return "Compte créé avec succès. En attente de validation!";
+}
 
 	public String valideUser(String matricule) {
 		Optional<Utilisateurs> userOptional = userRepository.findByMatricule(matricule);

@@ -57,7 +57,7 @@ const Register = () => {
       }
 
       const response = await fetch(
-        "http://192.168.88.58:8087/utilisateur/register",
+        "http://192.268.88.58:8087/utilisateur/register",
         {
           method: "POST",
           body: formData,
@@ -67,6 +67,7 @@ const Register = () => {
       const result = await response.text();
 
       if (response.ok) {
+        // Succès
         Swal.fire({
           title: "Inscription réussie 🎉",
           text: "Votre compte a été créé. Veuillez contacter l'administrateur pour l’activer.",
@@ -78,7 +79,7 @@ const Register = () => {
         setPreviewImage(null);
         setSelectedImage(null);
       } else {
-        // Affiche erreur serveur (ex: doublon email ou username)
+        // Erreur serveur (doublon ou autre)
         setMessageError(result || "Erreur lors de l'inscription");
       }
     } catch (error) {

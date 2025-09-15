@@ -11,9 +11,9 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateurs, Strin
 
 Optional<Utilisateurs>findByUsername(String username);
 	
-	Optional<Utilisateurs> findByMatricule(String matricule);  // Ajoutez cette méthode pour rechercher par matricule
+	Optional<Utilisateurs> findByMatricule(String matricule);
 	
 	List<Utilisateurs> findByValide(boolean valide);
 	
-	long countByValide(boolean valide);  // Ajoutez cette méthode pour compter les utilisateurs non validés
+	long countByValide(boolean valide);  
 }

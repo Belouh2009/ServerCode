@@ -14,9 +14,7 @@ const cardVariants = {
 
 export default function ContentDashboard() {
   return (
-    <Content
-      className="content"
-    >
+    <Content className="content">
       <Title
         level={2}
         style={{

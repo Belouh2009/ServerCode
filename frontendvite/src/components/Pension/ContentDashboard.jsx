@@ -1,36 +1,88 @@
 import React from "react";
-import { Layout, Card, Row, Col, Typography } from "antd";
+import { Layout, Card, Row, Col, Typography, Space } from "antd";
 import { motion } from "framer-motion";
 import CertificatCountCard from "./Cap/CertificatCapCount";
 import CertificatCountCce from "./Cce/CertificatCceCount";
 
-const { Content } = Layout;
-const { Title } = Typography;
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+// Configuration des animations pour une réutilisation et une cohérence
+const ANIMATION_CONFIG = {
+  card: {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.1, 0.25, 1.0], // Courbe d'animation plus naturelle
+      },
+    },
+  },
+  title: {
+    hidden: { opacity: 0, y: -20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        delay: 0.1,
+      },
+    },
+  },
+  stagger: {
+    visible: {
+      transition: {
+        staggerChildren: 0.1, // Délai entre les animations des enfants
+      },
+    },
+  },
 };
 
-export default function ContentDashboard() {
+// Styles constants pour une meilleure maintenabilité
+const STYLES = {
+  content: {
+    padding: "24px",
+    backgroundColor: "#f8fcff",
+    minHeight: "calc(100vh - 90px)", // Prend toute la hauteur disponible
+  },
+  title: {
+    color: "#1e88e5",
+    marginBottom: "28px",
+    textAlign: "center",
+    fontWeight: 600,
+  },
+  mainCard: {
+    borderRadius: "12px",
+    overflow: "hidden",
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
+    border: "none",
+  },
+  cardHeader: {
+    backgroundColor: "linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)",
+    padding: "16px 24px",
+    fontWeight: 600,
+    fontSize: "18px",
+    border: "none",
+  },
+};
+
+// Composant principal
+const DashboardContent = () => {
   return (
-    <Content
-      className="content"
-    >
-      <Title
-        level={2}
-        style={{
-          color: "#1e88e5",
-          marginBottom: "20px",
-        }}
+    <Layout.Content className="dashboard-content" style={STYLES.content}>
+      <motion.div
+        variants={ANIMATION_CONFIG.title}
+        initial="hidden"
+        animate="visible"
       >
-        Tableau de bord - Edition CSP
-      </Title>
+        <Typography.Title level={2} style={STYLES.title}>
+          Tableau de bord - Édition CSP
+        </Typography.Title>
+      </motion.div>
 
       <Row gutter={[24, 24]} justify="center">
-        <Col xs={24} sm={24} md={20} lg={16}>
+        <Col xs={24} sm={24} md={20} lg={16} xl={14}>
           <motion.div
-            variants={cardVariants}
+            variants={ANIMATION_CONFIG.card}
             initial="hidden"
             animate="visible"
           >
@@ -41,30 +93,33 @@ export default function ContentDashboard() {
                 </div>
               }
               bordered={false}
-              style={{
-                borderRadius: "16px",
-                textAlign: "center",
-                boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.08)",
-              }}
-              headStyle={{
-                backgroundColor: "#e6f7ff",
-                borderRadius: "16px 16px 0 0",
-                fontWeight: "bold",
-                fontSize: "18px",
-              }}
+              style={STYLES.mainCard}
+              headStyle={STYLES.cardHeader}
             >
-              <Row gutter={[16, 16]} justify="center">
-                <Col xs={24} sm={12}>
-                  <CertificatCountCard />
-                </Col>
-                <Col xs={24} sm={12}>
-                  <CertificatCountCce />
-                </Col>
-              </Row>
+              <motion.div
+                variants={ANIMATION_CONFIG.stagger}
+                initial="hidden"
+                animate="visible"
+              >
+                <Row gutter={[20, 20]} justify="center">
+                  <Col xs={24} sm={12}>
+                    <motion.div variants={ANIMATION_CONFIG.card}>
+                      <CertificatCountCard />
+                    </motion.div>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <motion.div variants={ANIMATION_CONFIG.card}>
+                      <CertificatCountCce />
+                    </motion.div>
+                  </Col>
+                </Row>
+              </motion.div>
             </Card>
           </motion.div>
         </Col>
       </Row>
-    </Content>
+    </Layout.Content>
   );
-}
+};
+
+export default DashboardContent;

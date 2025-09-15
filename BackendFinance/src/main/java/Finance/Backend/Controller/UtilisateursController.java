@@ -54,7 +54,7 @@ public class UtilisateursController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+@PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerUser(
             @RequestPart("data") @Valid RegistreDTO registerDTO,
             @RequestPart(value = "image", required = false) MultipartFile imageFile) {
@@ -63,8 +63,6 @@ public class UtilisateursController {
             String imageName = "user.jpg"; // image par défaut
 
             if (imageFile != null && !imageFile.isEmpty()) {
-                System.out.println("Image reçue : " + imageFile.getOriginalFilename());
-
                 String uploadsDir = System.getProperty("user.dir") + "/uploads/";
                 Path uploadPath = Paths.get(uploadsDir);
                 if (!Files.exists(uploadPath)) {
@@ -80,20 +78,22 @@ public class UtilisateursController {
                 imageName = newFilename;
             } else if (registerDTO.getImage() != null && !registerDTO.getImage().isEmpty()) {
                 imageName = registerDTO.getImage();
-                System.out.println("Pas d'image uploadée, utilisation de l'image par défaut : " + imageName);
-            } else {
-                System.out.println("Aucune image reçue, on utilisera l'image par défaut");
             }
 
             registerDTO.setImage(imageName);
             String message = userService.registerUser(registerDTO);
 
             return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            // Erreur doublon
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'enregistrement de l'utilisateur");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de l'enregistrement de l'utilisateur");
         }
     }
+
 
     @PostMapping("/valide/{matricule}")
     public ResponseEntity<String> validateUser(@PathVariable String matricule) {
